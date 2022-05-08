@@ -3,15 +3,15 @@ package team.waggly.backend.model
 import javax.persistence.*
 
 @Entity
-class PostLike (
+class BannedUserList (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column
     @ManyToOne
-    val post: Post,
+    val groupChat: GroupChat,
 
     @Column(columnDefinition = "INTEGER(10)")
-    val userId: Long
+    val userId: Int,
 )

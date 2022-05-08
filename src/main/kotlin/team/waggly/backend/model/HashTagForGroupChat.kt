@@ -3,15 +3,16 @@ package team.waggly.backend.model
 import javax.persistence.*
 
 @Entity
-class PostLike (
+class HashTagForGroupChat (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val Id: Long? = null,
 
     @Column
     @ManyToOne
-    val post: Post,
+    val groupChat: GroupChat,
 
-    @Column(columnDefinition = "INTEGER(10)")
-    val userId: Long
+    @Column
+    @ManyToOne
+    val hashTag: HashTag,
 )

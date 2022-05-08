@@ -1,17 +1,17 @@
 package team.waggly.backend.model
 
+import java.time.LocalTime
 import javax.persistence.*
 
 @Entity
-class PostLike (
+class ChatRoom (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
-    @ManyToOne
-    val post: Post,
+    @Column(columnDefinition = "VARCHAR(30)")
+    var purpose: String,
 
-    @Column(columnDefinition = "INTEGER(10)")
-    val userId: Long
+    @Column
+    val createdAt: LocalTime,
 )
