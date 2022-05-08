@@ -1,17 +1,18 @@
 package team.waggly.backend.model
 
+import java.time.LocalTime
 import javax.persistence.*
 
 @Entity
-class PostLike (
+class CommentLIke (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column
     @ManyToOne
-    val post: Post,
+    val comment: Comment,
 
     @Column(columnDefinition = "INTEGER(10)")
-    val userId: Long
+    val userId: Long,
 )

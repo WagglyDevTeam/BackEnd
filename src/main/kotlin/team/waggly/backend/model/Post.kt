@@ -8,18 +8,26 @@ class Post(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
+
     @Column(columnDefinition = "VARCHAR(255)")
     var title: String,
-    @Column
+
+    @Column(columnDefinition = "VARCHAR(255)")
     var description: String,
-    @Column
+
+    @Column(columnDefinition = "VARCHAR(30)")
     val college: String, //단과대 enum
-    @Column
+
+    @Column(columnDefinition = "VARCHAR(30)")
     var activeStatus: String, // enum
+
+    @Column
     @ManyToOne
     val author: User,
+
     @Column
     val createdAt: LocalTime,
+
     @Column
     var modifiedAt: LocalTime
 )

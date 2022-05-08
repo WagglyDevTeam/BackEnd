@@ -7,8 +7,11 @@ class PostImage (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
+
     @Column
-    val imageUrl: String,
     @ManyToOne
-    val post: Post
-    )
+    val post: Post,
+
+    @Column(columnDefinition = "VARCHAR(255)")
+    val imageUrl: String,
+)
