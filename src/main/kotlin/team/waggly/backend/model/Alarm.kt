@@ -3,15 +3,17 @@ package team.waggly.backend.model
 import javax.persistence.*
 
 @Entity
-class PostLike (
+class Alarm (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
-    @ManyToOne
-    val post: Post,
+    @Column(columnDefinition = "VARCHAR(30)")
+    val alarmType: String,
 
     @Column(columnDefinition = "INTEGER(10)")
-    val userId: Long
+    val targetId: Int,
+
+    @Column(columnDefinition = "INTEGER(10)")
+    val receiverId: Int,
 )
