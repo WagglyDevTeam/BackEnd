@@ -1,6 +1,6 @@
 package team.waggly.backend.model
 
-import java.util.*
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -21,23 +21,37 @@ class User(
     @Column(columnDefinition = "VARCHAR2(30)")
     var password: String,
 
-    @Column(columnDefinition = "VARCHAR2(6)") // ENUM 변경
-    val gender: String,
+    @Column(columnDefinition = "VARCHAR2(6)")
+    val gender: GenderType,
 
-    @Column(columnDefinition = "INTEGER(10)")
-    var classNum: Int, // 보류
+    @Column(columnDefinition = "INTEGER(3)")
+    var classNum: Int,
 
-    @Column(columnDefinition = "VARCHAR(20)")
-    var activeStatus: String, // ENUM 변경
+    @Column(columnDefinition = "VARCHAR(10)")
+    var activeStatus: UserActiveStatusType = UserActiveStatusType.ACTIVE,
 
     @Column(nullable = true)
-    var withdrawalDate: Date?,
+    var withdrawalDate: LocalDateTime? = null,
 
     @Column(columnDefinition = "VARCHAR(20)")
-    val auth: String, //ENUM 변경
+    val auth: AuthType = AuthType.USER,
 
     @Column(nullable = true, columnDefinition = "VARCHAR2(100)")    //자기소개 몇자 내외?
-    var introduction: String?
-){
+    var introduction: String? // 추 후 협의 null vs ""
+) {
+    enum class GenderType {
+        MALE,
+        FEMALE
+    }
 
+    enum class UserActiveStatusType {
+        ACTIVE,
+        WITHDRAWAL,
+        BAN
+    }
+
+    enum class AuthType {
+        ADMIN,
+        USER
+    }
 }

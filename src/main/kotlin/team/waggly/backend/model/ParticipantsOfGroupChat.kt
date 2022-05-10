@@ -5,32 +5,28 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-class ChatParticipantsInfo(
+class ParticipantsOfGroupChat(
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column
     @ManyToOne
-    val user: User,
+    val groupChat: GroupChat,
 
     @Column
-    @ManyToOne
-    val opponent: User,
+    val userId: Long, //연관 확인 필요
 
     @Column
-    @ManyToOne
-    val chatRoom: ChatRoom,
+    var isAlarmOn: Boolean = true,
 
-    @Column
-    val isAlarmOn: Boolean = true,
-
-    @Column(columnDefinition = "VARCHAR(10)")
-    val activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE, // 이넘
+    @Column(unique = true, columnDefinition = "VARCHAR2(15)")
+    var activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
 
     @Column
     val exitedAt: LocalDateTime? = null,
 
     @Column
     val joinedAt: LocalDateTime = LocalDateTime.now()
-)
+    )

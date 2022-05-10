@@ -13,5 +13,5 @@ class BannedUserList (
     val groupChat: GroupChat,
 
     @Column(columnDefinition = "INTEGER(10)")
-    val userId: Int,
+    val userId: Int
 )
