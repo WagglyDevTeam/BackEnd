@@ -8,8 +8,8 @@ class University (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val Id: Long? = null,
 
-    @Column(columnDefinition = "VARCHAR(30)")
-    val universityCode: String,
+//    @Column(columnDefinition = "VARCHAR(30)")
+//    val universityCode: String,
 
     @Column(columnDefinition = "VARCHAR(30)")
     val universityName: String,

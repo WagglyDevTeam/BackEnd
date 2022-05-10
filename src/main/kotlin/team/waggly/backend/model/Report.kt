@@ -18,5 +18,5 @@ class Report (
     val reportedUserId: Long, // 신고당한사람
 
     @Column(columnDefinition = "VARCHAR(100)")
-    val reason: String,
+    val reason: String
 )

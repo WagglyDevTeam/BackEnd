@@ -3,7 +3,7 @@ package team.waggly.backend.model
 import javax.persistence.*
 
 @Entity
-class HashTagForGroupChat (
+class HashTagForGroupChat(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val Id: Long? = null,
@@ -14,5 +14,5 @@ class HashTagForGroupChat (
 
     @Column
     @ManyToOne
-    val hashTag: HashTag,
+    val hashTag: HashTag
 )

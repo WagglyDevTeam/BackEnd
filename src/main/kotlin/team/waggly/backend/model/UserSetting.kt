@@ -13,14 +13,14 @@ class UserSetting (
     val user: User,
 
     @Column
-    var allowHelpRequest: Boolean,
+    var allowHelpRequest: Boolean = true,
 
     @Column
-    var allowFriendRequest: Boolean,
+    var allowFriendRequest: Boolean = true,
 
     @Column
-    var allowPushAlarm: Boolean, // 전체 푸시 알림
+    var allowPushAlarm: Boolean = true, // 전체 푸시 알림
 
     @Column
-    var allowMarketingAlarm: Boolean, // 마케팅 알림
+    var allowMarketingAlarm: Boolean = false, // 마케팅 알림
 )

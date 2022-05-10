@@ -1,7 +1,10 @@
 package team.waggly.backend.model
 
-import java.time.LocalTime
+import team.waggly.backend.commomenum.ActiveStatusType
+import team.waggly.backend.commomenum.CollegeType
+import java.time.LocalDateTime
 import javax.persistence.*
+
 
 @Entity
 class Post(
@@ -16,18 +19,18 @@ class Post(
     var description: String,
 
     @Column(columnDefinition = "VARCHAR(30)")
-    val college: String, //단과대 enum
+    val college: CollegeType, //단과대 enum
 
-    @Column(columnDefinition = "VARCHAR(30)")
-    var activeStatus: String, // enum
+    @Column(columnDefinition = "VARCHAR(10)")
+    var activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE, // enum
 
     @Column
     @ManyToOne
     val author: User,
 
     @Column
-    val createdAt: LocalTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column
-    var modifiedAt: LocalTime
+    var modifiedAt: LocalDateTime = LocalDateTime.now()
 )

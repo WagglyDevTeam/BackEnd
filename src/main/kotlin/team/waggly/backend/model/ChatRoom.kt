@@ -1,6 +1,7 @@
 package team.waggly.backend.model
 
-import java.time.LocalTime
+import team.waggly.backend.commomenum.ChatPurposeType
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -9,9 +10,9 @@ class ChatRoom (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(columnDefinition = "VARCHAR(30)")
-    var purpose: String,
+    @Column(columnDefinition = "VARCHAR(10)")
+    var chatPurpose: ChatPurposeType,
 
     @Column
-    val createdAt: LocalTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 )
