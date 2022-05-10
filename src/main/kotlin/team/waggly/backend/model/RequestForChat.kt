@@ -1,5 +1,6 @@
 package team.waggly.backend.model
 
+import team.waggly.backend.commomenum.ChatPurposeType
 import javax.persistence.*
 
 @Entity
@@ -20,11 +21,17 @@ class RequestForChat (
     val requestMsg: String,
 
     @Column
-    val isAccepted: Boolean,
+    val isAccepted: Boolean = false,
 
     @Column(columnDefinition = "VARCHAR(100)")
-    val chatPurpose: String,
+    val chatPurpose: ChatPurposeType,
 
     @Column(columnDefinition = "VARCHAR(100)")
-    val chatClass: String, // 선배 후배 동기 선택하는거임
-)
+    val chatClass: chatClassType, // 선배 후배 동기 선택하는거임
+) {
+    enum class chatClassType {
+        SENIOR,
+        MATE,
+        JUNIOR
+    }
+}

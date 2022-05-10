@@ -1,10 +1,11 @@
 package team.waggly.backend.model
 
-import java.time.LocalTime
+import team.waggly.backend.commomenum.ActiveStatusType
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-class Comment (
+class Comment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -24,9 +25,9 @@ class Comment (
     @Column(columnDefinition = "VARCHAR(255)")
     val description: String,
 
-    @Column(columnDefinition = "VARCHAR(15)")
-    val activeStatus: String,
+    @Column(columnDefinition = "VARCHAR(10)")
+    val activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
 
     @Column
-    val createdAt: LocalTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 )

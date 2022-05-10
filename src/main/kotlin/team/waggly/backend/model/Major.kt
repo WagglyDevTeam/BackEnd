@@ -1,6 +1,6 @@
 package team.waggly.backend.model
 
-import java.time.LocalTime
+import team.waggly.backend.commomenum.CollegeType
 import javax.persistence.*
 
 @Entity
@@ -20,5 +20,5 @@ class Major (
     val majorCode: String,
 
     @Column(columnDefinition = "VARCHAR(30)")
-    val collegeEnum: String, // 이넘
+    val collegeEnum: CollegeType, // 이넘
 )
