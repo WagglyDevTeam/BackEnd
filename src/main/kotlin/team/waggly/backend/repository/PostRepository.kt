@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository
 import team.waggly.backend.model.Post
 
 @Repository
-interface PostRepository : JpaRepository<Post, Long> {
-}
+interface PostRepository: JpaRepository<Post, Long>

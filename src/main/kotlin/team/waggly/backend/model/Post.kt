@@ -2,6 +2,7 @@ package team.waggly.backend.model
 
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
+import team.waggly.backend.dto.CreatePostDto
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -32,4 +33,5 @@ class Post(
 
     @Column
     var modifiedAt: LocalDateTime = LocalDateTime.now()
-)
+){
+}
