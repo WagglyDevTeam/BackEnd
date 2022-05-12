@@ -16,4 +16,5 @@ class University (
 
     @Column(columnDefinition = "VARCHAR(255)")
     val universityEmail: String,
+
 )
