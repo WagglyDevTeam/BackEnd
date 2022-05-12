@@ -18,7 +18,7 @@ class User(
     @Column(unique = true, columnDefinition = "VARCHAR2(15)")
     var nickName: String,
 
-    @Column(columnDefinition = "VARCHAR2(30)")
+    @Column(columnDefinition = "VARCHAR2(60)")
     var password: String,
 
     @Column(columnDefinition = "VARCHAR2(6)")
