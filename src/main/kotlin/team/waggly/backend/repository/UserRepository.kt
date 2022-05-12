@@ -4,4 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import team.waggly.backend.model.User
 
 interface UserRepository : JpaRepository<User, Long> {
+    fun findByEmail(email: String): User?
 }
