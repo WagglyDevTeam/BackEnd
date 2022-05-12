@@ -8,11 +8,9 @@ class GroupChat(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val Id: Long? = null,
 
-    @Column
     @ManyToOne
     val host: User,
 
-    @Column
     @ManyToOne
     val university: University,
 

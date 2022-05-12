@@ -39,12 +39,12 @@ class User(
     @Column(nullable = true, columnDefinition = "VARCHAR2(100)")    //자기소개 몇자 내외?
     var introduction: String? // 추 후 협의 null vs ""
 ) {
-    enum class GenderType {
+    enum class GenderType{
         MALE,
         FEMALE
     }
 
-    enum class UserActiveStatusType {
+    enum class UserActiveStatusType{
         ACTIVE,
         WITHDRAWAL,
         BAN
