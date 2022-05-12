@@ -10,15 +10,12 @@ class Comment(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
     @ManyToOne
     val post: Post,
 
-    @Column
     @ManyToOne
     val reply: Comment? = null,
 
-    @Column
     @ManyToOne
     val user: User,
 
