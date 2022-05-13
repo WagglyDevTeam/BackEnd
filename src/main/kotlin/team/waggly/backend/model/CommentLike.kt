@@ -1,6 +1,5 @@
 package team.waggly.backend.model
 
-import java.time.LocalTime
 import javax.persistence.*
 
 @Entity
