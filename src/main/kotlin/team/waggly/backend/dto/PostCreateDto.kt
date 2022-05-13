@@ -15,13 +15,5 @@ data class PostCreateDto (
             description = description,
             college = college,
             author = author,
-//            User(
-//                    email = "test@test.com",
-//                    profileImgUrl = "asdf",
-//                    nickName = "asdf",
-//                    password = "asdf",
-//                    gender = User.GenderType.MALE,
-//                    classNum = 19,
-//            )
     )
 }

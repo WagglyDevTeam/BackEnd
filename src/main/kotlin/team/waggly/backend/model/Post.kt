@@ -19,6 +19,7 @@ class Post(
     var description: String,
 
     @Column(columnDefinition = "VARCHAR(30)")
+    @Enumerated(EnumType.STRING)
     var college: CollegeType, //단과대 enum
 
     @Column(columnDefinition = "VARCHAR(10)")
