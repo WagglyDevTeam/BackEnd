@@ -8,21 +8,20 @@ data class PostCreateDto (
         private val title: String,
         private val description: String,
         private val college: CollegeType,
+        private val classNum: Int,
 ) {
     fun toEntity(author: User): Post = Post(
             title = title,
             description = description,
             college = college,
-            author = User(
-                    id = 1L,
-                    email = "test@test.com",
-                    profileImgUrl = "asdf",
-                    nickName = "asdf",
-                    password = "asdf",
-                    gender = User.GenderType.MALE,
-
-
-
-            )
+            author = author,
+//            User(
+//                    email = "test@test.com",
+//                    profileImgUrl = "asdf",
+//                    nickName = "asdf",
+//                    password = "asdf",
+//                    gender = User.GenderType.MALE,
+//                    classNum = 19,
+//            )
     )
 }

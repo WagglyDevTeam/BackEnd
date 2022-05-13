@@ -2,9 +2,9 @@ package team.waggly.backend.model
 
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
+import team.waggly.backend.dto.PostCreateDto
 import java.time.LocalDateTime
 import javax.persistence.*
-
 
 @Entity
 class Post(
@@ -35,5 +35,5 @@ class Post(
 
     @Column
     var deletedAt: LocalDateTime? = null,
-){
+) {
 }
