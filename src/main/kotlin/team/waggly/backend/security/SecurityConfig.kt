@@ -10,26 +10,36 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import team.waggly.backend.repository.UserRepository
 import team.waggly.backend.security.filter.FormLoginFilter
 import team.waggly.backend.security.filter.JwtAuthFilter
+import team.waggly.backend.security.jwt.HeaderTokenExtractor
 import team.waggly.backend.security.provider.FormLoginAuthProvider
+import team.waggly.backend.security.provider.JWTAuthProvider
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(private val userDetailsServiceImpl: UserDetailsServiceImpl) : WebSecurityConfigurerAdapter() {
+class SecurityConfig(
+    private val userDetailsServiceImpl: UserDetailsServiceImpl,
+    private val userRepository: UserRepository
+) : WebSecurityConfigurerAdapter() {
+    private val headerTokenExtractor = HeaderTokenExtractor()
+
     @Bean
     fun encodePassword() : BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
     }
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.authenticationProvider(FormLoginAuthProvider(userDetailsServiceImpl, encodePassword()))
+        auth
+            .authenticationProvider(FormLoginAuthProvider(userDetailsServiceImpl, encodePassword()))
+            .authenticationProvider(JWTAuthProvider(userRepository))
     }
 
     override fun configure(web: WebSecurity) {
         web
-                .ignoring()
-                .antMatchers("/h2-console/**")
+            .ignoring()
+            .antMatchers("/h2-console/**")
     }
 
     @Throws(Exception::class)
@@ -37,16 +47,17 @@ class SecurityConfig(private val userDetailsServiceImpl: UserDetailsServiceImpl)
         http.csrf().disable().httpBasic()
 
         http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
         http
-                .addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
         http.authorizeRequests()
-                .antMatchers("/h2-console/**", "/user/signup").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .exceptionHandling()
+            .antMatchers("/h2-console/**", "/user/signup").permitAll()
+            .anyRequest().permitAll()
+            .and()
+            .exceptionHandling()
     }
 
     @Bean
@@ -63,6 +74,7 @@ class SecurityConfig(private val userDetailsServiceImpl: UserDetailsServiceImpl)
         val skipPathList = mutableListOf<String>()
 
         skipPathList.add("GET,/h2-console/**")
+        skipPathList.add("POST,/h2-console/**")
         skipPathList.add("POST,/user/signup")
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")
