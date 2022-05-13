@@ -1,9 +1,10 @@
 package team.waggly.backend.model
 
+import java.time.LocalTime
 import javax.persistence.*
 
 @Entity
-class CommentLike(
+class CommentLike (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
