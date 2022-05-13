@@ -11,7 +11,7 @@ import java.lang.IllegalArgumentException
 class UserDetailsServiceImpl(private val userRepository: UserRepository) : UserDetailsService {
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails? {
-        val user = userRepository.findByEmail(username) ?: throw IllegalArgumentException() // 추후 익셉션 구현 필요... 인증, 인가
+        val user = userRepository.findByEmail(username) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.") // 추후 익셉션 구현 필요... 인증, 인가
         return UserDetailsImpl(user)
     }
 }
