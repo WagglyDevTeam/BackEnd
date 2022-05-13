@@ -55,7 +55,7 @@ class SecurityConfig(
 
         http.authorizeRequests()
                 .antMatchers("/h2-console/**", "/user/signup").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
                 .and()
                 .exceptionHandling()
     }
