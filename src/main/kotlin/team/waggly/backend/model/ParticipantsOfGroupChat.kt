@@ -20,7 +20,7 @@ class ParticipantsOfGroupChat(
     @Column
     var isAlarmOn: Boolean = true,
 
-    @Column(unique = true, columnDefinition = "VARCHAR2(15)")
+    @Column(unique = true, columnDefinition = "VARCHAR(15)")
     var activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
 
     @Column
