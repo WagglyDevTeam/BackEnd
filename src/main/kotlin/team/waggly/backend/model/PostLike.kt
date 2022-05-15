@@ -2,7 +2,7 @@ package team.waggly.backend.model
 
 import javax.persistence.*
 
-@Entity
+@Entity(name = "post_like")
 class PostLike (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
