@@ -1,7 +1,7 @@
 package team.waggly.backend.commomenum
 
-enum class ActiveStatusType {
-        ACTIVE,
-        INACTIVE,
-        BAN // 탈퇴 / 정지 회의 후 결정
+enum class ActiveStatusType(str: String) {
+        ACTIVE("active"),
+        INACTIVE("inactive"),
+        // BAN // 탈퇴 / 정지 회의 후 결정
 }
