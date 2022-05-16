@@ -1,17 +1,20 @@
 package team.waggly.backend.controller
 
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.validation.BindingResult
+import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.*
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.PostDto
-import team.waggly.backend.model.Post
+import team.waggly.backend.exception.CustomException
 import team.waggly.backend.model.User
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.PostService
+import javax.validation.Valid
 
 @RestController
 class PostController (
@@ -41,10 +44,46 @@ class PostController (
 
     @GetMapping("/post/{postId}")
     fun getPostDetails(@PathVariable postId: Long,
-                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): PostDto.PostDetailsResponseDto {
-        val user: User = userDetailsImpl.user
+                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): PostDto.PostDetailsResponseDto {
+        val user: User? = userDetailsImpl?.user ?: null
         return postService.getPostDetails(postId, user)
     }
+
+    @PostMapping("/post")
+    fun createPost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
+                   @RequestBody @Valid postCreateDto: PostDto.CreatePostRequestDto,
+                   bindingResult: BindingResult): ResponseEntity<Any> {
+        if (bindingResult.hasErrors()) {
+            val msg: MutableList<String> = arrayListOf()
+            bindingResult.allErrors.forEach {
+                val field = it as FieldError
+                val message = it.defaultMessage
+                msg.add("${field.field} : $message")
+            }
+            val result = bindingResult.allErrors.map {
+                    error -> CustomException.ValidatorExceptionReturnType(error.code!!, error.defaultMessage!!)
+            }
+            return ResponseEntity.badRequest().body(CustomException.ValidatorException(result))
+        }
+        return ResponseEntity<Any>(postService.createPost(postCreateDto, userDetailsImpl), HttpStatus.CREATED)
+    }
+
+    @PutMapping("/post/{postId}")
+    fun updatePost(@PathVariable postId: Long,
+                   @RequestBody postUpdateDto: PostDto.UpdatePostRequestDto): ResponseEntity<Any> {
+        postService.updatePost(postId, postUpdateDto)
+        return ResponseEntity<Any>(PostDto.SuccessResponse(true), HttpStatus.OK)
+    }
+
+    @DeleteMapping("/post/{postId}")
+    fun deletePost(@PathVariable postId: Long,
+                   @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
+        postService.deletePost(postId, userDetailsImpl.user)
+        return ResponseEntity<Any>(PostDto.SuccessResponse(true), HttpStatus.NO_CONTENT)
+    }
+}
+
+
 //
 //    @GetMapping("/post")
 //    fun getAllPostsByCollege(@RequestParam college: String?,
@@ -66,18 +105,3 @@ class PostController (
 //        val user: User = userDetailsImpl.user
 //        return postService.getAllPostsByCollegeByOrderByIdDesc(collegeEnum, pageable, user)
 //    }
-
-    @PostMapping("/post")
-    @ResponseStatus(HttpStatus.CREATED)  // 201
-    fun createPost(@RequestBody postCreateDto: PostDto.CreatePostRequestDto,
-                   @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl)
-    = postService.createPost(postCreateDto, userDetailsImpl)
-
-    @PutMapping("/post/{postId}")
-    @ResponseStatus(HttpStatus.OK)  // 200
-    fun updatePost(@PathVariable postId: Long, @RequestBody postUpdateDto: PostDto.UpdatePostRequestDto) = postService.updatePost(postId, postUpdateDto)
-
-    @DeleteMapping("/post/{postId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)  // 204
-    fun deletePost(@PathVariable postId: Long) = postService.deletePost(postId)
-}

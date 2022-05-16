@@ -1,5 +1,6 @@
 package team.waggly.backend.dto
 
+import org.hibernate.validator.constraints.Length
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.model.Post
@@ -7,13 +8,20 @@ import team.waggly.backend.model.User
 import team.waggly.backend.repository.CommentRepository
 import team.waggly.backend.repository.PostLikeRepository
 import java.time.LocalDateTime
+import javax.validation.constraints.NotBlank
 
 class PostDto {
     data class CreatePostRequestDto (
-        val title: String,
-        val description: String,
-        val college: CollegeType,
-        val isAnonymous: Boolean,
+        @field:NotBlank(message = "제목을 입력해주세요.")
+        @field:Length(min = 3, message = "세 글자 이상으로 작성해주세요.")
+        private val title: String,
+
+        @field:NotBlank(message = "내용을 입력해주세요.")
+        private val description: String,
+
+        private val college: CollegeType,
+
+        private val isAnonymous: Boolean,
     ) {
         fun toEntity(user: User): Post = Post(
             title = title,
@@ -41,7 +49,7 @@ class PostDto {
         }
     }
 
-    data class DeletePostResponseDto (
+    data class SuccessResponse (
         val success: Boolean
     )
 
@@ -76,7 +84,7 @@ class PostDto {
         )
     }
 
-    // 수정
+    // Comment 포함 수정
     data class CollegePostsResponseDto(
         val bestPost: PostDetailsResponseDto,
         val posts: List<PostDetailsResponseDto>,
