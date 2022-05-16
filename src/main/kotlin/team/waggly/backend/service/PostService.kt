@@ -15,6 +15,7 @@ import team.waggly.backend.repository.CommentRepository
 import team.waggly.backend.repository.PostLikeRepository
 import team.waggly.backend.repository.PostRepository
 import team.waggly.backend.security.UserDetailsImpl
+import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
@@ -27,8 +28,8 @@ class PostService (
 
     // 전체 게시글 조회
     fun getAllPosts(pageable: Pageable, user: User?): List<PostDto.PostDetailsResponseDto> {
-        val userId = user?.id ?: null
-        val allPosts: List<Post> = postRepository.findAll()
+        val userId: Long? = user?.id ?: null
+        val allPosts: List<Post> = postRepository.findAllActivePosts()
         val postsDto: List<PostDto.PostDetailsResponseDto> = allPosts.map { posts ->
             PostDto.PostDetailsResponseDto(posts, postLikeRepository, commentRepository, userId)
         }
@@ -37,38 +38,39 @@ class PostService (
         return postsDtoToPageable.toList()
     }
 
-    // 게시글 상세 조회하기
-    fun getPostDetails(postId: Long, user: User): PostDto.PostDetailsResponseDto {
-        if (user.id == null) {
-            throw NotFoundException()
-        }
-        val post: Post = postRepository.findById(postId).orElseThrow()
-        return PostDto.PostDetailsResponseDto(post, postLikeRepository, commentRepository, user.id)
-    }
-
     // 단과대 별 게시글 조회
-    // 어떻게 처리할지 모르므로 일단 DTO 없이 그냥 줘봄
     fun getAllPostsByCollegeByOrderByIdDesc(college: CollegeType, pageable: Pageable, user: User?): PostDto.CollegePostsResponseDto {
-        val userId = user?.id ?: null
+        val userId: Long? = user?.id ?: null
         // 해당 단과대의 베스트 게시글 ID
-        val allPosts: List<Post> = postRepository.findByCollegeByOrderByIdDesc(college.toString())
+        val allPosts: List<Post> = postRepository.findActivePostsByCollegeByOrderByIdDesc(college.toString())
         val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(college.toString()) ?: 0
         val best: Post = postRepository.findById(collegeBestId).orElse(allPosts[0])
 
         val bestDto: PostDto.PostDetailsResponseDto = PostDto.PostDetailsResponseDto(best, postLikeRepository, commentRepository, userId)
-        println("bestDto: $bestDto")
         val postsDto: List<PostDto.PostDetailsResponseDto> = allPosts.map {
                 posts -> PostDto.PostDetailsResponseDto(posts, postLikeRepository, commentRepository, userId)
         }
-        println("postDto: $postsDto")
         val postsDtoToPageable: Page<PostDto.PostDetailsResponseDto> = PageImpl<PostDto.PostDetailsResponseDto>(postsDto, pageable, postsDto.size.toLong())
         val postsPageableToList: List<PostDto.PostDetailsResponseDto> = postsDtoToPageable.toList()
 
         return PostDto.CollegePostsResponseDto(bestDto, postsPageableToList)
     }
 
+    // 게시글 상세 조회하기 (만약 본인 게시글이면 조회가 가능해야하니깐)
+    fun getPostDetails(postId: Long, user: User?): PostDto.PostDetailsResponseDto {
+        val userId: Long? = user?.id ?: null
+
+        val post: Post = postRepository.findById(postId).orElseThrow()
+
+        if (post.activeStatus != ActiveStatusType.ACTIVE) {
+            throw IllegalArgumentException("비공개 게시글입니다.")
+        }
+        return PostDto.PostDetailsResponseDto(post, postLikeRepository, commentRepository, userId)
+    }
+
     @Transactional
-    fun createPost(postCreateDto: PostDto.CreatePostRequestDto, userDetailsImpl: UserDetailsImpl): PostDto.CreatePostResponseDto {
+    fun createPost(postCreateDto: PostDto.CreatePostRequestDto,
+                   userDetailsImpl: UserDetailsImpl): PostDto.CreatePostResponseDto {
         val user = userDetailsImpl.user
         if (user.id == null) {
             throw NotFoundException()
@@ -85,12 +87,15 @@ class PostService (
     }
 
     @Transactional
-    fun deletePost(postId: Long): PostDto.DeletePostResponseDto {
+    fun deletePost(postId: Long, user: User): PostDto.SuccessResponse {
         val post: Post = postRepository.findByIdOrNull(postId) ?: throw Exception("해당하는 게시글이 없습니다.")
+        if (post.author.id != user.id) {
+            throw Exception("본인의 게시글만 삭제 가능합니다.")
+        }
         post.activeStatus = ActiveStatusType.INACTIVE
         post.deletedAt = LocalDateTime.now()
         postRepository.save(post)
 
-        return PostDto.DeletePostResponseDto(true)
+        return PostDto.SuccessResponse(true)
     }
 }
