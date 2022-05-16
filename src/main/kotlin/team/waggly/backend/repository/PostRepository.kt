@@ -11,11 +11,13 @@ import team.waggly.backend.model.Post
 
 @Repository
 interface PostRepository: JpaRepository<Post, Long> {
-    fun findAllByActiveStatusOrderByIdAsc(activeStatus: ActiveStatusType, pageable: Pageable): Page<Post>?
-//
+    @Query("SELECT p FROM Post p WHERE active_status='ACTIVE'")
+    fun findAllActivePosts(): List<Post>
+
+    @Query("SELECT p FROM Post p WHERE active_status='ACTIVE' and college LIKE CONCAT('%',:college,'%')")
+    fun findActivePostsByCollegeByOrderByIdDesc(college: String): List<Post>
+
 //    @Query("SELECT p FROM Post p WHERE college LIKE CONCAT('%',:college,'%')")
 //    fun findAllByCollegeByOrderByIdDesc(college: String, pageable: Pageable): Page<Post>?
 
-    @Query("SELECT p FROM Post p WHERE college LIKE CONCAT('%',:college,'%')")
-    fun findByCollegeByOrderByIdDesc(college: String): List<Post>
 }
