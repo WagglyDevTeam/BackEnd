@@ -61,17 +61,13 @@ dependencies {
 
     // S3
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.0.1.RELEASE")
-}
 
-//// querydsl 추가
-//idea {
-//    module {
-//        val kaptMain = file("build/generated/source/kapt/main")
-//        sourceDirs.add(kaptMain)
-//        generatedSourceDirs.add(kaptMain)
-//    }
-//}
-//// querydsl 추가 끝
+    //Email send
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+}
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {

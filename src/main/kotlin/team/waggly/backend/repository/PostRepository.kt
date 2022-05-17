@@ -1,5 +1,6 @@
 package team.waggly.backend.repository
 
+<<<<<<< HEAD
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -20,4 +21,10 @@ interface PostRepository: JpaRepository<Post, Long> {
 //    @Query("SELECT p FROM Post p WHERE college LIKE CONCAT('%',:college,'%')")
 //    fun findAllByCollegeByOrderByIdDesc(college: String, pageable: Pageable): Page<Post>?
 
+=======
+import org.springframework.data.jpa.repository.JpaRepository
+import team.waggly.backend.model.Post
+
+interface PostRepository : JpaRepository<Post, Long> {
+>>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
 }

@@ -18,7 +18,11 @@ class User(
     @Column(unique = true, columnDefinition = "VARCHAR(15)")
     var nickName: String,
 
+<<<<<<< HEAD
     @Column(columnDefinition = "VARCHAR(60)")
+=======
+    @Column(columnDefinition = "VARCHAR2(60)")
+>>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
     var password: String,
 
     @Column(columnDefinition = "VARCHAR(6)")
@@ -39,12 +43,12 @@ class User(
     @Column(nullable = true, columnDefinition = "VARCHAR(100)")    //자기소개 몇자 내외?
     var introduction: String? = ""// 추 후 협의 null vs ""
 ) {
-    enum class GenderType {
+    enum class GenderType{
         MALE,
         FEMALE
     }
 
-    enum class UserActiveStatusType {
+    enum class UserActiveStatusType{
         ACTIVE,
         WITHDRAWAL,
         BAN
