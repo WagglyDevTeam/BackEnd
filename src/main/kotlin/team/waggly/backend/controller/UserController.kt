@@ -2,13 +2,16 @@ package team.waggly.backend.controller
 
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.*
+import team.waggly.backend.service.emailService.CertificationService
+import team.waggly.backend.service.emailService.SendEmailService
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RestController
 import team.waggly.backend.dto.CertificationDto
 import team.waggly.backend.dto.SendEmailDto
 import team.waggly.backend.dto.SignupDto
 import team.waggly.backend.security.UserDetailsImpl
-import team.waggly.backend.service.CertificationService
-import team.waggly.backend.service.SendEmailService
 import team.waggly.backend.service.SignupService
 
 @RestController
