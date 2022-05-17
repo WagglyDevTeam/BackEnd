@@ -26,5 +26,5 @@ class Comment(
     val activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
 
     @Column
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime = LocalDateTime.now()
 )
