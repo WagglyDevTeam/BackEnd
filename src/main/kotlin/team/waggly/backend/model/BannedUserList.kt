@@ -8,7 +8,6 @@ class BannedUserList (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
     @ManyToOne
     val groupChat: GroupChat,
 

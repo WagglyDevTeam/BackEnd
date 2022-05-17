@@ -9,11 +9,9 @@ class RequestForChat (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
     @ManyToOne
     val receiver: User,
 
-    @Column
     @ManyToOne
     val sender: User,
 

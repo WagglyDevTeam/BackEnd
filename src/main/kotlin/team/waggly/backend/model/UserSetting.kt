@@ -8,7 +8,6 @@ class UserSetting (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
     @OneToOne
     val user: User,
 
