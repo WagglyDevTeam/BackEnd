@@ -20,8 +20,13 @@ import team.waggly.backend.security.provider.JWTAuthProvider
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
+<<<<<<< HEAD
+    private val userDetailsServiceImpl: UserDetailsServiceImpl,
+    private val userRepository: UserRepository
+=======
         private val userDetailsServiceImpl: UserDetailsServiceImpl,
         private val userRepository: UserRepository
+>>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
 ) : WebSecurityConfigurerAdapter() {
     private val headerTokenExtractor = HeaderTokenExtractor()
 
@@ -32,14 +37,24 @@ class SecurityConfig(
 
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth
+<<<<<<< HEAD
+            .authenticationProvider(FormLoginAuthProvider(userDetailsServiceImpl, encodePassword()))
+            .authenticationProvider(JWTAuthProvider(userRepository))
+=======
                 .authenticationProvider(FormLoginAuthProvider(userDetailsServiceImpl, encodePassword()))
                 .authenticationProvider(JWTAuthProvider(userRepository))
+>>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
     }
 
     override fun configure(web: WebSecurity) {
         web
+<<<<<<< HEAD
+            .ignoring()
+            .antMatchers("/h2-console/**")
+=======
                 .ignoring()
                 .antMatchers("/h2-console/**")
+>>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
     }
 
     @Throws(Exception::class)
@@ -47,6 +62,19 @@ class SecurityConfig(
         http.csrf().disable().httpBasic()
 
         http.sessionManagement()
+<<<<<<< HEAD
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+        http
+            .addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter::class.java)
+
+        http.authorizeRequests()
+            .antMatchers("/h2-console/**", "/user/signup").permitAll()
+            .anyRequest().permitAll()
+            .and()
+            .exceptionHandling()
+=======
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
         http
@@ -58,6 +86,7 @@ class SecurityConfig(
                 .anyRequest().permitAll()
                 .and()
                 .exceptionHandling()
+>>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
     }
 
     @Bean
@@ -74,8 +103,15 @@ class SecurityConfig(
         val skipPathList = mutableListOf<String>()
 
         skipPathList.add("GET,/h2-console/**")
+<<<<<<< HEAD
+        skipPathList.add("POST,/h2-console/**")
         skipPathList.add("POST,/user/signup")
 
+=======
+        skipPathList.add("POST,/user/signup")
+        skipPathList.add("POST,/user/email")
+        skipPathList.add("POST,/user/email/certification")
+>>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 
         val filter = JwtAuthFilter(headerTokenExtractor, matcher)
