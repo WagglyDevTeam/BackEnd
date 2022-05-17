@@ -8,7 +8,6 @@ class PostImage (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
     @ManyToOne
     val post: Post,
 

@@ -10,15 +10,12 @@ class ChatParticipantsInfo(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
     @ManyToOne
     val user: User,
 
-    @Column
     @ManyToOne
     val opponent: User,
 
-    @Column
     @ManyToOne
     val chatRoom: ChatRoom,
 

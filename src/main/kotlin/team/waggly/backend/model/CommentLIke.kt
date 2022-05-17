@@ -9,7 +9,6 @@ class CommentLIke (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
     @ManyToOne
     val comment: Comment,
 
