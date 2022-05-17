@@ -1,4 +1,4 @@
-package team.waggly.backend.service
+package team.waggly.backend.service.emailService
 
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.http.HttpStatus
