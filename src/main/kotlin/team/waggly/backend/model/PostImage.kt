@@ -3,14 +3,14 @@ package team.waggly.backend.model
 import javax.persistence.*
 
 @Entity
-class PostImage (
+class PostImage(post: Post, imageUrl:String) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: Long? = null
 
     @ManyToOne
-    val post: Post,
+    var post: Post = post
 
     @Column(columnDefinition = "VARCHAR(255)")
-    val imageUrl: String,
-)
+    var imageUrl: String = imageUrl
+}
