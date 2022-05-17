@@ -8,17 +8,20 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.PostDto
 import team.waggly.backend.exception.CustomException
 import team.waggly.backend.model.User
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.PostService
+import team.waggly.backend.service.awsS3.S3Uploader
 import javax.validation.Valid
 
 @RestController
 class PostController (
-        private val postService: PostService
+        private val postService: PostService,
+        private val s3Uploader: S3Uploader,
 ) {
     @GetMapping("/post")
     fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
@@ -81,8 +84,12 @@ class PostController (
         postService.deletePost(postId, userDetailsImpl.user)
         return ResponseEntity<Any>(PostDto.SuccessResponse(true), HttpStatus.NO_CONTENT)
     }
-}
 
+    @PostMapping("/post/upload")
+    fun uploadFile(@RequestParam file: MultipartFile): String {
+        return s3Uploader.upload(file)
+    }
+}
 
 //
 //    @GetMapping("/post")

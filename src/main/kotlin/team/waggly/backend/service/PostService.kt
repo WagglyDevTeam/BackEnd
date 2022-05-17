@@ -15,15 +15,17 @@ import team.waggly.backend.repository.CommentRepository
 import team.waggly.backend.repository.PostLikeRepository
 import team.waggly.backend.repository.PostRepository
 import team.waggly.backend.security.UserDetailsImpl
+import team.waggly.backend.service.awsS3.S3Uploader
 import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
 class PostService (
-    private val postRepository: PostRepository,
-    private val postLikeRepository: PostLikeRepository,
-    private val commentRepository: CommentRepository
+        private val postRepository: PostRepository,
+        private val postLikeRepository: PostLikeRepository,
+        private val commentRepository: CommentRepository,
+        private val s3Uploader: S3Uploader,
 ){
 
     // 전체 게시글 조회
@@ -76,6 +78,7 @@ class PostService (
             throw NotFoundException()
         }
         postRepository.save(postCreateDto.toEntity(user))
+        // 이미지 업로드 (Controller부터) 구현하기
         return PostDto.CreatePostResponseDto(true)
     }
 

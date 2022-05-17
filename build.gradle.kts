@@ -58,6 +58,9 @@ dependencies {
     implementation("com.querydsl:querydsl-jpa:$querydslVersion")
     kapt("com.querydsl:querydsl-apt:$querydslVersion:jpa")
     annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
+
+    // S3
+    implementation("org.springframework.cloud:spring-cloud-starter-aws:2.0.1.RELEASE")
 }
 
 //// querydsl 추가
