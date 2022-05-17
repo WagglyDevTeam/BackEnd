@@ -10,7 +10,7 @@ import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
-import team.waggly.backend.dto.PostDto
+import team.waggly.backend.dto.postDto.*
 import team.waggly.backend.exception.CustomException
 import team.waggly.backend.model.User
 import team.waggly.backend.security.UserDetailsImpl
@@ -29,7 +29,7 @@ class PostController (
                     @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<Any> {
         val user: User? = userDetailsImpl?.user ?: null
         if (college == null) {
-            return ResponseEntity<Any>(postService.getAllPosts(pageable, user), HttpStatus.OK)
+            return ResponseEntity.ok().body(postService.getAllPosts(pageable, user))
         } else {
             val collegeEnum = when (college) {
                 "test" -> CollegeType.TEST
@@ -41,20 +41,20 @@ class PostController (
                 else -> throw NoSuchElementException("올바른 학부를 선택해주세요.")
             }
 
-            return ResponseEntity<Any>(postService.getAllPostsByCollegeByOrderByIdDesc(collegeEnum, pageable, user), HttpStatus.OK)
+            return ResponseEntity.ok().body(postService.getAllPostsByCollegeByOrderByIdDesc(collegeEnum, pageable, user))
         }
     }
 
     @GetMapping("/post/{postId}")
     fun getPostDetails(@PathVariable postId: Long,
-                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<PostDto.PostDetailsResponseDto> {
-        val user: User? = userDetailsImpl?.user
-        return ResponseEntity.ok(postService.getPostDetails(postId, user))
+                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<PostDetailsResponseDto> {
+        val user: User? = userDetailsImpl?.user ?: null
+        return ResponseEntity.ok().body(postService.getPostDetails(postId, user))
     }
 
     @PostMapping("/post")
     fun createPost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
-                   @RequestBody @Valid postCreateDto: PostDto.CreatePostRequestDto,
+                   @ModelAttribute @Valid postCreateDto: CreatePostRequestDto,
                    bindingResult: BindingResult): ResponseEntity<Any> {
         if (bindingResult.hasErrors()) {
             val msg: MutableList<String> = arrayListOf()
@@ -73,16 +73,17 @@ class PostController (
 
     @PutMapping("/post/{postId}")
     fun updatePost(@PathVariable postId: Long,
-                   @RequestBody postUpdateDto: PostDto.UpdatePostRequestDto): ResponseEntity<Any> {
+                   @RequestBody postUpdateDto: UpdatePostRequestDto
+    ): ResponseEntity<Any> {
         postService.updatePost(postId, postUpdateDto)
-        return ResponseEntity<Any>(PostDto.SuccessResponse(true), HttpStatus.OK)
+        return ResponseEntity.ok().body(UpdatePostResponseDto(true))
     }
 
     @DeleteMapping("/post/{postId}")
     fun deletePost(@PathVariable postId: Long,
                    @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
         postService.deletePost(postId, userDetailsImpl.user)
-        return ResponseEntity<Any>(PostDto.SuccessResponse(true), HttpStatus.NO_CONTENT)
+        return ResponseEntity<Any>(DeletePostResponseDto(true), HttpStatus.NO_CONTENT)
     }
 
     @PostMapping("/post/upload")
