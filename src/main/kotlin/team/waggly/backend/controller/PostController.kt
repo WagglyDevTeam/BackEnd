@@ -26,10 +26,10 @@ class PostController (
     @GetMapping("/post")
     fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
                     @RequestParam college: String?,
-                    @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): Any? {
+                    @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<Any> {
         val user: User? = userDetailsImpl?.user ?: null
         if (college == null) {
-            return postService.getAllPosts(pageable, user)
+            return ResponseEntity<Any>(postService.getAllPosts(pageable, user), HttpStatus.OK)
         } else {
             val collegeEnum = when (college) {
                 "test" -> CollegeType.TEST
@@ -41,15 +41,15 @@ class PostController (
                 else -> throw NoSuchElementException("올바른 학부를 선택해주세요.")
             }
 
-            return postService.getAllPostsByCollegeByOrderByIdDesc(collegeEnum, pageable, user)
+            return ResponseEntity<Any>(postService.getAllPostsByCollegeByOrderByIdDesc(collegeEnum, pageable, user), HttpStatus.OK)
         }
     }
 
     @GetMapping("/post/{postId}")
     fun getPostDetails(@PathVariable postId: Long,
-                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): PostDto.PostDetailsResponseDto {
+                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<PostDto.PostDetailsResponseDto> {
         val user: User? = userDetailsImpl?.user ?: null
-        return postService.getPostDetails(postId, user)
+        return ResponseEntity.ok(postService.getPostDetails(postId, user))
     }
 
     @PostMapping("/post")
@@ -92,7 +92,7 @@ class PostController (
 }
 
 //
-//    @GetMapping("/post")
+//    @GetMapping("/post/{college}")
 //    fun getAllPostsByCollege(@RequestParam college: String?,
 //                             @PageableDefault(size = 10, page = 0) pageable: Pageable,
 //                             @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): PostDto.CollegePostsResponseDto {
