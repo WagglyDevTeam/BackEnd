@@ -65,7 +65,7 @@ class CommentService(
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
         val user = userDetailImpl.user
         val commentLike: CommentLike =
-            commentLikeRepository.findByUserIdAndCommentIdOrNull(user.id!!, commentId) //null 처리 해야할듯
+            commentLikeRepository.findByUserIdAndCommentId(user.id!!, commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.") //null 처리 해야할듯
 
         //commentLike 가 존재하지 않는다면 commentLIkeRepository.save 후 dto 생성 및 반환
         //commentLike 가 존재한다면 commentLikeRepository.delete 후 dto 생성 및 반환
