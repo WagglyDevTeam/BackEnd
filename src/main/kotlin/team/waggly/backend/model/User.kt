@@ -18,11 +18,7 @@ class User(
     @Column(unique = true, columnDefinition = "VARCHAR(15)")
     var nickName: String,
 
-<<<<<<< HEAD
     @Column(columnDefinition = "VARCHAR(60)")
-=======
-    @Column(columnDefinition = "VARCHAR2(60)")
->>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
     var password: String,
 
     @Column(columnDefinition = "VARCHAR(6)")
