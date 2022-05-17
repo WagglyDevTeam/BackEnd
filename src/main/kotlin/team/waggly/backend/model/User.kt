@@ -9,19 +9,23 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(unique = true, columnDefinition = "VARCHAR2(45)")
+    @Column(unique = true, columnDefinition = "VARCHAR(45)")
     val email: String,
 
     @Column
     var profileImgUrl: String,
 
-    @Column(unique = true, columnDefinition = "VARCHAR2(15)")
+    @Column(unique = true, columnDefinition = "VARCHAR(15)")
     var nickName: String,
 
+<<<<<<< HEAD
+    @Column(columnDefinition = "VARCHAR(60)")
+=======
     @Column(columnDefinition = "VARCHAR2(60)")
+>>>>>>> 17a95112e49562fb52eeb4f8841ed553a3880a4b
     var password: String,
 
-    @Column(columnDefinition = "VARCHAR2(6)")
+    @Column(columnDefinition = "VARCHAR(6)")
     val gender: GenderType,
 
     @Column(columnDefinition = "INTEGER(3)")
@@ -36,8 +40,8 @@ class User(
     @Column(columnDefinition = "VARCHAR(20)")
     val auth: AuthType = AuthType.USER,
 
-    @Column(nullable = true, columnDefinition = "VARCHAR2(100)")    //자기소개 몇자 내외?
-    var introduction: String? // 추 후 협의 null vs ""
+    @Column(nullable = true, columnDefinition = "VARCHAR(100)")    //자기소개 몇자 내외?
+    var introduction: String? = ""// 추 후 협의 null vs ""
 ) {
     enum class GenderType{
         MALE,
