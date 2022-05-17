@@ -1,4 +1,6 @@
 package team.waggly.backend.dto.commentdto
 
-class CommentRequestDto {
-}
+data class CommentRequestDto(
+    val commentDesc : String,
+    val isAnonymous : Boolean
+)
