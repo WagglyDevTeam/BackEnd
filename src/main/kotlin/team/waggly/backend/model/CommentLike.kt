@@ -8,7 +8,6 @@ class CommentLike (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column
     @ManyToOne
     val comment: Comment,
 

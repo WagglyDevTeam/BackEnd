@@ -24,7 +24,6 @@ class Post(
     @Column(columnDefinition = "VARCHAR(10)")
     var activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE, // enum
 
-    @Column
     @ManyToOne
     val author: User,
 
