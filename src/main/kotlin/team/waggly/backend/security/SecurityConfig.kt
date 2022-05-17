@@ -75,7 +75,8 @@ class SecurityConfig(
 
         skipPathList.add("GET,/h2-console/**")
         skipPathList.add("POST,/user/signup")
-
+        skipPathList.add("POST,/user/email")
+        skipPathList.add("POST,/user/email/certification")
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 
         val filter = JwtAuthFilter(headerTokenExtractor, matcher)
