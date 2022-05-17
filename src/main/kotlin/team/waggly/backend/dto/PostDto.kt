@@ -1,6 +1,7 @@
 package team.waggly.backend.dto
 
 import org.hibernate.validator.constraints.Length
+import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.model.Post
@@ -13,13 +14,14 @@ import javax.validation.constraints.NotBlank
 class PostDto {
     data class CreatePostRequestDto (
         @field:NotBlank(message = "제목을 입력해주세요.")
-        @field:Length(min = 3, message = "세 글자 이상으로 작성해주세요.")
         private val title: String,
 
         @field:NotBlank(message = "내용을 입력해주세요.")
         private val description: String,
 
         private val college: CollegeType,
+
+        private val file: MultipartFile?,
 
         private val isAnonymous: Boolean,
     ) {
