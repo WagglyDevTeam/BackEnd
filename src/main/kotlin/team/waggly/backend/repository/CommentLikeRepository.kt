@@ -7,6 +7,6 @@ import team.waggly.backend.model.CommentLike
 @Repository
 interface CommentLikeRepository : JpaRepository<CommentLike, Long> {
     fun existsByUserIdAndCommentId(userId: Long, commentId: Long): Boolean
-    fun findByUserIdAndCommentIdOrNull(userId: Long, commentId: Long) : CommentLike//유일
+    fun findByUserIdAndCommentId(userId: Long, commentId: Long) : CommentLike?//유일
     fun countByCommentId(commentId: Long): Int
 }
