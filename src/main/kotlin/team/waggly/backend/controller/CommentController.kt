@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import team.waggly.backend.dto.commentdto.CommentRequestDto
+import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.CommentService
 
 @RestController
@@ -13,9 +14,11 @@ class CommentController(private val commentService: CommentService) {
     fun createComment(
         @PathVariable postId: Long,
         @RequestBody commentRequestDto: CommentRequestDto,
-        @AuthenticationPrincipal userDetailImpl: UserDetailImpl?
+        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl // null 불가능
     ): ResponseEntity<Any> {
-        commentService.createComment(postId, commentRequestDto, userDetailImpl)
+
+        commentService.createComment(postId, commentRequestDto, userDetailsImpl)
+
         return ResponseEntity
             .ok()
             .body(true)
@@ -25,10 +28,24 @@ class CommentController(private val commentService: CommentService) {
     @DeleteMapping("/comment/{commentId}")
     fun deleteComment(
         @PathVariable commentId: Long,
-        @AuthenticationPrincipal userDetailImpl: UserDetailImpl?
+        @AuthenticationPrincipal userDetailImpl: UserDetailsImpl
+    ): ResponseEntity<Any> {
+
+        commentService.deleteComment(commentId, userDetailImpl)
+
+        return ResponseEntity
+            .ok()
+            .body(true)
+    }
+
+    //댓글 좋아요
+    @PostMapping("/like/comment/{commentId}")
+    fun likeComment(
+        @PathVariable commentId: Long,
+        @AuthenticationPrincipal userDetailImpl: UserDetailsImpl
     ): ResponseEntity<Any> {
         return ResponseEntity
             .ok()
-            .body(commentService.deleteComment(commentId, userDetailImpl))
+            .body(commentService.likeComment(commentId, userDetailImpl))
     }
 }
