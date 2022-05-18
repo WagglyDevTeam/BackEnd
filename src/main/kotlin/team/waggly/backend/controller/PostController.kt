@@ -27,6 +27,8 @@ class PostController (
     fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
                     @RequestParam college: String?,
                     @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<Any> {
+        println(pageable.pageSize)
+        println(pageable.pageNumber)
         val user: User? = userDetailsImpl?.user ?: null
         if (college == null) {
             return ResponseEntity.ok().body(postService.getAllPosts(pageable, user))
@@ -54,7 +56,7 @@ class PostController (
 
     @PostMapping("/post")
     fun createPost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
-                   @ModelAttribute @Valid postCreateDto: CreatePostRequestDto,
+                   @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
                    bindingResult: BindingResult): ResponseEntity<Any> {
         if (bindingResult.hasErrors()) {
             val msg: MutableList<String> = arrayListOf()

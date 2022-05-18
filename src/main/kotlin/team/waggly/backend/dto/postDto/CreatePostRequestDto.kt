@@ -15,9 +15,9 @@ data class CreatePostRequestDto (
 
     val college: CollegeType,
 
-    val file: List<MultipartFile?>,
+    val file: List<MultipartFile>?,
 
-    val isAnonymous: Boolean,
+    val isAnonymous: Boolean = false,
 ) {
     fun toEntity(user: User): Post = Post(
         title = title,
