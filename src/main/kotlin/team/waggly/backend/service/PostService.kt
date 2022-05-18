@@ -30,14 +30,17 @@ class PostService (
         private val postImageRepository: PostImageRepository,
         private val s3Uploader: S3Uploader,
 ){
-
     // 전체 게시글 조회
     fun getAllPosts(pageable: Pageable, user: User?): List<PostDetailsResponseDto> {
-        val userId: Long? = user?.id ?: null
+        val userId: Long? = user?.id
         val allPosts: List<Post> = postRepository.findAllActivePosts()
-        val postsDto: List<PostDetailsResponseDto> = allPosts.map { posts ->
-            PostDetailsResponseDto(posts, postLikeRepository, commentRepository, userId)
+
+        val postsDto: MutableList<PostDetailsResponseDto> = arrayListOf()
+        for (post in allPosts) {
+            val dto: PostDetailsResponseDto = updatePostDetailInfo(post, userId!!)
+            postsDto.add(dto)
         }
+
         val postsDtoToPageable: Page<PostDetailsResponseDto> =
             PageImpl<PostDetailsResponseDto>(postsDto, pageable, postsDto.size.toLong())
         return postsDtoToPageable.toList()
@@ -45,16 +48,23 @@ class PostService (
 
     // 단과대 별 게시글 조회
     fun getAllPostsByCollegeByOrderByIdDesc(college: CollegeType, pageable: Pageable, user: User?): CollegePostsResponseDto {
-        val userId: Long? = user?.id ?: null
-        // 해당 단과대의 베스트 게시글 ID
+        val userId: Long? = user?.id
         val allPosts: List<Post> = postRepository.findActivePostsByCollegeByOrderByIdDesc(college.toString())
+
+        // 해당 단과대의 베스트 게시글 ID
         val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(college.toString()) ?: 0
         val best: Post = postRepository.findById(collegeBestId).orElse(allPosts[0])
 
-        val bestDto: PostDetailsResponseDto = PostDetailsResponseDto(best, postLikeRepository, commentRepository, userId)
-        val postsDto: List<PostDetailsResponseDto> = allPosts.map {
-                posts -> PostDetailsResponseDto(posts, postLikeRepository, commentRepository, userId)
+        // Best 게시글
+        val bestDto: PostDetailsResponseDto = this.updatePostDetailInfo(best, userId!!)
+
+        // 게시글 리스트
+        val postsDto: MutableList<PostDetailsResponseDto> = arrayListOf()
+        for (post in allPosts) {
+            val postDto: PostDetailsResponseDto = this.updatePostDetailInfo(post, userId!!)
+            postsDto.add(postDto)
         }
+
         val postsDtoToPageable: Page<PostDetailsResponseDto> = PageImpl<PostDetailsResponseDto>(postsDto, pageable, postsDto.size.toLong())
         val postsPageableToList: List<PostDetailsResponseDto> = postsDtoToPageable.toList()
 
@@ -63,14 +73,26 @@ class PostService (
 
     // 게시글 상세 조회하기 (만약 본인 게시글이면 조회가 가능해야하니깐)
     fun getPostDetails(postId: Long, user: User?): PostDetailsResponseDto {
-        val userId: Long? = user?.id ?: null
+        val userId: Long? = user?.id
 
         val post: Post = postRepository.findById(postId).orElseThrow()
 
         if (post.activeStatus != ActiveStatusType.ACTIVE) {
             throw IllegalArgumentException("비공개 게시글입니다.")
         }
-        return PostDetailsResponseDto(post, postLikeRepository, commentRepository, userId)
+        val postDetailsResponseDto = PostDetailsResponseDto(post)
+
+        val postImageCnt: Int = postImageRepository.findAllByPostId(post.id!!).size
+        val postLikeCnt: Int = postLikeRepository.countByPostId(post.id!!)
+        val postCommentCnt: Int = commentRepository.countByPostId(post.id!!)
+        val isLikedByMe: Boolean = if (userId != null) postLikeRepository.existsByUserId(userId!!) else false
+
+        postDetailsResponseDto.postImageCnt = postImageCnt
+        postDetailsResponseDto.postLikeCnt = postLikeCnt
+        postDetailsResponseDto.postCommentCnt = postCommentCnt
+        postDetailsResponseDto.isLikedByMe = isLikedByMe
+
+        return postDetailsResponseDto
     }
 
     @Transactional
@@ -112,5 +134,21 @@ class PostService (
         postRepository.save(post)
 
         return DeletePostResponseDto(true)
+    }
+
+    fun updatePostDetailInfo(post: Post, userId: Long): PostDetailsResponseDto {
+        val postDetailsResponseDto = PostDetailsResponseDto(post)
+
+        val postImageCnt: Int = postImageRepository.findAllByPostId(post.id!!).size
+        val postLikeCnt: Int = postLikeRepository.countByPostId(post.id!!)
+        val postCommentCnt: Int = commentRepository.countByPostId(post.id!!)
+        val isLikedByMe: Boolean = if (userId != null) postLikeRepository.existsByUserId(userId) else false
+
+        postDetailsResponseDto.postImageCnt = postImageCnt
+        postDetailsResponseDto.postLikeCnt = postLikeCnt
+        postDetailsResponseDto.postCommentCnt = postCommentCnt
+        postDetailsResponseDto.isLikedByMe = isLikedByMe
+
+        return postDetailsResponseDto
     }
 }
