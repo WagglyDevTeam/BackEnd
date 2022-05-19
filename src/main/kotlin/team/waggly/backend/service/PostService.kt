@@ -41,9 +41,9 @@ class PostService (
             postsDto.add(dto)
         }
 
-        val postsDtoToPageable: Page<PostDetailsResponseDto> =
-            PageImpl<PostDetailsResponseDto>(postsDto, pageable, postsDto.size.toLong())
-        return postsDtoToPageable.toList()
+        val start: Long = pageable.offset
+        val end: Long = if ((start + pageable.pageSize) > postsDto.size) postsDto.size.toLong() else (start + pageable.pageSize)
+        return PageImpl(postsDto.subList(start.toInt(), end.toInt()), pageable, postsDto.size.toLong()).toList()
     }
 
     // 단과대 별 게시글 조회
@@ -65,10 +65,11 @@ class PostService (
             postsDto.add(postDto)
         }
 
-        val postsDtoToPageable: Page<PostDetailsResponseDto> = PageImpl<PostDetailsResponseDto>(postsDto, pageable, postsDto.size.toLong())
-        val postsPageableToList: List<PostDetailsResponseDto> = postsDtoToPageable.toList()
+        val start: Long = pageable.offset
+        val end: Long = if ((start + pageable.pageSize) > postsDto.size) postsDto.size.toLong() else (start + pageable.pageSize)
+        val postsDtoToPageable: List<PostDetailsResponseDto> = PageImpl(postsDto.subList(start.toInt(), end.toInt()), pageable, postsDto.size.toLong()).toList()
 
-        return CollegePostsResponseDto(bestDto, postsPageableToList)
+        return CollegePostsResponseDto(bestDto, postsDtoToPageable)
     }
 
     // 게시글 상세 조회하기 (만약 본인 게시글이면 조회가 가능해야하니깐)
@@ -109,7 +110,7 @@ class PostService (
             var fileList: MutableList<String> = arrayListOf()
             for (file in postCreateDto.file) {
                 val fileUrl: String = s3Uploader.upload(file!!)
-                val image = PostImage(post,fileUrl)
+                val image = PostImage(post, fileUrl, file.originalFilename!!)
                 postImageRepository.save(image)
             }
         }
@@ -120,6 +121,28 @@ class PostService (
     fun updatePost(postId: Long, postUpdateDto: UpdatePostRequestDto): Post {
         val post: Post = postRepository.findByIdOrNull(postId) ?: throw NotFoundException()
         postUpdateDto.updateEntity(post)
+
+        if (postUpdateDto.file != null) {
+            var fileList: MutableList<String> = arrayListOf()
+            for (file in postUpdateDto.file) {
+                val fileUrl: String = s3Uploader.upload(file!!)
+                val image = PostImage(post, fileUrl, file.originalFilename!!)
+                // 파일 이름을 확인해야 지울 수 있는데.. column 또 만들어야 하는 것 같음
+//                s3Uploader.delete(image.)
+                postImageRepository.save(image)
+
+            }
+        }
+
+        // 이미지는 그냥 삭제하는걸로 가는게??
+        if (postUpdateDto.deleteTargetId != null) {
+            for (target in postUpdateDto.deleteTargetId) {
+                val targetImage: PostImage = postImageRepository.findById(target.toLong()).orElseThrow()
+                postImageRepository.delete(targetImage)
+
+            }
+        }
+
         return postRepository.save(post)
     }
 
