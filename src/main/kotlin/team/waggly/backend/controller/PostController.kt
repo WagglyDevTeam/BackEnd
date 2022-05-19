@@ -24,11 +24,9 @@ class PostController (
         private val s3Uploader: S3Uploader,
 ) {
     @GetMapping("/post")
-    fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
+    fun getAllPosts(@PageableDefault(size = 10, page = 1) pageable: Pageable,
                     @RequestParam college: String?,
                     @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<Any> {
-        println(pageable.pageSize)
-        println(pageable.pageNumber)
         val user: User? = userDetailsImpl?.user ?: null
         if (college == null) {
             return ResponseEntity.ok().body(postService.getAllPosts(pageable, user))
@@ -75,8 +73,20 @@ class PostController (
 
     @PutMapping("/post/{postId}")
     fun updatePost(@PathVariable postId: Long,
-                   @RequestBody postUpdateDto: UpdatePostRequestDto
-    ): ResponseEntity<Any> {
+                   @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
+                   bindingResult: BindingResult): ResponseEntity<Any> {
+        if (bindingResult.hasErrors()) {
+            val msg: MutableList<String> = arrayListOf()
+            bindingResult.allErrors.forEach {
+                val field = it as FieldError
+                val message = it.defaultMessage
+                msg.add("${field.field} : $message")
+            }
+            val result = bindingResult.allErrors.map { error ->
+                CustomException.ValidatorExceptionReturnType(error.code!!, error.defaultMessage!!)
+            }
+            return ResponseEntity.badRequest().body(CustomException.ValidatorException(result))
+        }
         postService.updatePost(postId, postUpdateDto)
         return ResponseEntity.ok().body(UpdatePostResponseDto(true))
     }
@@ -93,6 +103,7 @@ class PostController (
         return s3Uploader.upload(file)
     }
 }
+
 
 //
 //    @GetMapping("/post/{college}")
