@@ -72,7 +72,8 @@ class PostController (
     }
 
     @PutMapping("/post/{postId}")
-    fun updatePost(@PathVariable postId: Long,
+    fun updatePost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
+                   @PathVariable postId: Long,
                    @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
                    bindingResult: BindingResult): ResponseEntity<Any> {
         if (bindingResult.hasErrors()) {
@@ -87,8 +88,7 @@ class PostController (
             }
             return ResponseEntity.badRequest().body(CustomException.ValidatorException(result))
         }
-        postService.updatePost(postId, postUpdateDto)
-        return ResponseEntity.ok().body(UpdatePostResponseDto(true))
+        return ResponseEntity.ok().body(postService.updatePost(postId, postUpdateDto, userDetailsImpl))
     }
 
     @DeleteMapping("/post/{postId}")
@@ -96,11 +96,6 @@ class PostController (
                    @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
         postService.deletePost(postId, userDetailsImpl.user)
         return ResponseEntity<Any>(DeletePostResponseDto(true), HttpStatus.NO_CONTENT)
-    }
-
-    @PostMapping("/post/upload")
-    fun uploadFile(@RequestParam file: MultipartFile): String {
-        return s3Uploader.upload(file)
     }
 }
 

@@ -22,10 +22,7 @@ class S3Uploader(
     @Value("\${cloud.aws.s3.dir}")
     lateinit var dir: String
 
-    fun upload(file: MultipartFile): String {
-        val split: List<String> = file.originalFilename!!.split(".")
-        val extName: String = split[split.lastIndex]
-        val fileName = "${UUID.randomUUID()}.${extName}"
+    fun upload(file: MultipartFile, fileName: String): String {
         val objMeta = ObjectMetadata()
         val bytes = IOUtils.toByteArray(file.inputStream)
         objMeta.contentLength = bytes.size.toLong()
@@ -39,7 +36,7 @@ class S3Uploader(
     }
 
     fun delete(fileName: String) {
-        val deleteObjectRequest: DeleteObjectRequest = DeleteObjectRequest(bucket, dir + fileName)
-        S3Client.deleteObject(deleteObjectRequest)
+//        val deleteObjectRequest = DeleteObjectRequest(bucket, (dir + fileName))
+        S3Client.deleteObject(bucket, dir + fileName)
     }
 }
