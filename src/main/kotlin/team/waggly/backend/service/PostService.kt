@@ -1,7 +1,7 @@
 package team.waggly.backend.service
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -20,6 +20,7 @@ import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.awsS3.S3Uploader
 import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
+import java.util.*
 import javax.transaction.Transactional
 
 @Service
@@ -30,6 +31,9 @@ class PostService (
         private val postImageRepository: PostImageRepository,
         private val s3Uploader: S3Uploader,
 ){
+    @Value("\${cloud.aws.s3.dir}")
+    lateinit var dir: String
+
     // 전체 게시글 조회
     fun getAllPosts(pageable: Pageable, user: User?): List<PostDetailsResponseDto> {
         val userId: Long? = user?.id
@@ -83,15 +87,10 @@ class PostService (
         }
         val postDetailsResponseDto = PostDetailsResponseDto(post)
 
-        val postImageCnt: Int = postImageRepository.findAllByPostId(post.id!!).size
-        val postLikeCnt: Int = postLikeRepository.countByPostId(post.id!!)
-        val postCommentCnt: Int = commentRepository.countByPostId(post.id!!)
-        val isLikedByMe: Boolean = if (userId != null) postLikeRepository.existsByUserId(userId!!) else false
-
-        postDetailsResponseDto.postImageCnt = postImageCnt
-        postDetailsResponseDto.postLikeCnt = postLikeCnt
-        postDetailsResponseDto.postCommentCnt = postCommentCnt
-        postDetailsResponseDto.isLikedByMe = isLikedByMe
+        postDetailsResponseDto.postImageCnt = postImageRepository.findAllByPostId(post.id!!).size
+        postDetailsResponseDto.postLikeCnt = postLikeRepository.countByPostId(post.id!!)
+        postDetailsResponseDto.postCommentCnt = commentRepository.countByPostId(post.id!!)
+        postDetailsResponseDto.isLikedByMe = if (userId != null) postLikeRepository.existsByUserId(userId!!) else false
 
         return postDetailsResponseDto
     }
@@ -107,10 +106,11 @@ class PostService (
         postRepository.save(post)
 
         if (postCreateDto.file != null) {
-            var fileList: MutableList<String> = arrayListOf()
             for (file in postCreateDto.file) {
-                val fileUrl: String = s3Uploader.upload(file!!)
-                val image = PostImage(post, fileUrl, file.originalFilename!!)
+                val extName: String = file.originalFilename!!.substringAfterLast(".")
+                val uploadName = "${UUID.randomUUID()}.${extName}"
+                val fileUrl: String = s3Uploader.upload(file!!, uploadName)
+                val image = PostImage(post, fileUrl, file.originalFilename!!, uploadName)
                 postImageRepository.save(image)
             }
         }
@@ -118,32 +118,44 @@ class PostService (
     }
 
     @Transactional
-    fun updatePost(postId: Long, postUpdateDto: UpdatePostRequestDto): Post {
+    fun updatePost(postId: Long,
+                   postUpdateDto: UpdatePostRequestDto,
+                   userDetailsImpl: UserDetailsImpl): PostDetailsResponseDto {
+        val user = userDetailsImpl.user
+        if (user.id == null) {
+            throw NotFoundException()
+        }
         val post: Post = postRepository.findByIdOrNull(postId) ?: throw NotFoundException()
         postUpdateDto.updateEntity(post)
 
         if (postUpdateDto.file != null) {
-            var fileList: MutableList<String> = arrayListOf()
             for (file in postUpdateDto.file) {
-                val fileUrl: String = s3Uploader.upload(file!!)
-                val image = PostImage(post, fileUrl, file.originalFilename!!)
-                // 파일 이름을 확인해야 지울 수 있는데.. column 또 만들어야 하는 것 같음
-//                s3Uploader.delete(image.)
+                val extName: String = file.originalFilename!!.substringAfterLast(".")
+                val uploadName = "${UUID.randomUUID()}.${extName}"
+                val fileUrl: String = s3Uploader.upload(file!!, uploadName)
+                val image = PostImage(post, fileUrl, file.originalFilename!!, uploadName)
                 postImageRepository.save(image)
-
             }
         }
 
-        // 이미지는 그냥 삭제하는걸로 가는게??
-        if (postUpdateDto.deleteTargetId != null) {
+        if (postUpdateDto.deleteTargetId != null && postUpdateDto.deleteTargetId.isNotEmpty()) {
             for (target in postUpdateDto.deleteTargetId) {
                 val targetImage: PostImage = postImageRepository.findById(target.toLong()).orElseThrow()
-                postImageRepository.delete(targetImage)
-
+                println(dir + targetImage.uploadName)
+                s3Uploader.delete(targetImage.uploadName)
+                postImageRepository.deleteById(target.toLong())
             }
         }
+        val updatedPost = postRepository.save(post)
 
-        return postRepository.save(post)
+        val postDetailsResponseDto = PostDetailsResponseDto(updatedPost)
+
+        postDetailsResponseDto.postImageCnt = postImageRepository.findAllByPostId(updatedPost.id!!).size
+        postDetailsResponseDto.postLikeCnt = postLikeRepository.countByPostId(updatedPost.id!!)
+        postDetailsResponseDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id!!)
+        postDetailsResponseDto.isLikedByMe = if (user.id != null) postLikeRepository.existsByUserId(user.id) else false
+
+        return postDetailsResponseDto
     }
 
     @Transactional
