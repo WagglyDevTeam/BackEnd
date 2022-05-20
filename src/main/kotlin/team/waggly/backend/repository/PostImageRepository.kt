@@ -8,4 +8,7 @@ import team.waggly.backend.model.PostImage
 @Repository
 interface PostImageRepository : JpaRepository<PostImage, Long> {
     fun findAllByPostId(postId: Long): List<PostImage>
+    fun findByImageUrlByDeletedAtNull(imageUrl: String): PostImage?
+    fun findByPostIdByDeletedAtNull(postId: Long): PostImage?
+    fun findAllByPostIdByDeletedAtNull(postId: Long): List<PostImage>?
 }
