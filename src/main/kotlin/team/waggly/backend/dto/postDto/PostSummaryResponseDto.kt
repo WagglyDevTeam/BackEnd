@@ -2,12 +2,10 @@ package team.waggly.backend.dto.postDto
 
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.model.Post
-import team.waggly.backend.repository.CommentRepository
-import team.waggly.backend.repository.PostLikeRepository
 import java.time.LocalDateTime
 
 // 수정
-data class PostDetailsResponseDto(
+data class PostSummaryResponseDto(
     var postId: Long?,
     var postTitle: String,
     var postDesc: String,

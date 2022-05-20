@@ -1,5 +1,6 @@
 package team.waggly.backend.model
 
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -19,4 +20,10 @@ class PostImage(post: Post, imageUrl: String, originalName: String, uploadName: 
 
     @Column(columnDefinition = "VARCHAR(255)")
     var uploadName: String = uploadName
+
+    @Column
+    val createdAt: LocalDateTime = LocalDateTime.now()
+
+    @Column
+    var deletedAt: LocalDateTime? = null
 }

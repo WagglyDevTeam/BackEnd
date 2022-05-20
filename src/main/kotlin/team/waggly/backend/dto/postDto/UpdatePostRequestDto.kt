@@ -17,7 +17,7 @@ data class UpdatePostRequestDto(
         @field:NotNull(message = "학부를 선택해주세요.")
         val college: CollegeType?,
         val file: List<MultipartFile>?,
-        val deleteTargetId: List<String>?,
+        val deleteTargetUrl: List<String>?,
 ) {
     fun updateEntity(post: Post) {
         post.title = title ?: post.title

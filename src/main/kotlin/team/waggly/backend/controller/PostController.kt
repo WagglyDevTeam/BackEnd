@@ -8,7 +8,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.postDto.*
 import team.waggly.backend.exception.CustomException
@@ -47,7 +46,7 @@ class PostController (
 
     @GetMapping("/post/{postId}")
     fun getPostDetails(@PathVariable postId: Long,
-                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<PostDetailsResponseDto> {
+                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<PostSummaryResponseDto> {
         val user: User? = userDetailsImpl?.user ?: null
         return ResponseEntity.ok().body(postService.getPostDetails(postId, user))
     }
