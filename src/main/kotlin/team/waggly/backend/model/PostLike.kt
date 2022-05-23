@@ -3,14 +3,14 @@ package team.waggly.backend.model
 import javax.persistence.*
 
 @Entity(name = "post_like")
-class PostLike (
+class PostLike(post: Post, userId: Long){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: Long? = null
 
     @ManyToOne
-    val post: Post,
+    var post: Post = post
 
     @Column(columnDefinition = "INTEGER(10)")
-    val userId: Long
-)
+    var userId: Long = userId
+}
