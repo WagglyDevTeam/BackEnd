@@ -11,6 +11,7 @@ import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.postDto.*
 import team.waggly.backend.model.Post
 import team.waggly.backend.model.PostImage
+import team.waggly.backend.model.PostLike
 import team.waggly.backend.model.User
 import team.waggly.backend.repository.CommentRepository
 import team.waggly.backend.repository.PostImageRepository
@@ -65,7 +66,7 @@ class PostService (
         // 게시글 리스트
         val postsDto: MutableList<PostSummaryResponseDto> = arrayListOf()
         for (post in allPosts) {
-            val postDto: PostSummaryResponseDto = this.updatePostDetailInfo(post, userId!!)
+            val postDto: PostSummaryResponseDto = this.updatePostDetailInfo(post, userId)
             postsDto.add(postDto)
         }
 
@@ -87,16 +88,16 @@ class PostService (
         }
         val postDetailResponseDto = PostDetailResponseDto(post)
 
-        val postImages = postImageRepository.findAllByPostIdByDeletedAtNull(post.id!!)
+        val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(post.id!!)
         if (postImages != null) {
             for (postImage in postImages) {
                 postDetailResponseDto.postImages.add(postImage.imageUrl)
             }
         }
 
-        postDetailResponseDto.postLikeCnt = postLikeRepository.countByPostId(post.id!!)
-        postDetailResponseDto.postCommentCnt = commentRepository.countByPostId(post.id!!)
-        postDetailResponseDto.isLikedByMe = if (userId != null) postLikeRepository.existsByUserId(userId!!) else false
+        postDetailResponseDto.postLikeCnt = postLikeRepository.countByPostId(post.id)
+        postDetailResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
+        postDetailResponseDto.isLikedByMe = if (userId != null) postLikeRepository.existsByUserId(userId) else false
 
         return postDetailResponseDto
     }
@@ -115,7 +116,7 @@ class PostService (
             for (file in postCreateDto.file) {
                 val extName: String = file.originalFilename!!.substringAfterLast(".")
                 val uploadName = "${UUID.randomUUID()}.${extName}"
-                val fileUrl: String = s3Uploader.upload(file!!, uploadName)
+                val fileUrl: String = s3Uploader.upload(file, uploadName)
                 val image = PostImage(post, fileUrl, file.originalFilename!!, uploadName)
                 postImageRepository.save(image)
             }
@@ -138,15 +139,15 @@ class PostService (
             for (file in postUpdateDto.file) {
                 val extName: String = file.originalFilename!!.substringAfterLast(".")
                 val uploadName = "${UUID.randomUUID()}.${extName}"
-                val fileUrl: String = s3Uploader.upload(file!!, uploadName)
+                val fileUrl: String = s3Uploader.upload(file, uploadName)
                 val image = PostImage(post, fileUrl, file.originalFilename!!, uploadName)
                 postImageRepository.save(image)
             }
         }
 
-        if (postUpdateDto.deleteTargetUrl != null && postUpdateDto.deleteTargetUrl.isNotEmpty()) {
+        if ((postUpdateDto.deleteTargetUrl != null) && postUpdateDto.deleteTargetUrl.isNotEmpty()) {
             for (target in postUpdateDto.deleteTargetUrl) {
-                val targetImage: PostImage = postImageRepository.findByImageUrlByDeletedAtNull(target) ?: null ?: throw NotFoundException()
+                val targetImage: PostImage = postImageRepository.findByImageUrlAndDeletedAtNull(target) ?: throw NotFoundException()
                 println(dir + targetImage.uploadName)
                 s3Uploader.delete(targetImage.uploadName)
                 postImageRepository.delete(targetImage)
@@ -156,16 +157,16 @@ class PostService (
 
         val postDetailResponseDto = PostDetailResponseDto(updatedPost)
 
-        val postImages = postImageRepository.findAllByPostIdByDeletedAtNull(updatedPost.id!!)
+        val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(updatedPost.id!!)
         if (postImages != null) {
             for (postImage in postImages) {
                 postDetailResponseDto.postImages.add(postImage.imageUrl)
             }
         }
 
-        postDetailResponseDto.postLikeCnt = postLikeRepository.countByPostId(updatedPost.id!!)
-        postDetailResponseDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id!!)
-        postDetailResponseDto.isLikedByMe = if (user.id != null) postLikeRepository.existsByUserId(user.id) else false
+        postDetailResponseDto.postLikeCnt = postLikeRepository.countByPostId(updatedPost.id)
+        postDetailResponseDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id)
+        postDetailResponseDto.isLikedByMe = postLikeRepository.existsByUserId(user.id)
 
         return postDetailResponseDto
     }
@@ -187,9 +188,9 @@ class PostService (
         val postSummaryResponseDto = PostSummaryResponseDto(post)
 
         val postImageCnt: Int = postImageRepository.findAllByPostId(post.id!!).size
-        val postLikeCnt: Int = postLikeRepository.countByPostId(post.id!!)
-        val postCommentCnt: Int = commentRepository.countByPostId(post.id!!)
-        val isLikedByMe: Boolean = if (userId != null) postLikeRepository.existsByUserId(userId) else false
+        val postLikeCnt: Int = postLikeRepository.countByPostId(post.id)
+        val postCommentCnt: Int = commentRepository.countByPostId(post.id)
+        val isLikedByMe: Boolean = postLikeRepository.existsByUserId(userId)
 
         postSummaryResponseDto.postImageCnt = postImageCnt
         postSummaryResponseDto.postLikeCnt = postLikeCnt
@@ -197,5 +198,28 @@ class PostService (
         postSummaryResponseDto.isLikedByMe = isLikedByMe
 
         return postSummaryResponseDto
+    }
+
+    fun likePost(postId: Long, userId: Long): PostLikeResponseDto {
+        val post: Post = postRepository.findById(postId).orElseThrow()
+
+        val postLike: PostLike? = postLikeRepository.findByPostAndUserId(post, userId)
+        println(postLike)
+
+        // 좋아요를 안눌렀으면, PostLike 추가
+        val isLikedByMe: Boolean = if (postLike == null) {
+            postLikeRepository.save(PostLike(post, userId))
+            true
+        } else {
+            // 좋아요를 눌렀으면, PostLike 삭제
+            postLikeRepository.delete(postLike)
+            false
+        }
+
+        val postLikeCnt: Int = postLikeRepository.countByPostId(postId)
+        return PostLikeResponseDto(
+            isLikedByMe,
+            postLikeCnt,
+        )
     }
 }
