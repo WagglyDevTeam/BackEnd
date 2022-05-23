@@ -12,6 +12,7 @@ import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.postDto.*
 import team.waggly.backend.exception.CustomException
 import team.waggly.backend.model.User
+import team.waggly.backend.repository.PostLikeRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.PostService
 import team.waggly.backend.service.awsS3.S3Uploader
@@ -20,10 +21,11 @@ import javax.validation.Valid
 @RestController
 class PostController (
         private val postService: PostService,
-        private val s3Uploader: S3Uploader,
+        private val postLikeRepository: PostLikeRepository
 ) {
-    @GetMapping("/post")
-    fun getAllPosts(@PageableDefault(size = 10, page = 1) pageable: Pageable,
+    // 모든 게시글 (학부 필터링 포함)
+    @GetMapping("/board")
+    fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
                     @RequestParam college: String?,
                     @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<Any> {
         val user: User? = userDetailsImpl?.user ?: null
@@ -44,14 +46,17 @@ class PostController (
         }
     }
 
-    @GetMapping("/post/{postId}")
-    fun getPostDetails(@PathVariable postId: Long,
-                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<PostSummaryResponseDto> {
+    // 게시글 상세
+    @GetMapping("/board/{boardId}")
+    fun getPostDetails(@PathVariable boardId: Long,
+                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?):
+            ResponseEntity<PostDetailResponseDto> {
         val user: User? = userDetailsImpl?.user ?: null
-        return ResponseEntity.ok().body(postService.getPostDetails(postId, user))
+        return ResponseEntity.ok().body(postService.getPostDetails(boardId, user))
     }
 
-    @PostMapping("/post")
+    // 게시글 작성
+    @PostMapping("/board")
     fun createPost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
                    @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
                    bindingResult: BindingResult): ResponseEntity<Any> {
@@ -70,9 +75,10 @@ class PostController (
         return ResponseEntity<Any>(postService.createPost(postCreateDto, userDetailsImpl), HttpStatus.CREATED)
     }
 
-    @PutMapping("/post/{postId}")
+    // 게시글 수정
+    @PutMapping("/board/{boardId}")
     fun updatePost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
-                   @PathVariable postId: Long,
+                   @PathVariable boardId: Long,
                    @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
                    bindingResult: BindingResult): ResponseEntity<Any> {
         if (bindingResult.hasErrors()) {
@@ -87,14 +93,22 @@ class PostController (
             }
             return ResponseEntity.badRequest().body(CustomException.ValidatorException(result))
         }
-        return ResponseEntity.ok().body(postService.updatePost(postId, postUpdateDto, userDetailsImpl))
+        return ResponseEntity.ok().body(postService.updatePost(boardId, postUpdateDto, userDetailsImpl))
     }
 
-    @DeleteMapping("/post/{postId}")
-    fun deletePost(@PathVariable postId: Long,
+    // 게시글 삭제
+    @DeleteMapping("/board/{boardId}")
+    fun deletePost(@PathVariable boardId: Long,
                    @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
-        postService.deletePost(postId, userDetailsImpl.user)
+        postService.deletePost(boardId, userDetailsImpl.user)
         return ResponseEntity<Any>(DeletePostResponseDto(true), HttpStatus.NO_CONTENT)
+    }
+
+    @PostMapping("/board/{boardId}/like")
+    fun likePost(@PathVariable boardId: Long,
+                 @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseEntity<PostLikeResponseDto> {
+        val userId: Long = userDetailsImpl.user.id ?: throw NoSuchElementException()
+        return ResponseEntity.ok().body(postService.likePost(boardId, userId))
     }
 }
 
