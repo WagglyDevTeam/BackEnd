@@ -4,17 +4,18 @@ import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.model.Post
 import java.time.LocalDateTime
 
-// 수정
-data class PostSummaryResponseDto(
+data class PostDetailDto(
     val postId: Long?,
     val postTitle: String,
     val postDesc: String,
     val postCreatedAt: LocalDateTime,
-//        var authorMajor: String,
-    var postImageCnt: Int?,
+    val postImages: MutableList<String>,
     var postLikeCnt: Int?,
     var postCommentCnt: Int?,
     var isLikedByMe: Boolean?,
+    val authorId: Long,
+    //        var authorMajor: String,
+    val authorNickname: String,
     val isBlind: Boolean,
     val isAnonymous: Boolean,
 ) {
@@ -23,10 +24,12 @@ data class PostSummaryResponseDto(
         post.title,
         post.description,
         post.createdAt,
-            null,
+        arrayListOf(),
         null,
         null,
         null,
+        post.author.id!!,
+        post.author.nickName,
         post.activeStatus == ActiveStatusType.INACTIVE,
         post.isAnonymous != 0,
     )
