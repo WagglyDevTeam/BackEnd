@@ -15,7 +15,6 @@ import team.waggly.backend.model.User
 import team.waggly.backend.repository.PostLikeRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.PostService
-import team.waggly.backend.service.awsS3.S3Uploader
 import javax.validation.Valid
 
 @RestController
@@ -50,7 +49,7 @@ class PostController (
     @GetMapping("/board/{boardId}")
     fun getPostDetails(@PathVariable boardId: Long,
                        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?):
-            ResponseEntity<PostDetailResponseDto> {
+            ResponseEntity<PostDetailDto> {
         val user: User? = userDetailsImpl?.user ?: null
         return ResponseEntity.ok().body(postService.getPostDetails(boardId, user))
     }
