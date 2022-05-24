@@ -78,7 +78,7 @@ class PostService (
     }
 
     // 게시글 상세 조회하기 (만약 본인 게시글이면 조회가 가능해야하니깐)
-    fun getPostDetails(postId: Long, user: User?): PostDetailResponseDto {
+    fun getPostDetails(postId: Long, user: User?): PostDetailDto {
         val userId: Long? = user?.id
 
         val post: Post = postRepository.findById(postId).orElse(null) ?: throw NotFoundException()
@@ -86,20 +86,20 @@ class PostService (
         if (post.activeStatus != ActiveStatusType.ACTIVE) {
             throw IllegalArgumentException("비공개 게시글입니다.")
         }
-        val postDetailResponseDto = PostDetailResponseDto(post)
+        val postDetailDto = PostDetailDto(post)
 
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(post.id!!)
         if (postImages != null) {
             for (postImage in postImages) {
-                postDetailResponseDto.postImages.add(postImage.imageUrl)
+                postDetailDto.postImages.add(postImage.imageUrl)
             }
         }
 
-        postDetailResponseDto.postLikeCnt = postLikeRepository.countByPostId(post.id)
-        postDetailResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        postDetailResponseDto.isLikedByMe = if (userId != null) postLikeRepository.existsByUserId(userId) else false
+        postDetailDto.postLikeCnt = postLikeRepository.countByPostId(post.id)
+        postDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
+        postDetailDto.isLikedByMe = if (userId != null) postLikeRepository.existsByUserId(userId) else false
 
-        return postDetailResponseDto
+        return postDetailDto
     }
 
     @Transactional
@@ -127,7 +127,7 @@ class PostService (
     @Transactional
     fun updatePost(postId: Long,
                    postUpdateDto: UpdatePostRequestDto,
-                   userDetailsImpl: UserDetailsImpl): PostDetailResponseDto {
+                   userDetailsImpl: UserDetailsImpl): PostDetailDto {
         val user = userDetailsImpl.user
         if (user.id == null) {
             throw NotFoundException()
@@ -155,20 +155,20 @@ class PostService (
         }
         val updatedPost = postRepository.save(post)
 
-        val postDetailResponseDto = PostDetailResponseDto(updatedPost)
+        val postDetailDto = PostDetailDto(updatedPost)
 
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(updatedPost.id!!)
         if (postImages != null) {
             for (postImage in postImages) {
-                postDetailResponseDto.postImages.add(postImage.imageUrl)
+                postDetailDto.postImages.add(postImage.imageUrl)
             }
         }
 
-        postDetailResponseDto.postLikeCnt = postLikeRepository.countByPostId(updatedPost.id)
-        postDetailResponseDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id)
-        postDetailResponseDto.isLikedByMe = postLikeRepository.existsByUserId(user.id)
+        postDetailDto.postLikeCnt = postLikeRepository.countByPostId(updatedPost.id)
+        postDetailDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id)
+        postDetailDto.isLikedByMe = postLikeRepository.existsByUserId(user.id)
 
-        return postDetailResponseDto
+        return postDetailDto
     }
 
     @Transactional
@@ -187,15 +187,10 @@ class PostService (
     fun updatePostDetailInfo(post: Post, userId: Long): PostSummaryResponseDto {
         val postSummaryResponseDto = PostSummaryResponseDto(post)
 
-        val postImageCnt: Int = postImageRepository.findAllByPostId(post.id!!).size
-        val postLikeCnt: Int = postLikeRepository.countByPostId(post.id)
-        val postCommentCnt: Int = commentRepository.countByPostId(post.id)
-        val isLikedByMe: Boolean = postLikeRepository.existsByUserId(userId)
-
-        postSummaryResponseDto.postImageCnt = postImageCnt
-        postSummaryResponseDto.postLikeCnt = postLikeCnt
-        postSummaryResponseDto.postCommentCnt = postCommentCnt
-        postSummaryResponseDto.isLikedByMe = isLikedByMe
+        postSummaryResponseDto.postImageCnt = postImageRepository.findAllByPostId(post.id!!).size
+        postSummaryResponseDto.postLikeCnt = postLikeRepository.countByPostId(post.id)
+        postSummaryResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
+        postSummaryResponseDto.isLikedByMe = postLikeRepository.existsByUserId(userId)
 
         return postSummaryResponseDto
     }
