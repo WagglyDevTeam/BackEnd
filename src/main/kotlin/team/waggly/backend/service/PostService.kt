@@ -41,9 +41,11 @@ class PostService (
         val allPosts: List<Post> = postRepository.findAllActivePosts()
 
         val postsDto: MutableList<PostSummaryResponseDto> = arrayListOf()
-        for (post in allPosts) {
-            val dto: PostSummaryResponseDto = updatePostSummaryResponseDto(post, userId!!)
-            postsDto.add(dto)
+        if(allPosts.isNotEmpty()) {
+            for (post in allPosts) {
+                val dto: PostSummaryResponseDto = updatePostSummaryResponseDto(post, userId!!)
+                postsDto.add(dto)
+            }
         }
 
         val start: Long = pageable.offset
@@ -97,7 +99,7 @@ class PostService (
 
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        postDetailDto.isLikedByMe = if (userId != null) postLikeRepository.existsByUserId(userId) else false
+        postDetailDto.isLikedByMe = if (userId != null) postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE) else false
 
         return postDetailDto
     }
@@ -157,7 +159,6 @@ class PostService (
             }
         }
         val updatedPost = postRepository.save(post)
-
         val postDetailDto = PostDetailDto(updatedPost)
 
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(updatedPost.id!!)
@@ -169,7 +170,7 @@ class PostService (
 
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(updatedPost.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id)
-        postDetailDto.isLikedByMe = postLikeRepository.existsByUserId(user.id)
+        postDetailDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id!!, user.id, ActiveStatusType.ACTIVE)
 
         return postDetailDto
     }
@@ -187,13 +188,13 @@ class PostService (
         return DeletePostResponseDto(true)
     }
 
-    fun updatePostSummaryResponseDto(post: Post, userId: Long): PostSummaryResponseDto {
+    private fun updatePostSummaryResponseDto(post: Post, userId: Long): PostSummaryResponseDto {
         val postSummaryResponseDto = PostSummaryResponseDto(post)
 
-        postSummaryResponseDto.postImageCnt = postImageRepository.findAllByPostId(post.id!!).size
+        postSummaryResponseDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
         postSummaryResponseDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postSummaryResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        postSummaryResponseDto.isLikedByMe = postLikeRepository.existsByUserId(userId)
+        postSummaryResponseDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
 
         return postSummaryResponseDto
     }
