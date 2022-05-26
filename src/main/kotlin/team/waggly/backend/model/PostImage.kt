@@ -1,16 +1,29 @@
 package team.waggly.backend.model
 
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-class PostImage (
+class PostImage(post: Post, imageUrl: String, originalName: String, uploadName: String) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: Long? = null
 
     @ManyToOne
-    val post: Post,
+    var post: Post = post
 
     @Column(columnDefinition = "VARCHAR(255)")
-    val imageUrl: String,
-)
+    var imageUrl: String = imageUrl
+
+    @Column(columnDefinition = "VARCHAR(255)")
+    var originalName: String = originalName
+
+    @Column(columnDefinition = "VARCHAR(255)")
+    var uploadName: String = uploadName
+
+    @Column
+    val createdAt: LocalDateTime = LocalDateTime.now()
+
+    @Column
+    var deletedAt: LocalDateTime? = null
+}
