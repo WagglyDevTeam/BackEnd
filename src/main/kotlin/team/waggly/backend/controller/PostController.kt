@@ -48,7 +48,7 @@ class PostController (
     @GetMapping("/post/{postId}")
     fun getPostDetails(@PathVariable postId: Long,
                        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<PostDto.PostDetailsResponseDto> {
-        val user: User? = userDetailsImpl?.user ?: null
+        val user: User? = userDetailsImpl?.user
         return ResponseEntity.ok(postService.getPostDetails(postId, user))
     }
 
