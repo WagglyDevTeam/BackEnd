@@ -22,9 +22,9 @@ class MyPageController (
     @GetMapping("/user/post")
     fun getAllMyPost(@PageableDefault(size = 10, page = 0) pageable: Pageable,
                      @RequestParam college: String?,
-                     @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<Any> {
-        val user: User =
-        myPageService.getAllMyPost()
-        return ResponseEntity<Any>("", HttpStatus.OK)
+                     @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
+        val user: User = userDetailsImpl.user
+
+        return ResponseEntity<Any>(myPageService.getAllMyPost(pageable, user), HttpStatus.OK)
     }
 }

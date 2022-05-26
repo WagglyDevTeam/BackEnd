@@ -9,7 +9,7 @@ data class MyPostsResponseDto (
     val postDesc: String,
     val postCreatedAt: LocalDateTime,
     //        var authorMajor: String,
-    val postImageCnt: Int?,
+    var postImageCnt: Int?,
     var postLikeCnt: Int?,
     var postCommentCnt: Int?,
     var isLikedByMe: Boolean?,
