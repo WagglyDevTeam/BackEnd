@@ -42,7 +42,7 @@ class PostService (
 
         val postsDto: MutableList<PostSummaryResponseDto> = arrayListOf()
         for (post in allPosts) {
-            val dto: PostSummaryResponseDto = updatePostDetailInfo(post, userId!!)
+            val dto: PostSummaryResponseDto = updatePostSummaryResponseDto(post, userId!!)
             postsDto.add(dto)
         }
 
@@ -61,12 +61,12 @@ class PostService (
         val best: Post = postRepository.findById(collegeBestId).orElse(allPosts[0])
 
         // Best 게시글
-        val bestDto: PostSummaryResponseDto = this.updatePostDetailInfo(best, userId!!)
+        val bestDto: PostSummaryResponseDto = this.updatePostSummaryResponseDto(best, userId!!)
 
         // 게시글 리스트
         val postsDto: MutableList<PostSummaryResponseDto> = arrayListOf()
         for (post in allPosts) {
-            val postDto: PostSummaryResponseDto = this.updatePostDetailInfo(post, userId)
+            val postDto: PostSummaryResponseDto = this.updatePostSummaryResponseDto(post, userId)
             postsDto.add(postDto)
         }
 
@@ -95,7 +95,7 @@ class PostService (
             }
         }
 
-        postDetailDto.postLikeCnt = postLikeRepository.countByPostId(post.id)
+        postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
         postDetailDto.isLikedByMe = if (userId != null) postLikeRepository.existsByUserId(userId) else false
 
@@ -115,6 +115,9 @@ class PostService (
         if (postCreateDto.file != null) {
             for (file in postCreateDto.file) {
                 val extName: String = file.originalFilename!!.substringAfterLast(".")
+                if (!listOf("jpg", "jpeg", "gif", "png").contains(extName)) {
+                    throw IllegalArgumentException("올바른 파일 형식이 아닙니다.")
+                }
                 val uploadName = "${UUID.randomUUID()}.${extName}"
                 val fileUrl: String = s3Uploader.upload(file, uploadName)
                 val image = PostImage(post, fileUrl, file.originalFilename!!, uploadName)
@@ -164,7 +167,7 @@ class PostService (
             }
         }
 
-        postDetailDto.postLikeCnt = postLikeRepository.countByPostId(updatedPost.id)
+        postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(updatedPost.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id)
         postDetailDto.isLikedByMe = postLikeRepository.existsByUserId(user.id)
 
@@ -184,11 +187,11 @@ class PostService (
         return DeletePostResponseDto(true)
     }
 
-    fun updatePostDetailInfo(post: Post, userId: Long): PostSummaryResponseDto {
+    fun updatePostSummaryResponseDto(post: Post, userId: Long): PostSummaryResponseDto {
         val postSummaryResponseDto = PostSummaryResponseDto(post)
 
         postSummaryResponseDto.postImageCnt = postImageRepository.findAllByPostId(post.id!!).size
-        postSummaryResponseDto.postLikeCnt = postLikeRepository.countByPostId(post.id)
+        postSummaryResponseDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postSummaryResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
         postSummaryResponseDto.isLikedByMe = postLikeRepository.existsByUserId(userId)
 
@@ -201,17 +204,25 @@ class PostService (
         val postLike: PostLike? = postLikeRepository.findByPostAndUserId(post, userId)
         println(postLike)
 
+        var isLikedByMe: Boolean = false
+
         // 좋아요를 안눌렀으면, PostLike 추가
-        val isLikedByMe: Boolean = if (postLike == null) {
+        if (postLike == null) {
             postLikeRepository.save(PostLike(post, userId))
-            true
+            isLikedByMe = true
         } else {
-            // 좋아요를 눌렀으면, PostLike 삭제
-            postLikeRepository.delete(postLike)
-            false
+            when (postLike.status) {
+                ActiveStatusType.INACTIVE -> {
+                    postLike.status = ActiveStatusType.ACTIVE
+                    isLikedByMe = true
+                }
+                ActiveStatusType.ACTIVE -> postLike.status = ActiveStatusType.INACTIVE
+            }
+
+            postLikeRepository.save(postLike)
         }
 
-        val postLikeCnt: Int = postLikeRepository.countByPostId(postId)
+        val postLikeCnt: Int = postLikeRepository.countByPostIdAndStatus(postId, ActiveStatusType.ACTIVE)
         return PostLikeResponseDto(
             isLikedByMe,
             postLikeCnt,

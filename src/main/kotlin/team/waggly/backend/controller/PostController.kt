@@ -103,7 +103,8 @@ class PostController (
         return ResponseEntity<Any>(DeletePostResponseDto(true), HttpStatus.NO_CONTENT)
     }
 
-    @PostMapping("/board/{boardId}/like")
+    // 게시글 좋아요
+    @PutMapping("/board/{boardId}/like")
     fun likePost(@PathVariable boardId: Long,
                  @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseEntity<PostLikeResponseDto> {
         val userId: Long = userDetailsImpl.user.id ?: throw NoSuchElementException()
