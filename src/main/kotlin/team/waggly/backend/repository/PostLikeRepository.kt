@@ -2,6 +2,7 @@ package team.waggly.backend.repository
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.model.Post
 import team.waggly.backend.model.PostLike
 
@@ -13,10 +14,12 @@ interface PostLikeRepository : JpaRepository<PostLike, Long> {
     fun getMostLikedPostInCollege(college: String): Long?
 
     fun countByPostId(postId: Long): Int
+    fun countByPostIdAndStatus(postId: Long, status: ActiveStatusType): Int
 
     fun existsByUserId(userId: Long): Boolean
 
     fun findByPostAndUserId(post: Post, userId: Long): PostLike?
+
 }
 
 //
