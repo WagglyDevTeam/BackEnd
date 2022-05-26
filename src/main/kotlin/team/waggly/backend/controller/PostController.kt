@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.PostDto
-import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.exception.CustomException
 import team.waggly.backend.model.User
 import team.waggly.backend.security.UserDetailsImpl
@@ -27,10 +26,10 @@ class PostController (
     @GetMapping("/post")
     fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
                     @RequestParam college: String?,
-                    @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseDto<Any> {
+                    @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<Any> {
         val user: User? = userDetailsImpl?.user ?: null
         if (college == null) {
-            return ResponseDto(postService.getAllPosts(pageable, user))
+            return ResponseEntity<Any>(postService.getAllPosts(pageable, user), HttpStatus.OK)
         } else {
             val collegeEnum = when (college) {
                 "test" -> CollegeType.TEST
@@ -42,21 +41,21 @@ class PostController (
                 else -> throw NoSuchElementException("올바른 학부를 선택해주세요.")
             }
 
-            return ResponseDto(postService.getAllPostsByCollegeByOrderByIdDesc(collegeEnum, pageable, user))
+            return ResponseEntity<Any>(postService.getAllPostsByCollegeByOrderByIdDesc(collegeEnum, pageable, user), HttpStatus.OK)
         }
     }
 
     @GetMapping("/post/{postId}")
     fun getPostDetails(@PathVariable postId: Long,
-                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseDto<PostDto.PostDetailsResponseDto> {
-        val user: User? = userDetailsImpl?.user ?: null
-        return ResponseDto(postService.getPostDetails(postId, user))
+                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseEntity<PostDto.PostDetailsResponseDto> {
+        val user: User? = userDetailsImpl?.user
+        return ResponseEntity.ok(postService.getPostDetails(postId, user))
     }
 
     @PostMapping("/post")
     fun createPost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
                    @RequestBody @Valid postCreateDto: PostDto.CreatePostRequestDto,
-                   bindingResult: BindingResult): ResponseDto<Any> {
+                   bindingResult: BindingResult): ResponseEntity<Any> {
         if (bindingResult.hasErrors()) {
             val msg: MutableList<String> = arrayListOf()
             bindingResult.allErrors.forEach {
@@ -67,16 +66,16 @@ class PostController (
             val result = bindingResult.allErrors.map {
                     error -> CustomException.ValidatorExceptionReturnType(error.code!!, error.defaultMessage!!)
             }
-            return ResponseDto(CustomException.ValidatorException(result))
+            return ResponseEntity.badRequest().body(CustomException.ValidatorException(result))
         }
-        return ResponseDto(postService.createPost(postCreateDto, userDetailsImpl), HttpStatus.CREATED.value())
+        return ResponseEntity<Any>(postService.createPost(postCreateDto, userDetailsImpl), HttpStatus.CREATED)
     }
 
     @PutMapping("/post/{postId}")
     fun updatePost(@PathVariable postId: Long,
-                   @RequestBody postUpdateDto: PostDto.UpdatePostRequestDto): ResponseDto<PostDto.SuccessResponse> {
+                   @RequestBody postUpdateDto: PostDto.UpdatePostRequestDto): ResponseEntity<Any> {
         postService.updatePost(postId, postUpdateDto)
-        return ResponseDto(PostDto.SuccessResponse(true))
+        return ResponseEntity<Any>(PostDto.SuccessResponse(true), HttpStatus.OK)
     }
 
     @DeleteMapping("/post/{postId}")
