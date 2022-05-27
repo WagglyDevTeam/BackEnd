@@ -23,6 +23,7 @@ class Comment(
     val description: String,
 
     @Column(columnDefinition = "VARCHAR(10)")
+    @Enumerated(EnumType.STRING)
     val activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
 
     @Column

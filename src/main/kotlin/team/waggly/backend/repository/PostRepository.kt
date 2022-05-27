@@ -18,7 +18,7 @@ interface PostRepository: JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE active_status='ACTIVE' and college LIKE CONCAT('%',:college,'%')")
     fun findActivePostsByCollegeByOrderByIdDesc(college: String): List<Post>
 
-    fun findByAuthorAndActiveStatus(user: User, active: ActiveStatusType): List<Post>
+    fun findByAuthorAndActiveStatusOrderByCreatedAtDesc(user: User, activeStatus: ActiveStatusType): List<Post>
 }
 
 //    @Query("SELECT p FROM Post p WHERE college LIKE CONCAT('%',:college,'%')")
