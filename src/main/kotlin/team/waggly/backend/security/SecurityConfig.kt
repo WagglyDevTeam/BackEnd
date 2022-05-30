@@ -77,6 +77,7 @@ class SecurityConfig(
         skipPathList.add("POST,/user/signup")
         skipPathList.add("POST,/user/signup")
         skipPathList.add("POST,/user/email")
+        skipPathList.add("POST,/major")
         skipPathList.add("POST,/user/email/certification")
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")
