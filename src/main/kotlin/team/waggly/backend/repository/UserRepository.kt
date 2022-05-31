@@ -7,4 +7,5 @@ import team.waggly.backend.model.User
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
     fun findByEmail(email: String): User?
+    fun findByNickName(nickname: String): User?
 }

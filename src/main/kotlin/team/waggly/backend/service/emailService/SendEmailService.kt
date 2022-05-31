@@ -82,7 +82,7 @@ class SendEmailService(
         return key.toString()
     }
 
-    //  Key = 이메일, value = 인증번호 인 hashMap을 Redis에 Hash로 저장시킨다.
+    //  Key = 이메일, value = 인증번호를 Redis에 expire time 100초로 저장시킨다.
     fun saveHashMapToRedis(email: String,certiNum: String){
         val hashOperations = redisTemplate.opsForValue()
         hashOperations.set(email,certiNum,100,TimeUnit.SECONDS)
