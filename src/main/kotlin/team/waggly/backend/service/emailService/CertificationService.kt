@@ -49,11 +49,10 @@ class CertificationService(
     }
 
     fun checkCertificationNum(email: String, certiNum: String): Boolean{
-        val hashOperations = redisTemplate.opsForHash<String, Any>()
-        val hashMapForCertification = hashOperations.entries("certificationEmail")
-
-        if(hashMapForCertification.containsKey(email))
-            if(certiNum == hashMapForCertification[email])
+        val hashOperations = redisTemplate.opsForValue()
+        print(hashOperations.get(email))
+        if(hashOperations.get(email)!=null)
+            if(certiNum == hashOperations.get(email))
                 return true
 
         return false

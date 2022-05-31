@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import team.waggly.backend.dto.SendEmailDto
 import team.waggly.backend.repository.UniversityRepository
+import java.util.concurrent.TimeUnit
 import javax.mail.internet.MimeMessage
 
 @Service
@@ -82,11 +83,8 @@ class SendEmailService(
     }
 
     //  Key = 이메일, value = 인증번호 인 hashMap을 Redis에 Hash로 저장시킨다.
-    fun saveHashMapToRedis(email: String,key: String){
-        val hashOperations = redisTemplate.opsForHash<String, Any>()
-        val hashMap = HashMap<String, String>()
-        hashMap.put(email,key)
-        hashOperations.putAll("certificationEmail",hashMap)
-
+    fun saveHashMapToRedis(email: String,certiNum: String){
+        val hashOperations = redisTemplate.opsForValue()
+        hashOperations.set(email,certiNum,100,TimeUnit.SECONDS)
     }
 }
