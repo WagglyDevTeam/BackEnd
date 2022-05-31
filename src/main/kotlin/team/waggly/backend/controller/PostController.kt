@@ -54,7 +54,7 @@ class PostController (
 
     @PostMapping("/post")
     fun createPost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
-                   @RequestBody @Valid postCreateDto: PostDto.CreatePostRequestDto,
+                   @RequestBody  postCreateDto: PostDto.CreatePostRequestDto,
                    bindingResult: BindingResult): ResponseEntity<Any> {
         if (bindingResult.hasErrors()) {
             val msg: MutableList<String> = arrayListOf()

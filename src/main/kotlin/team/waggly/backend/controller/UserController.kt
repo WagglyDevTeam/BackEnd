@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.RestController
 import team.waggly.backend.dto.CertificationDto
 import team.waggly.backend.dto.SendEmailDto
 import team.waggly.backend.dto.SignupDto
+import team.waggly.backend.dto.user.CheckNicknameRequestDto
+import team.waggly.backend.dto.user.CheckNicknameResponseDto
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.SignupService
+import java.util.regex.Pattern
+import javax.validation.Valid
 
 @RestController
 class UserController(
@@ -40,5 +44,14 @@ class UserController(
     @PostMapping("/user/email/certification")
     fun certificationController(@RequestBody certificationRequestDto: CertificationDto.Reqeust): ResponseEntity<CertificationDto.Response> {
         return ResponseEntity.ok().body(certificationService.certificationEmail(certificationRequestDto))
+    }
+
+    @PostMapping("/user/nickname")
+    fun checkUserNickname(@RequestBody @Valid checkNicknameRequestDto: CheckNicknameRequestDto): CheckNicknameResponseDto {
+        val pattern = Pattern.compile("^[A-Za-z0-9가-힣]{2,6}$")
+        val matcher = pattern.matcher(checkNicknameRequestDto.nickname)
+        if(!matcher.find())
+            throw Exception("정규 표현식이 맞지 않습니다.")
+        return signupService.checkUserNickname(checkNicknameRequestDto)
     }
 }
