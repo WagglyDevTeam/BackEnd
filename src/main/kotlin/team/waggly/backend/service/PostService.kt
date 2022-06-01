@@ -38,7 +38,12 @@ class PostService (
     // 전체 게시글 조회
     fun getAllPosts(pageable: Pageable, user: User?): List<PostSummaryResponseDto> {
         val userId: Long? = user?.id
-        val allPosts: List<Post> = postRepository.findAllActivePosts()
+        val allPosts: List<Post> = postRepository.findAllByActiveStatusOrderByIdDesc(ActiveStatusType.ACTIVE)
+
+        // 게시글이 없을 경우 빈 배열
+        if (allPosts.isEmpty()) {
+            return emptyList()
+        }
 
         val postsDto: MutableList<PostSummaryResponseDto> = arrayListOf()
         if(allPosts.isNotEmpty()) {
@@ -54,10 +59,14 @@ class PostService (
     }
 
     // 단과대 별 게시글 조회
-    fun getAllPostsByCollegeByOrderByIdDesc(college: CollegeType, pageable: Pageable, user: User?): CollegePostsResponseDto {
+    fun getAllCollegePosts(college: CollegeType, pageable: Pageable, user: User?): CollegePostsResponseDto {
         val userId: Long? = user?.id
-        val allPosts: List<Post> = postRepository.findActivePostsByCollegeByOrderByIdDesc(college.toString())
+        val allPosts: List<Post> = postRepository.findAllByCollegeAndActiveStatusOrderByIdDesc(college, ActiveStatusType.ACTIVE)
 
+        // 게시글이 없을 경우 null + 빈 배열
+        if (allPosts.isEmpty()) {
+            return CollegePostsResponseDto(null, emptyList())
+        }
         // 해당 단과대의 베스트 게시글 ID
         val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(college.toString()) ?: 0
         val best: Post = postRepository.findById(collegeBestId).orElse(allPosts[0])
@@ -79,14 +88,14 @@ class PostService (
         return CollegePostsResponseDto(bestDto, postsDtoToPageable)
     }
 
-    // 게시글 상세 조회하기 (만약 본인 게시글이면 조회가 가능해야하니깐)
+    // 게시글 상세 조회하기
     fun getPostDetails(postId: Long, user: User?): PostDetailDto {
         val userId: Long? = user?.id
-
         val post: Post = postRepository.findById(postId).orElse(null) ?: throw NotFoundException()
 
-        if (post.activeStatus != ActiveStatusType.ACTIVE) {
-            throw IllegalArgumentException("비공개 게시글입니다.")
+        // 삭제된 게시글 처리
+        if (post.activeStatus == ActiveStatusType.INACTIVE) {
+            throw IllegalArgumentException("삭제된 게시글입니다.")
         }
         val postDetailDto = PostDetailDto(post)
 
@@ -104,6 +113,7 @@ class PostService (
         return postDetailDto
     }
 
+    // 게시글 작성
     @Transactional
     fun createPost(postCreateDto: CreatePostRequestDto,
                    userDetailsImpl: UserDetailsImpl): CreatePostResponseDto {
@@ -118,7 +128,7 @@ class PostService (
             for (file in postCreateDto.file) {
                 val extName: String = file.originalFilename!!.substringAfterLast(".")
                 if (!listOf("jpg", "jpeg", "gif", "png").contains(extName)) {
-                    throw IllegalArgumentException("올바른 파일 형식이 아닙니다.")
+                    throw IllegalArgumentException("올바른 파일 형식이 아닙니다. (.jpg, .jpeg, .gif, .png)")
                 }
                 val uploadName = "${UUID.randomUUID()}.${extName}"
                 val fileUrl: String = s3Uploader.upload(file, uploadName)
@@ -129,6 +139,7 @@ class PostService (
         return CreatePostResponseDto(true)
     }
 
+    // 게시글 수정
     @Transactional
     fun updatePost(postId: Long,
                    postUpdateDto: UpdatePostRequestDto,
@@ -175,6 +186,7 @@ class PostService (
         return postDetailDto
     }
 
+    // 게시글 삭제
     @Transactional
     fun deletePost(postId: Long, user: User): DeletePostResponseDto {
         val post: Post = postRepository.findByIdOrNull(postId) ?: throw Exception("해당하는 게시글이 없습니다.")
@@ -188,17 +200,7 @@ class PostService (
         return DeletePostResponseDto(true)
     }
 
-    private fun updatePostSummaryResponseDto(post: Post, userId: Long): PostSummaryResponseDto {
-        val postSummaryResponseDto = PostSummaryResponseDto(post)
-
-        postSummaryResponseDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
-        postSummaryResponseDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
-        postSummaryResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        postSummaryResponseDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
-
-        return postSummaryResponseDto
-    }
-
+    // 좋아요
     fun likePost(postId: Long, userId: Long): PostLikeResponseDto {
         val post: Post = postRepository.findById(postId).orElseThrow()
 
@@ -229,4 +231,16 @@ class PostService (
             postLikeCnt,
         )
     }
+
+    private fun updatePostSummaryResponseDto(post: Post, userId: Long): PostSummaryResponseDto {
+        val postSummaryResponseDto = PostSummaryResponseDto(post)
+
+        postSummaryResponseDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
+        postSummaryResponseDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
+        postSummaryResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
+        postSummaryResponseDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
+
+        return postSummaryResponseDto
+    }
+
 }

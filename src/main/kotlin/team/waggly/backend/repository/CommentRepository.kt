@@ -8,6 +8,9 @@ import team.waggly.backend.model.User
 
 @Repository
 interface CommentRepository : JpaRepository<Comment, Long> {
-    fun countByPostId(postId: Long): Int
+    // MyPageController.getAllMyPosts - 내가 쓴 게시글 전체 리스트
     fun findByUserAndActiveStatusOrderByCreatedAtDesc(user: User, activeStatus: ActiveStatusType): List<Comment>
+
+    // 게시글의 댓글 수
+    fun countByPostId(postId: Long): Int
 }
