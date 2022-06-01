@@ -1,8 +1,11 @@
 package team.waggly.backend.controller
 
+import com.sun.mail.iap.Response
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import team.waggly.backend.dto.ResponseDto
+import team.waggly.backend.dto.commentdto.CommentLikeResponseDto
 import team.waggly.backend.dto.commentdto.CommentRequestDto
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.CommentService
@@ -15,13 +18,11 @@ class CommentController(private val commentService: CommentService) {
         @PathVariable postId: Long,
         @RequestBody commentRequestDto: CommentRequestDto,
         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl // null 불가능
-    ): ResponseEntity<Any> {
+    ): ResponseDto<Any> {
 
         commentService.createComment(postId, commentRequestDto, userDetailsImpl)
 
-        return ResponseEntity
-            .ok()
-            .body(true)
+        return ResponseDto()
     }
 
     //댓글 삭제
@@ -29,13 +30,11 @@ class CommentController(private val commentService: CommentService) {
     fun deleteComment(
         @PathVariable commentId: Long,
         @AuthenticationPrincipal userDetailImpl: UserDetailsImpl
-    ): ResponseEntity<Any> {
+    ): ResponseDto<Any> {
 
         commentService.deleteComment(commentId, userDetailImpl)
 
-        return ResponseEntity
-            .ok()
-            .body(true)
+        return ResponseDto()
     }
 
     //댓글 좋아요
@@ -43,9 +42,7 @@ class CommentController(private val commentService: CommentService) {
     fun likeComment(
         @PathVariable commentId: Long,
         @AuthenticationPrincipal userDetailImpl: UserDetailsImpl
-    ): ResponseEntity<Any> {
-        return ResponseEntity
-            .ok()
-            .body(commentService.likeComment(commentId, userDetailImpl))
+    ): ResponseDto<CommentLikeResponseDto> {
+        return ResponseDto(commentService.likeComment(commentId, userDetailImpl))
     }
 }
