@@ -25,7 +25,7 @@ class PostController (
         private val postLikeRepository: PostLikeRepository
 ) {
     // 모든 게시글 (학부 필터링 포함)
-    @GetMapping("/")
+    @GetMapping
     fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
                     @RequestParam college: String?,
                     @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseDto<Any> {
@@ -42,7 +42,7 @@ class PostController (
                 "social" -> CollegeType.SOCIAL
                 else -> throw NoSuchElementException("올바른 학부를 선택해주세요.")
             }
-            return ResponseDto(postService.getAllPostsByCollegeByOrderByIdDesc(collegeEnum, pageable, user))
+            return ResponseDto(postService.getAllCollegePosts(collegeEnum, pageable, user))
         }
     }
 
@@ -56,7 +56,7 @@ class PostController (
     }
 
     // 게시글 작성
-    @PostMapping("/")
+    @PostMapping
     fun createPost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
                    @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
                    bindingResult: BindingResult): ResponseDto<Any> {
