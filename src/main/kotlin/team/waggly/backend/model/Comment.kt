@@ -22,9 +22,15 @@ class Comment(
     @Column(columnDefinition = "VARCHAR(255)")
     val description: String,
 
+    @Column
+    var isAnonymous: Boolean = false,
+
     @Column(columnDefinition = "VARCHAR(10)")
-    val activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
+    var activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
 
     @Column
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column
+    var deletedAt: LocalDateTime? = null
 )

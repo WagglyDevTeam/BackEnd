@@ -1,7 +1,5 @@
 package team.waggly.backend.controller
 
-import com.sun.mail.iap.Response
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import team.waggly.backend.dto.ResponseDto
@@ -38,7 +36,7 @@ class CommentController(private val commentService: CommentService) {
     }
 
     //댓글 좋아요
-    @PostMapping("/like/comment/{commentId}")
+    @PutMapping("/like/comment/{commentId}")
     fun likeComment(
         @PathVariable commentId: Long,
         @AuthenticationPrincipal userDetailImpl: UserDetailsImpl
