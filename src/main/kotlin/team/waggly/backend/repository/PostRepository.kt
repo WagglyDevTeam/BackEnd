@@ -12,15 +12,12 @@ import team.waggly.backend.model.User
 
 @Repository
 interface PostRepository: JpaRepository<Post, Long> {
-    @Query("SELECT p FROM Post p WHERE active_status='ACTIVE'")
-    fun findAllActivePosts(): List<Post>
+    // PostController.getAllPosts - 게시글 전체 리스트 (Status: "ACTIVE")
+    fun findAllByActiveStatusOrderByIdDesc(activeStatus: ActiveStatusType): List<Post>
 
-    @Query("SELECT p FROM Post p WHERE active_status='ACTIVE' and college LIKE CONCAT('%',:college,'%')")
-    fun findActivePostsByCollegeByOrderByIdDesc(college: String): List<Post>
+    // PostController.getAllCollegePosts - 학과 전체 게시글 리스트 (Status: "ACTIVE")
+    fun findAllByCollegeAndActiveStatusOrderByIdDesc(college: CollegeType, activeStatus: ActiveStatusType): List<Post>
 
+    // MyPageController.getAllMyPosts - 자신이 쓴 게시글 리스트
     fun findByAuthorAndActiveStatusOrderByCreatedAtDesc(user: User, activeStatus: ActiveStatusType): List<Post>
 }
-
-//    @Query("SELECT p FROM Post p WHERE college LIKE CONCAT('%',:college,'%')")
-//    fun findAllByCollegeByOrderByIdDesc(college: String, pageable: Pageable): Page<Post>?
-//}
