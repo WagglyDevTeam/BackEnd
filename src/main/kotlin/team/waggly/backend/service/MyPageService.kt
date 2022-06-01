@@ -17,7 +17,6 @@ import team.waggly.backend.repository.*
 class MyPageService (
     private val postRepository: PostRepository,
     private val postLikeRepository: PostLikeRepository,
-    private val commentLikeRepository: CommentLikeRepository,
     private val postImageRepository: PostImageRepository,
     private val commentRepository: CommentRepository,
 ) {
@@ -29,8 +28,14 @@ class MyPageService (
 
         if (allPosts.isNotEmpty()) {
             for (post in allPosts) {
-                val dto: MyPostsDetailDto = updateMyPostsResponseDto(post, user.id!!)
-                postsDto.add(dto)
+                val myPostsDetailDto = MyPostsDetailDto(post)
+
+                myPostsDetailDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
+                myPostsDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
+                myPostsDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
+                myPostsDetailDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id, user.id!!, ActiveStatusType.ACTIVE)
+
+                postsDto.add(myPostsDetailDto)
             }
         }
 
@@ -47,8 +52,7 @@ class MyPageService (
 
         if (allComments.isNotEmpty()) {
             for (comment in allComments) {
-                val dto: MyCommentsDetailDto = MyCommentsDetailDto(comment)
-                commentsDto.add(dto)
+                commentsDto.add(MyCommentsDetailDto(comment))
             }
         }
 
@@ -56,15 +60,5 @@ class MyPageService (
         val end: Long =
             if ((start + pageable.pageSize) > commentsDto.size) commentsDto.size.toLong() else (start + pageable.pageSize)
         return MyCommentsResponseDto(PageImpl(commentsDto.subList(start.toInt(), end.toInt()), pageable, commentsDto.size.toLong()).toList())
-    }
-    private fun updateMyPostsResponseDto(post: Post, userId: Long): MyPostsDetailDto {
-        val myPostsDetailDto = MyPostsDetailDto(post)
-
-        myPostsDetailDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
-        myPostsDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
-        myPostsDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        myPostsDetailDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
-
-        return myPostsDetailDto
     }
 }
