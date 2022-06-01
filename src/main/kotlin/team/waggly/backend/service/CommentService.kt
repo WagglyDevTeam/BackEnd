@@ -11,6 +11,7 @@ import team.waggly.backend.repository.CommentLikeRepository
 import team.waggly.backend.repository.CommentRepository
 import team.waggly.backend.repository.PostRepository
 import team.waggly.backend.security.UserDetailsImpl
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
@@ -32,7 +33,8 @@ class CommentService(
         val comment = Comment(
             post = post,
             user = user,
-            description = commentRequestDto.commentDesc
+            description = commentRequestDto.commentDesc,
+            isAnonymous = commentRequestDto.isAnonymous
         )
         commentRepository.save(comment)
     }
@@ -52,8 +54,8 @@ class CommentService(
             post = comment.post,
             user = comment.user,
             description = comment.description,
-            activeStatus = ActiveStatusType.INACTIVE
-            //deleteTime 필요?
+            activeStatus = ActiveStatusType.INACTIVE,
+            deletedAt = LocalDateTime.now()
         )
         commentRepository.save(comment)
     }
@@ -64,34 +66,34 @@ class CommentService(
     ): CommentLikeResponseDto {
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
         val user = userDetailImpl.user
-        val commentLike: CommentLike =
-            commentLikeRepository.findByUserIdAndCommentId(user.id!!, commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.") //null 처리 해야할듯
+        val commentLike: CommentLike? = commentLikeRepository.findByUserIdAndCommentId(user.id!!, commentId)
+        var isLikedByMe = false
 
-        //commentLike 가 존재하지 않는다면 commentLIkeRepository.save 후 dto 생성 및 반환
-        //commentLike 가 존재한다면 commentLikeRepository.delete 후 dto 생성 및 반환
-
-        //좋아요 취소
-        if (commentLikeRepository.existsByUserIdAndCommentId(user.id, commentId)) {
-            commentLike.id?.let { commentLikeRepository.deleteById(it) } // null 체크?
-
-            //함수로 만들어야 함
-            return CommentLikeResponseDto(
-                isLikedByMe = false,
-                commentLikeCnt = commentLikeRepository.countByCommentId(commentId)
-            )
-            //
-        } else {
+        // 처음 좋아요 누를 때
+        if (commentLike == null) {
             val newCommentLike = CommentLike(
                 comment = comment,
                 userId = user.id
             )
             commentLikeRepository.save(newCommentLike)
-            //
-            return CommentLikeResponseDto(
-                isLikedByMe = false,
-                commentLikeCnt = commentLikeRepository.countByCommentId(commentId)
-            )
-            //
+            isLikedByMe = true
+        } else {
+            when (commentLike.activeStatus) {
+                //좋아요 취소
+                ActiveStatusType.ACTIVE -> commentLike.activeStatus = ActiveStatusType.INACTIVE
+                //좋아요 다시 누르기
+                ActiveStatusType.INACTIVE -> {
+                    commentLike.activeStatus = ActiveStatusType.ACTIVE
+                    isLikedByMe = false
+                }
+            }
+            commentLikeRepository.save(commentLike)
         }
+        val commentLikeCnt: Int =
+            commentLikeRepository.countByCommentIdAndActiveStatus(commentId, ActiveStatusType.ACTIVE)
+        return CommentLikeResponseDto(
+            isLikedByMe,
+            commentLikeCnt
+        )
     }
 }
