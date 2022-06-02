@@ -22,12 +22,12 @@ class Comment(
     @Column(columnDefinition = "VARCHAR(255)")
     val description: String,
 
-    @Column
+    @Column(columnDefinition = "TINYINT(1)")
     var isAnonymous: Boolean = false,
 
     @Column(columnDefinition = "VARCHAR(10)")
     @Enumerated(EnumType.STRING)
-    val activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
+    var activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
 
     @Column
     val createdAt: LocalDateTime = LocalDateTime.now(),
