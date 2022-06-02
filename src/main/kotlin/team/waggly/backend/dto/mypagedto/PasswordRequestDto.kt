@@ -1,4 +1,4 @@
-package team.waggly.backend.dto.mypagedto
+package team.waggly.backend.dto.myPageDto
 
 class PasswordRequestDto(
         val password: String
