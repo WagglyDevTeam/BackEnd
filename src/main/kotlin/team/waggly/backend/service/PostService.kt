@@ -19,19 +19,18 @@ import team.waggly.backend.repository.PostLikeRepository
 import team.waggly.backend.repository.PostRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.awsS3.S3Uploader
-import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
 
 @Service
-class PostService (
+class PostService(
         private val postRepository: PostRepository,
         private val postLikeRepository: PostLikeRepository,
         private val commentRepository: CommentRepository,
         private val postImageRepository: PostImageRepository,
         private val s3Uploader: S3Uploader,
-){
+) {
     @Value("\${cloud.aws.s3.dir}")
     lateinit var dir: String
 
@@ -46,7 +45,7 @@ class PostService (
         }
 
         val postsDto: MutableList<PostSummaryResponseDto> = arrayListOf()
-        if(allPosts.isNotEmpty()) {
+        if (allPosts.isNotEmpty()) {
             for (post in allPosts) {
                 val dto: PostSummaryResponseDto = updatePostSummaryResponseDto(post, userId!!)
                 postsDto.add(dto)
@@ -130,9 +129,9 @@ class PostService (
                 if (!listOf("jpg", "jpeg", "gif", "png").contains(extName)) {
                     throw IllegalArgumentException("올바른 파일 형식이 아닙니다. (.jpg, .jpeg, .gif, .png)")
                 }
-                val uploadName = "${UUID.randomUUID()}.${extName}"
-                val fileUrl: String = s3Uploader.upload(file, uploadName)
-                val image = PostImage(post, fileUrl, file.originalFilename!!, uploadName)
+
+                val fileUrl: String = s3Uploader.upload(file)
+                val image = PostImage(post, fileUrl, file.originalFilename!!, fileUrl)
                 postImageRepository.save(image)
             }
         }
@@ -153,17 +152,16 @@ class PostService (
 
         if (postUpdateDto.file != null) {
             for (file in postUpdateDto.file) {
-                val extName: String = file.originalFilename!!.substringAfterLast(".")
-                val uploadName = "${UUID.randomUUID()}.${extName}"
-                val fileUrl: String = s3Uploader.upload(file, uploadName)
-                val image = PostImage(post, fileUrl, file.originalFilename!!, uploadName)
+                val fileUrl: String = s3Uploader.upload(file)
+                val image = PostImage(post, fileUrl, file.originalFilename!!, fileUrl)
                 postImageRepository.save(image)
             }
         }
 
         if ((postUpdateDto.deleteTargetUrl != null) && postUpdateDto.deleteTargetUrl.isNotEmpty()) {
             for (target in postUpdateDto.deleteTargetUrl) {
-                val targetImage: PostImage = postImageRepository.findByImageUrlAndDeletedAtNull(target) ?: throw NotFoundException()
+                val targetImage: PostImage = postImageRepository.findByImageUrlAndDeletedAtNull(target)
+                        ?: throw NotFoundException()
                 println(dir + targetImage.uploadName)
                 s3Uploader.delete(targetImage.uploadName)
                 postImageRepository.delete(targetImage)
@@ -227,8 +225,8 @@ class PostService (
 
         val postLikeCnt: Int = postLikeRepository.countByPostIdAndStatus(postId, ActiveStatusType.ACTIVE)
         return PostLikeResponseDto(
-            isLikedByMe,
-            postLikeCnt,
+                isLikedByMe,
+                postLikeCnt,
         )
     }
 

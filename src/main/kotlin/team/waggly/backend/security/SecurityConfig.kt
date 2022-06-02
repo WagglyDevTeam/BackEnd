@@ -54,7 +54,6 @@ class SecurityConfig(
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
         http.authorizeRequests()
-                .antMatchers("/h2-console/**", "/user/signup").permitAll()
                 .anyRequest().permitAll()
                 .and()
                 .exceptionHandling()
@@ -74,7 +73,6 @@ class SecurityConfig(
         val skipPathList = mutableListOf<String>()
 
         skipPathList.add("GET,/h2-console/**")
-        skipPathList.add("POST,/user/signup")
         skipPathList.add("POST,/user/signup")
         skipPathList.add("POST,/user/email")
         skipPathList.add("POST,/major")
