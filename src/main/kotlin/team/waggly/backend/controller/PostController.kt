@@ -42,7 +42,7 @@ class PostController (
                 "social" -> CollegeType.SOCIAL
                 else -> throw NoSuchElementException("올바른 학부를 선택해주세요.")
             }
-            return ResponseDto(postService.getAllCollegePosts(collegeEnum, pageable, user))
+            return ResponseDto(postService.getAllCollegePosts(collegeEnum, pageable, user), HttpStatus.OK.value())
         }
     }
 
@@ -52,7 +52,7 @@ class PostController (
                        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?):
             ResponseDto<PostDetailDto> {
         val user: User? = userDetailsImpl?.user ?: null
-        return ResponseDto(postService.getPostDetails(boardId, user))
+        return ResponseDto(postService.getPostDetails(boardId, user), HttpStatus.OK.value())
     }
 
     // 게시글 작성
@@ -99,16 +99,16 @@ class PostController (
     // 게시글 삭제
     @DeleteMapping("/{boardId}")
     fun deletePost(@PathVariable boardId: Long,
-                   @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
+                   @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl): ResponseDto<DeletePostResponseDto> {
         postService.deletePost(boardId, userDetailsImpl.user)
-        return ResponseEntity(DeletePostResponseDto(true), HttpStatus.NO_CONTENT)
+        return ResponseDto(DeletePostResponseDto(true), HttpStatus.NO_CONTENT.value())
     }
 
     // 게시글 좋아요
     @PutMapping("/{boardId}/like")
     fun likePost(@PathVariable boardId: Long,
-                 @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
+                 @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<PostLikeResponseDto> {
         val userId: Long = userDetailsImpl.user.id ?: throw NoSuchElementException()
-        return ResponseEntity(postService.likePost(boardId, userId), HttpStatus.OK)
+        return ResponseDto(postService.likePost(boardId, userId), HttpStatus.OK.value())
     }
 }
