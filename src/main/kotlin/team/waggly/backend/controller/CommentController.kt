@@ -1,12 +1,11 @@
 package team.waggly.backend.controller
 
-import com.sun.mail.iap.Response
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.commentdto.CommentLikeResponseDto
 import team.waggly.backend.dto.commentdto.CommentRequestDto
+import team.waggly.backend.dto.commentdto.ReplyRequestDto
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.CommentService
 
@@ -38,11 +37,27 @@ class CommentController(private val commentService: CommentService) {
     }
 
     //댓글 좋아요
-    @PostMapping("/like/comment/{commentId}")
+    @PutMapping("/like/comment/{commentId}")
     fun likeComment(
         @PathVariable commentId: Long,
         @AuthenticationPrincipal userDetailImpl: UserDetailsImpl
     ): ResponseDto<CommentLikeResponseDto> {
         return ResponseDto(commentService.likeComment(commentId, userDetailImpl))
     }
+
+    //대댓글 작성
+    @PostMapping("reply/{commentId}")
+    fun createReply(
+        @PathVariable commentId: Long,
+        @RequestBody replyRequestDto: ReplyRequestDto,
+        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl // null 불가능
+    ): ResponseDto<Any> {
+
+        commentService.createReply(commentId, replyRequestDto, userDetailsImpl)
+
+        return ResponseDto()
+    }
+
+    //대댓글 삭제, 대댓글 좋아요 불필요
+
 }

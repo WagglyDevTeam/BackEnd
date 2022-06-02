@@ -14,7 +14,7 @@ class Comment(
     val post: Post,
 
     @ManyToOne
-    val reply: Comment? = null,
+    val parentComment: Comment? = null,
 
     @ManyToOne
     val user: User,
@@ -22,10 +22,16 @@ class Comment(
     @Column(columnDefinition = "VARCHAR(255)")
     val description: String,
 
+    @Column
+    var isAnonymous: Boolean = false,
+
     @Column(columnDefinition = "VARCHAR(10)")
     @Enumerated(EnumType.STRING)
     val activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE,
 
     @Column
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column
+    var deletedAt: LocalDateTime? = null
 )
