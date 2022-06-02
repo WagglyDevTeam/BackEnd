@@ -5,6 +5,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import team.waggly.backend.dto.SignupDto
+import team.waggly.backend.dto.user.CheckNicknameRequestDto
+import team.waggly.backend.dto.user.CheckNicknameResponseDto
 import team.waggly.backend.model.User
 import team.waggly.backend.repository.UserRepository
 
@@ -40,6 +42,11 @@ class SignupService(private val userRepository: UserRepository){
 
         userRepository.save(newUser)
         return SignupDto.Response(true)
+    }
+
+    fun checkUserNickname(checkNicknameRequestDto: CheckNicknameRequestDto): CheckNicknameResponseDto {
+        userRepository.findByNickName(checkNicknameRequestDto.nickname) ?: return CheckNicknameResponseDto(true)
+        return CheckNicknameResponseDto(false)
     }
 
 }
