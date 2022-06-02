@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.dto.commentdto.CommentLikeResponseDto
 import team.waggly.backend.dto.commentdto.CommentRequestDto
+import team.waggly.backend.dto.commentdto.ReplyRequestDto
 import team.waggly.backend.model.Comment
 import team.waggly.backend.model.CommentLike
 import team.waggly.backend.repository.CommentLikeRepository
@@ -96,4 +97,24 @@ class CommentService(
             commentLikeCnt
         )
     }
+
+    //대댓글 생성
+    @Transactional
+    fun createReply(commentId: Long, replyRequestDto: ReplyRequestDto, userDetails: UserDetailsImpl) {
+        val comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
+        if(comment.parentComment != null){
+            throw Exception("1계층 대댓글만 가능합니다.")
+        }
+        val user = userDetails.user
+        val reply = Comment(
+            post = comment.post,
+            user = user,
+            description = replyRequestDto.replyDesc,
+            isAnonymous = replyRequestDto.isAnonymous,
+            parentComment = comment
+        )
+        commentRepository.save(reply)
+    }
+
+
 }
