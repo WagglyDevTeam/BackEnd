@@ -71,7 +71,8 @@ class PostController (
             }
             return ResponseDto(CustomException.ValidatorException(result))
         }
-        return ResponseDto(postService.createPost(postCreateDto, userDetailsImpl), HttpStatus.CREATED.value())
+        postService.createPost(postCreateDto, userDetailsImpl)
+        return ResponseDto(null, HttpStatus.CREATED.value())
     }
 
     // 게시글 수정
@@ -100,7 +101,7 @@ class PostController (
     fun deletePost(@PathVariable boardId: Long,
                    @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl): ResponseDto<DeletePostResponseDto> {
         postService.deletePost(boardId, userDetailsImpl.user)
-        return ResponseDto(DeletePostResponseDto(true), HttpStatus.NO_CONTENT.value())
+        return ResponseDto(null, HttpStatus.NO_CONTENT.value())
     }
 
     // 게시글 좋아요

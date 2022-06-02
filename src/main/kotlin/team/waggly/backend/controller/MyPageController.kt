@@ -8,7 +8,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import team.waggly.backend.dto.ResponseDto
+import team.waggly.backend.dto.myPageDto.MyCommentsDetailDto
 import team.waggly.backend.dto.myPageDto.MyCommentsResponseDto
+import team.waggly.backend.dto.myPageDto.MyPostsDetailDto
 import team.waggly.backend.dto.myPageDto.MyPostsResponseDto
 import team.waggly.backend.model.User
 import team.waggly.backend.security.UserDetailsImpl
@@ -20,7 +22,7 @@ class MyPageController (
         ) {
     @GetMapping("/user/post")
     fun getAllMyPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
-                      @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<MyPostsResponseDto> {
+                      @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<List<MyPostsDetailDto>> {
         val user: User = userDetailsImpl.user
 
         return ResponseDto(myPageService.getAllMyPosts(pageable, user), HttpStatus.OK.value())
@@ -28,7 +30,7 @@ class MyPageController (
 
     @GetMapping("/user/comment")
     fun getAllMyComments(@PageableDefault(size = 10, page = 0) pageable: Pageable,
-                         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<MyCommentsResponseDto> {
+                         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<List<MyCommentsDetailDto>> {
         val user: User = userDetailsImpl.user
 
         return ResponseDto(myPageService.getAllMyComments(pageable, user), HttpStatus.OK.value())

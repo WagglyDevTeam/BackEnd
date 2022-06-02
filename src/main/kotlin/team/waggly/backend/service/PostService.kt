@@ -17,6 +17,7 @@ import team.waggly.backend.repository.CommentRepository
 import team.waggly.backend.repository.PostImageRepository
 import team.waggly.backend.repository.PostLikeRepository
 import team.waggly.backend.repository.PostRepository
+import team.waggly.backend.repository.querydsl.QPostLikeRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.awsS3.S3Uploader
 import java.time.LocalDateTime
@@ -27,6 +28,7 @@ import javax.transaction.Transactional
 class PostService(
         private val postRepository: PostRepository,
         private val postLikeRepository: PostLikeRepository,
+        private val qPostLikeRepository: QPostLikeRepository,
         private val commentRepository: CommentRepository,
         private val postImageRepository: PostImageRepository,
         private val s3Uploader: S3Uploader,
@@ -67,7 +69,8 @@ class PostService(
             return CollegePostsResponseDto(null, emptyList())
         }
         // 해당 단과대의 베스트 게시글 ID
-        val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(college.toString()) ?: 0
+//        val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(college.toString()) ?: 0
+        val collegeBestId: Long = qPostLikeRepository.getMostLikedPostInCollege(college) ?: 0
         val best: Post = postRepository.findById(collegeBestId).orElse(allPosts[0])
 
         // Best 게시글
@@ -115,7 +118,7 @@ class PostService(
     // 게시글 작성
     @Transactional
     fun createPost(postCreateDto: CreatePostRequestDto,
-                   userDetailsImpl: UserDetailsImpl): CreatePostResponseDto {
+                   userDetailsImpl: UserDetailsImpl) {
         val user = userDetailsImpl.user
         if (user.id == null) {
             throw NotFoundException()
@@ -135,7 +138,6 @@ class PostService(
                 postImageRepository.save(image)
             }
         }
-        return CreatePostResponseDto(true)
     }
 
     // 게시글 수정
@@ -186,7 +188,7 @@ class PostService(
 
     // 게시글 삭제
     @Transactional
-    fun deletePost(postId: Long, user: User): DeletePostResponseDto {
+    fun deletePost(postId: Long, user: User) {
         val post: Post = postRepository.findByIdOrNull(postId) ?: throw Exception("해당하는 게시글이 없습니다.")
         if (post.author.id != user.id) {
             throw Exception("본인의 게시글만 삭제 가능합니다.")
@@ -194,8 +196,6 @@ class PostService(
         post.activeStatus = ActiveStatusType.INACTIVE
         post.deletedAt = LocalDateTime.now()
         postRepository.save(post)
-
-        return DeletePostResponseDto(true)
     }
 
     // 좋아요

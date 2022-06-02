@@ -21,7 +21,7 @@ class MyPageService (
     private val commentRepository: CommentRepository,
 ) {
     // 내가 쓴 게시글 조회
-    fun getAllMyPosts(pageable: Pageable, user: User): MyPostsResponseDto {
+    fun getAllMyPosts(pageable: Pageable, user: User): List<MyPostsDetailDto> {
         val allPosts: List<Post> =
             postRepository.findByAuthorAndActiveStatusOrderByCreatedAtDesc(user, ActiveStatusType.ACTIVE)
         val postsDto: MutableList<MyPostsDetailDto> = arrayListOf()
@@ -42,11 +42,11 @@ class MyPageService (
         val start: Long = pageable.offset
         val end: Long =
             if ((start + pageable.pageSize) > postsDto.size) postsDto.size.toLong() else (start + pageable.pageSize)
-        return MyPostsResponseDto(PageImpl(postsDto.subList(start.toInt(), end.toInt()), pageable, postsDto.size.toLong()).toList())
+        return PageImpl(postsDto.subList(start.toInt(), end.toInt()), pageable, postsDto.size.toLong()).toList()
     }
 
     // 내가 쓴 댓글 조회
-    fun getAllMyComments(pageable: Pageable, user: User): MyCommentsResponseDto {
+    fun getAllMyComments(pageable: Pageable, user: User): List<MyCommentsDetailDto> {
         val allComments: List<Comment> = commentRepository.findByUserAndActiveStatusOrderByCreatedAtDesc(user, ActiveStatusType.ACTIVE)
         val commentsDto: MutableList<MyCommentsDetailDto> = arrayListOf()
 
@@ -59,6 +59,6 @@ class MyPageService (
         val start: Long = pageable.offset
         val end: Long =
             if ((start + pageable.pageSize) > commentsDto.size) commentsDto.size.toLong() else (start + pageable.pageSize)
-        return MyCommentsResponseDto(PageImpl(commentsDto.subList(start.toInt(), end.toInt()), pageable, commentsDto.size.toLong()).toList())
+        return PageImpl(commentsDto.subList(start.toInt(), end.toInt()), pageable, commentsDto.size.toLong()).toList()
     }
 }
