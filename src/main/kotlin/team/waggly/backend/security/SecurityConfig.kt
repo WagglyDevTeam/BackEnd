@@ -74,9 +74,12 @@ class SecurityConfig(
         val skipPathList = mutableListOf<String>()
 
         skipPathList.add("GET,/h2-console/**")
+        skipPathList.add("POST,/h2-console/**")
         skipPathList.add("POST,/user/signup")
         skipPathList.add("POST,/user/signup")
         skipPathList.add("POST,/user/email")
+        skipPathList.add("POST,/major")
+        skipPathList.add("POST,/user/nickname")
         skipPathList.add("POST,/user/email/certification")
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")
