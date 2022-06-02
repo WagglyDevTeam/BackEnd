@@ -2,6 +2,7 @@ package team.waggly.backend.service.awsS3
 
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
+import com.amazonaws.services.s3.model.DeleteObjectRequest
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.util.IOUtils
@@ -21,10 +22,7 @@ class S3Uploader(
     @Value("\${cloud.aws.s3.dir}")
     lateinit var dir: String
 
-    fun upload(file: MultipartFile): String {
-        val split: List<String> = file.originalFilename!!.split(".")
-        val extName: String = split[split.lastIndex]
-        val fileName = "${UUID.randomUUID()}.${extName}"
+    fun upload(file: MultipartFile, fileName: String): String {
         val objMeta = ObjectMetadata()
         val bytes = IOUtils.toByteArray(file.inputStream)
         objMeta.contentLength = bytes.size.toLong()
@@ -35,5 +33,10 @@ class S3Uploader(
                 .withCannedAcl(CannedAccessControlList.PublicRead))
 
         return S3Client.getUrl(bucket, dir + fileName).toString()
+    }
+
+    fun delete(fileName: String) {
+//        val deleteObjectRequest = DeleteObjectRequest(bucket, (dir + fileName))
+        S3Client.deleteObject(bucket, dir + fileName)
     }
 }

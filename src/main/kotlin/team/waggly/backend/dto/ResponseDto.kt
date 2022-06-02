@@ -19,5 +19,16 @@ open class ResponseDto<Any> {
             code: Int
     ) {
         this.datas = datas
+        this.code = code
+    }
+
+    constructor(
+        datas: Any?,
+        message: String,
+        code: Int
+    ) {
+        this.datas = datas
+        this.message = message
+        this.code = code
     }
 }
