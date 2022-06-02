@@ -48,16 +48,11 @@ class CommentService(
     ) {
         var comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
         val user = userDetails.user
-        if (comment.user != user) {
+        if (comment.user.id != user.id) {
             throw Exception("댓글 작성자만 댓글을 삭제할 수 있습니다.")
         }
-        comment = Comment(
-            post = comment.post,
-            user = comment.user,
-            description = comment.description,
-            activeStatus = ActiveStatusType.INACTIVE,
-            deletedAt = LocalDateTime.now()
-        )
+        comment.deletedAt = LocalDateTime.now()
+        comment.activeStatus = ActiveStatusType.INACTIVE
         commentRepository.save(comment)
     }
 
@@ -81,11 +76,14 @@ class CommentService(
         } else {
             when (commentLike.activeStatus) {
                 //좋아요 취소
-                ActiveStatusType.ACTIVE -> commentLike.activeStatus = ActiveStatusType.INACTIVE
+                ActiveStatusType.ACTIVE -> {
+                    commentLike.activeStatus = ActiveStatusType.INACTIVE
+                    isLikedByMe = false
+                }
                 //좋아요 다시 누르기
                 ActiveStatusType.INACTIVE -> {
                     commentLike.activeStatus = ActiveStatusType.ACTIVE
-                    isLikedByMe = false
+                    isLikedByMe = true
                 }
             }
             commentLikeRepository.save(commentLike)

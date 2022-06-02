@@ -22,7 +22,6 @@ import javax.validation.Valid
 @RequestMapping("/board")
 class PostController (
         private val postService: PostService,
-        private val postLikeRepository: PostLikeRepository
 ) {
     // 모든 게시글 (학부 필터링 포함)
     @GetMapping

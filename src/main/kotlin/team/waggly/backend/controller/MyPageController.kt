@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import team.waggly.backend.dto.ResponseDto
+import team.waggly.backend.dto.myPageDto.MyCommentsResponseDto
+import team.waggly.backend.dto.myPageDto.MyPostsResponseDto
 import team.waggly.backend.model.User
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.MyPageService
@@ -18,17 +20,17 @@ class MyPageController (
         ) {
     @GetMapping("/user/post")
     fun getAllMyPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
-                      @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
+                      @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<MyPostsResponseDto> {
         val user: User = userDetailsImpl.user
 
-        return ResponseEntity<Any>(myPageService.getAllMyPosts(pageable, user), HttpStatus.OK)
+        return ResponseDto(myPageService.getAllMyPosts(pageable, user), HttpStatus.OK.value())
     }
 
     @GetMapping("/user/comment")
     fun getAllMyComments(@PageableDefault(size = 10, page = 0) pageable: Pageable,
-                         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseEntity<Any> {
+                         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<MyCommentsResponseDto> {
         val user: User = userDetailsImpl.user
 
-        return ResponseEntity<Any>(myPageService.getAllMyComments(pageable, user), HttpStatus.OK)
+        return ResponseDto(myPageService.getAllMyComments(pageable, user), HttpStatus.OK.value())
     }
 }
