@@ -1,16 +1,15 @@
 package team.waggly.backend.controller
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import team.waggly.backend.dto.CertificationDto
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.SendEmailDto
 import team.waggly.backend.dto.SignupDto
+import team.waggly.backend.dto.mypagedto.*
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.SignupService
+import team.waggly.backend.service.UserService
 import team.waggly.backend.service.emailService.CertificationService
 import team.waggly.backend.service.emailService.SendEmailService
 
@@ -18,10 +17,11 @@ import team.waggly.backend.service.emailService.SendEmailService
 class UserController(
         private val signupService: SignupService,
         private val sendEmailService: SendEmailService,
-        private val certificationService: CertificationService
+        private val certificationService: CertificationService,
+        private val userService: UserService
 ) {
     @PostMapping("/user/signup")
-    fun signupController(@RequestBody signupRequestDto: SignupDto.Request): ResponseDto<SignupDto.Response> {
+    fun signupController(@RequestBody signupRequestDto: SignupDto.Request): ResponseDto<Any> {
         return ResponseDto(signupService.userSignup(signupRequestDto))
     }
 
@@ -39,5 +39,41 @@ class UserController(
     @PostMapping("/user/email/certification")
     fun certificationController(@RequestBody certificationRequestDto: CertificationDto.Reqeust): ResponseDto<CertificationDto.Response> {
         return ResponseDto(certificationService.certificationEmail(certificationRequestDto))
+    }
+
+    @PutMapping("/user/profile")
+    fun updateUserProfile(
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+            @RequestBody updateUserProfileRequestDto: UpdateUserProfileRequestDto,
+    ): ResponseDto<UpdateUserProfileDto> {
+        val user = userDetailsImpl.user
+        return ResponseDto(userService.updateUserProfile(user, updateUserProfileRequestDto))
+    }
+
+    @PutMapping("/user/introduction")
+    fun updateUserIntroduction(
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+            @RequestBody updateUserIntroductionRequestDto: UpdateUserIntroductionRequestDto,
+    ): ResponseDto<UpdateUserIntroductionDto> {
+        val user = userDetailsImpl.user
+        return ResponseDto(userService.updateUserIntroduction(user, updateUserIntroductionRequestDto))
+    }
+
+    @PostMapping("/user/password")
+    fun checkPassword(
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+            @RequestBody checkPasswordRequestDto: PasswordRequestDto
+    ): ResponseDto<Any> {
+        val user = userDetailsImpl.user
+        return ResponseDto(userService.checkPassword(user, checkPasswordRequestDto))
+    }
+
+    @PutMapping("/user/password")
+    fun updatePassword(
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+            @RequestBody updatePasswordRequestDto: PasswordRequestDto,
+    ): ResponseDto<Any> {
+        val user = userDetailsImpl.user
+        return ResponseDto(userService.updatePassword(user, updatePasswordRequestDto))
     }
 }
