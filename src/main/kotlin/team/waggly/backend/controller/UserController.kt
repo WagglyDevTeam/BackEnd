@@ -6,7 +6,7 @@ import team.waggly.backend.dto.CertificationDto
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.SendEmailDto
 import team.waggly.backend.dto.SignupDto
-import team.waggly.backend.dto.mypagedto.*
+import team.waggly.backend.dto.myPageDto.*
 import team.waggly.backend.dto.user.CheckNicknameRequestDto
 import team.waggly.backend.dto.user.CheckNicknameResponseDto
 import team.waggly.backend.security.UserDetailsImpl

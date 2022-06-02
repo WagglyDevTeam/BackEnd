@@ -4,7 +4,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import team.waggly.backend.dto.mypagedto.*
+import team.waggly.backend.dto.myPageDto.*
 import team.waggly.backend.model.User
 import team.waggly.backend.repository.UserRepository
 import team.waggly.backend.service.awsS3.S3Uploader
@@ -21,7 +21,7 @@ class UserService(
         val updateUser = userRepository.findByIdOrNull(user.id!!)
                 ?: throw java.lang.IllegalArgumentException("해당 유저가 존재하지 않습니다.")
         updateUser.nickName = updateUserProfileRequestDto.nickname
-        updateUser.profileImgUrl = s3Uploader.upload(updateUserProfileRequestDto.profileImg, updateUserProfileRequestDto.profileImg.originalFilename.toString())
+        updateUser.profileImgUrl = s3Uploader.upload(updateUserProfileRequestDto.profileImg)
 
         return UpdateUserProfileDto(
                 updateUser.profileImgUrl,
