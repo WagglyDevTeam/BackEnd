@@ -33,6 +33,7 @@ class SignupService(private val userRepository: UserRepository){
             signupRequestDto.classNumber,
             User.UserActiveStatusType.ACTIVE,
             null,
+            null,
             User.AuthType.USER,
             null
         )
