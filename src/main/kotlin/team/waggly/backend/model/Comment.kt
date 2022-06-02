@@ -14,7 +14,7 @@ class Comment(
     val post: Post,
 
     @ManyToOne
-    val reply: Comment? = null,
+    val parentComment: Comment? = null,
 
     @ManyToOne
     val user: User,
