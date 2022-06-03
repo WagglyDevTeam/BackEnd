@@ -31,7 +31,7 @@ class User(
     var activeStatus: UserActiveStatusType = UserActiveStatusType.ACTIVE,
 
     @Column(columnDefinition = "VARCHAR(255)")
-    var major: String?,
+    var major: String,
 
     @Column(nullable = true)
     var withdrawalDate: LocalDateTime? = null,

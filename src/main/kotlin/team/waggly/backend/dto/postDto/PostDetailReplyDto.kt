@@ -9,7 +9,7 @@ class PostDetailReplyDto (
     val replyDesc: String,
     val isLikedByMe: Boolean,
     val authorId: Long,
-//    val authorMajor: String,
+    val authorMajor: String,
     val authorNickname: String,
     val authorProfileImg: String,
     val isBlind: Boolean,

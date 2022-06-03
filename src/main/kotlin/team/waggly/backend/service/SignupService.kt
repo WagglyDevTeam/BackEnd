@@ -34,7 +34,7 @@ class SignupService(private val userRepository: UserRepository){
             gender,
             signupRequestDto.classNumber,
             User.UserActiveStatusType.ACTIVE,
-            null,
+            signupRequestDto.major,
             null,
             User.AuthType.USER,
             null

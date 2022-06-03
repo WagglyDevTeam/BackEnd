@@ -1,5 +1,6 @@
 package team.waggly.backend.dto.postDto
 
+import org.intellij.lang.annotations.RegExp
 import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.model.Post
@@ -16,6 +17,7 @@ data class UpdatePostRequestDto(
 
         @field:NotNull(message = "학부를 선택해주세요.")
         val college: CollegeType?,
+
         val file: List<MultipartFile>?,
         val deleteTargetUrl: List<String>?,
 ) {
