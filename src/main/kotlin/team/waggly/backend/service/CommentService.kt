@@ -31,12 +31,7 @@ class CommentService(
     ) {
         val post = postRepository.findByIdOrNull(postId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
         val user = userDetails.user
-        val comment = Comment(
-            post = post,
-            user = user,
-            description = commentRequestDto.commentDesc,
-            isAnonymous = commentRequestDto.isAnonymous
-        )
+        val comment: Comment = commentRequestDto.toEntity(post, user)
         commentRepository.save(comment)
     }
 
@@ -46,7 +41,7 @@ class CommentService(
         commentId: Long,
         userDetails: UserDetailsImpl
     ) {
-        var comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
+        val comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
         val user = userDetails.user
         if (comment.user.id != user.id) {
             throw Exception("댓글 작성자만 댓글을 삭제할 수 있습니다.")
@@ -100,19 +95,11 @@ class CommentService(
     @Transactional
     fun createReply(commentId: Long, replyRequestDto: ReplyRequestDto, userDetails: UserDetailsImpl) {
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
-        if(comment.parentComment != null){
+        if (comment.parentComment != null) {
             throw Exception("1계층 대댓글만 가능합니다.")
         }
         val user = userDetails.user
-        val reply = Comment(
-            post = comment.post,
-            user = user,
-            description = replyRequestDto.replyDesc,
-            isAnonymous = replyRequestDto.isAnonymous,
-            parentComment = comment
-        )
+        val reply: Comment = replyRequestDto.toEntity(comment, user)
         commentRepository.save(reply)
     }
-
-
 }
