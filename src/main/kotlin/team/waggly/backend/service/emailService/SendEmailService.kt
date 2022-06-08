@@ -8,7 +8,8 @@ import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.mail.javamail.MimeMessagePreparator
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import team.waggly.backend.dto.SendEmailDto
+import team.waggly.backend.dto.ResponseDto
+import team.waggly.backend.dto.email.EmailRequestDto
 import team.waggly.backend.repository.UniversityRepository
 import java.util.concurrent.TimeUnit
 import javax.mail.internet.MimeMessage
@@ -21,30 +22,27 @@ class SendEmailService(
 )
 {
     //Post 인증번호 전송 Controller Main 서비스 함수
-    fun emailCertification(emailCertificationRequestDto: SendEmailDto.Request): SendEmailDto.Response{
+    fun emailCertification(emailCertificationRequestDto: EmailRequestDto): ResponseDto<Any>{
         val email = emailCertificationRequestDto.email
-        universityEmailValidation(email)
+        if(!universityEmailValidation(email))
+            return ResponseDto(null,"이메일 형식이 학교이메일이 아닙니다.",404)
 
         val key = createKey()
-
         println(key)
         saveHashMapToRedis(email,key)
         certificationNumSender(email,key)
 
-        return SendEmailDto.Response(true)
-
-
+        return ResponseDto(null)
     }
 
     //학교이메일 유효성 검사 ac.kr , .edu 없으면 학교이메일 취금 x
-    fun universityEmailValidation(email: String){
+    fun universityEmailValidation(email: String):Boolean{
         val isUniversityEmail = when{
             email.contains("ac.kr") -> true
             email.contains(".edu") -> true
             else -> false
         }
-        if(!isUniversityEmail)
-            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"이메일 형식이 학교이메일이 아닙니다.")
+        return isUniversityEmail
     }
 
     // 인증번호가 포함된 이메일 보내는 함수

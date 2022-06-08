@@ -20,7 +20,7 @@ data class MyPostsDetailDto (
         post.title,
         post.description,
         post.createdAt,
-        post.author.major,
+        post.author.major.majorName,
         null,
         null,
         null,

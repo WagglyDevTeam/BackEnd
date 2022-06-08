@@ -30,8 +30,8 @@ class User(
     @Column(columnDefinition = "VARCHAR(10)")
     var activeStatus: UserActiveStatusType = UserActiveStatusType.ACTIVE,
 
-    @Column(columnDefinition = "VARCHAR(255)")
-    var major: String?,
+    @ManyToOne
+    var major: Major,
 
     @Column(nullable = true)
     var withdrawalDate: LocalDateTime? = null,
