@@ -2,7 +2,7 @@ package team.waggly.backend.dto.postDto
 
 import java.time.LocalDateTime
 
-class PostDetailReplyDto (
+data class PostDetailReplyDto (
     val replyId: Long,
     val replyCreatedAt: LocalDateTime,
     val replyLikeCnt: Int,

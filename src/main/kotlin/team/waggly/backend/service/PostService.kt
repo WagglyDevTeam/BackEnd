@@ -100,6 +100,7 @@ class PostService(
             throw IllegalArgumentException("삭제된 게시글입니다.")
         }
         val postDetailDto = PostDetailDto(post)
+        // TODO: Comment 연결시키기 (PostDetailCommentDto)
 
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(post.id!!)
         if (postImages != null) {
