@@ -9,7 +9,7 @@ import team.waggly.backend.repository.querydsl.QMajorRepository
 class MajorService(val qMajorRepository: QMajorRepository){
     fun searchMajor(majorSearchReqeustDto: MajorSearchReqeustDto): MutableList<MajorResponseDto> {
         var majorResponseDtolist = mutableListOf<MajorResponseDto>()
-        val majorSearchList = qMajorRepository.selectAllMajor(majorSearchReqeustDto.university,majorSearchReqeustDto.searchMajor)
+        val majorSearchList = qMajorRepository.selectAllMajor(majorSearchReqeustDto.universityId,majorSearchReqeustDto.searchMajor)
         majorSearchList.map {
             majorResponseDtolist.add(MajorResponseDto.fromEntity(it))
         }
