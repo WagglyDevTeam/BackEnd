@@ -53,8 +53,7 @@ class CommentController(private val commentService: CommentService) {
         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl // null 불가능
     ): ResponseDto<Any> {
 
-        commentService.createReply(commentId, replyRequestDto
-            , userDetailsImpl)
+        commentService.createReply(commentId, replyRequestDto, userDetailsImpl)
 
         return ResponseDto()
     }
