@@ -1,10 +1,11 @@
 package team.waggly.backend.service.emailService
 
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
-import team.waggly.backend.dto.CertificationDto
+import team.waggly.backend.dto.ResponseDto
+import team.waggly.backend.dto.certification.CertificationRequestDto
+import team.waggly.backend.dto.certification.CertificationResponseDto
+import team.waggly.backend.model.University
 import team.waggly.backend.repository.UniversityRepository
 
 @Service
@@ -12,26 +13,20 @@ class CertificationService(
     private val redisTemplate: RedisTemplate<Any, Any>,
     private val universityRepository: UniversityRepository
 ){
-    fun certificationEmail(certificationReqeustDto: CertificationDto.Reqeust): CertificationDto.Response {
+    fun certificationEmail(certificationReqeustDto: CertificationRequestDto): ResponseDto<Any> {
         val email = certificationReqeustDto.email
         val certiNum = certificationReqeustDto.certiNum
-        val universityName = getUniversityName(getUniversityEmail(email))
+        val university = getUniversityName(getUniversityEmail(email)) ?: return ResponseDto(null, "일치하는 학교가 없습니다.", 404)
 
         return when(checkCertificationNum(email,certiNum)){
-            true -> CertificationDto.Response(true,universityName)
-            false -> CertificationDto.Response(false,universityName)
+            true -> ResponseDto(CertificationResponseDto( universityId = university.Id!!, university = university.universityName))
+            false -> ResponseDto(null,"인증번호가 일치하지 않거나 유효시간이 지났습니다.", 404)
         }
 
     }
 
-    fun getUniversityName(universityEmail: String): String {
-        val university = universityRepository.findByUniversityEmail(universityEmail)
-        if (university != null) {
-            return university.universityName
-        }
-        else{
-            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"해당되는 학교이름이 없습니다.")
-        }
+    fun getUniversityName(universityEmail: String): University? {
+        return universityRepository.findByUniversityEmail(universityEmail)
     }
 
     // 유형에 따라 추가될수있음

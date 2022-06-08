@@ -11,10 +11,10 @@ import team.waggly.backend.model.QUniversity.university
 class QMajorRepository (
     val jpaQueryFactory: JPAQueryFactory
         ){
-     fun selectAllMajor(universityName: String, majorName: String): List<Major>{
+     fun selectAllMajor(universityId: Long, majorName: String): List<Major>{
           return jpaQueryFactory.selectFrom(major)
               .join(major.university, university)
-              .where(university.universityName.eq(universityName).and(major.majorName.contains(majorName)))
+              .where(university.Id.eq(universityId).and(major.majorName.contains(majorName)))
              .fetch()
     }
 }

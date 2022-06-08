@@ -1,20 +1,21 @@
 package team.waggly.backend.controller
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
-import team.waggly.backend.dto.CertificationDto
 import team.waggly.backend.dto.ResponseDto
-import team.waggly.backend.dto.SendEmailDto
-import team.waggly.backend.dto.SignupDto
+import team.waggly.backend.dto.certification.CertificationRequestDto
+import team.waggly.backend.dto.email.EmailRequestDto
 import team.waggly.backend.dto.myPageDto.*
 import team.waggly.backend.dto.user.CheckNicknameRequestDto
-import team.waggly.backend.dto.user.CheckNicknameResponseDto
+import team.waggly.backend.dto.user.SignupReqeustDto
+import team.waggly.backend.dto.user.SignupResponseDto
+import team.waggly.backend.exception.ErrorMessage
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.SignupService
 import team.waggly.backend.service.UserService
 import team.waggly.backend.service.emailService.CertificationService
 import team.waggly.backend.service.emailService.SendEmailService
-import java.util.regex.Pattern
 import javax.validation.Valid
 
 @RestController
@@ -25,24 +26,31 @@ class UserController(
     private val userService: UserService
 ) {
     @PostMapping("/user/signup")
-    fun signupController(@RequestBody signupRequestDto: SignupDto.Request): ResponseDto<Any> {
-        return ResponseDto(signupService.userSignup(signupRequestDto))
+    fun signupController(@Valid @RequestBody signupRequestDto: SignupReqeustDto, bindingResult: BindingResult): ResponseDto<Any> {
+        val error = ErrorMessage(bindingResult).getError()
+        if(error.isError){
+            return ResponseDto(null,error.errorMsg,404)
+        }
+        return signupService.userSignup(signupRequestDto)
     }
 
     @GetMapping("/user/profile")
-    fun getUserProfile(@AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<SignupDto.Response> {
-
-        return ResponseDto(SignupDto.Response(true))
+    fun getUserProfile(@AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<Any> {
+        return ResponseDto(SignupResponseDto(true))
     }
 
     @PostMapping("/user/email")
-    fun sendEmailController(@RequestBody emailCertificationRequestDto: SendEmailDto.Request): ResponseDto<SendEmailDto.Response> {
-        return ResponseDto(sendEmailService.emailCertification(emailCertificationRequestDto))
+    fun sendEmailController(@Valid @RequestBody emailCertificationRequestDto: EmailRequestDto, bindingResult: BindingResult): ResponseDto<Any> {
+        val error = ErrorMessage(bindingResult).getError()
+        if(error.isError){
+            return ResponseDto(null,error.errorMsg,404)
+        }
+        return sendEmailService.emailCertification(emailCertificationRequestDto)
     }
 
     @PostMapping("/user/email/certification")
-    fun certificationController(@RequestBody certificationRequestDto: CertificationDto.Reqeust): ResponseDto<CertificationDto.Response> {
-        return ResponseDto(certificationService.certificationEmail(certificationRequestDto))
+    fun certificationController(@RequestBody certificationRequestDto: CertificationRequestDto): ResponseDto<Any> {
+        return certificationService.certificationEmail(certificationRequestDto)
     }
 
     @PutMapping("/user/profile")
@@ -82,11 +90,14 @@ class UserController(
     }
 
     @PostMapping("/user/nickname")
-    fun checkUserNickname(@RequestBody @Valid checkNicknameRequestDto: CheckNicknameRequestDto): CheckNicknameResponseDto {
-        val pattern = Pattern.compile("^[A-Za-z0-9가-힣]{2,6}$")
-        val matcher = pattern.matcher(checkNicknameRequestDto.nickname)
-        if(!matcher.find())
-            throw Exception("정규 표현식이 맞지 않습니다.")
-        return signupService.checkUserNickname(checkNicknameRequestDto)
+    fun checkUserNickname(@Valid @RequestBody checkNicknameRequestDto: CheckNicknameRequestDto,
+                          bindingResult: BindingResult
+    ): ResponseDto<Any> {
+        val error = ErrorMessage(bindingResult).getError()
+        if(error.isError){
+            return ResponseDto(null,error.errorMsg,404)
+        }
+        signupService.checkUserNickname(checkNicknameRequestDto)
+        return ResponseDto()
     }
 }
