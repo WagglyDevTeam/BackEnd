@@ -1,5 +1,6 @@
 package team.waggly.backend.service
 
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -20,19 +21,19 @@ class SignupService(
     ){
     private val passwordEncoder = BCryptPasswordEncoder()
 
-    fun userSignup(signupRequestDto: SignupReqeustDto): ResponseDto<Any> {
+    fun userSignup(signupRequestDto: SignupReqeustDto){
         val initProfileImg = "기본이미지 Url"
         val findUser = userRepository.findByEmail(signupRequestDto.email)
 
         if(findUser != null){
-            return ResponseDto(null, "이메일당 하나의 아이디만 생성가능합니다.", 404)
+            throw Exception("이메일당 하나의 아이디만 생성가능합니다.")
         }
 
-        val major = majorRespository.findByIdOrNull(signupRequestDto.major) ?: return ResponseDto(null, "해당되는 학과가 없습니다.", 404)
+        val major = majorRespository.findByIdOrNull(signupRequestDto.major) ?: throw Exception("해당되는 학과가 없습니다.")
         val gender = when (signupRequestDto.gender) {
             "male" -> User.GenderType.MALE
             "female" -> User.GenderType.FEMALE
-            else -> return ResponseDto(null, "성별 데이터가 잘못되었습니다.", 404)
+            else -> throw Exception("성별 데이터가 잘못되었습니다.")
         }
         // 스프링 시큐리티에서 passwordEncoder로 인코딩후 넣어준다.
         val encodedPassword = passwordEncoder.encode(signupRequestDto.password)
@@ -54,11 +55,13 @@ class SignupService(
         )
 
         userRepository.save(newUser)
-        return ResponseDto()
     }
 
     fun checkUserNickname(checkNicknameRequestDto: CheckNicknameRequestDto) {
-        userRepository.findByNickName(checkNicknameRequestDto.nickname)
+        val checkNickname = userRepository.findByNickName(checkNicknameRequestDto.nickname)
+        if(checkNickname!=null){
+            throw Exception("닉네임이 중복되었습니다.")
+        }
     }
 
 }

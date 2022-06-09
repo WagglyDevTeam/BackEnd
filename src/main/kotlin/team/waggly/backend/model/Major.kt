@@ -17,6 +17,7 @@ class Major (
     val majorName: String,
 
     @Column(columnDefinition = "VARCHAR(30)")
+    @Enumerated(EnumType.STRING)
     val collegeEnum: CollegeType, // 이넘
 
     @Column

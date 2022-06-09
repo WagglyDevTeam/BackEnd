@@ -13,14 +13,14 @@ class CertificationService(
     private val redisTemplate: RedisTemplate<Any, Any>,
     private val universityRepository: UniversityRepository
 ){
-    fun certificationEmail(certificationReqeustDto: CertificationRequestDto): ResponseDto<Any> {
+    fun certificationEmail(certificationReqeustDto: CertificationRequestDto): CertificationResponseDto {
         val email = certificationReqeustDto.email
         val certiNum = certificationReqeustDto.certiNum
-        val university = getUniversityName(getUniversityEmail(email)) ?: return ResponseDto(null, "일치하는 학교가 없습니다.", 404)
+        val university = getUniversityName(getUniversityEmail(email)) ?: throw Exception("일치하는 학교가 없습니다.")
 
         return when(checkCertificationNum(email,certiNum)){
-            true -> ResponseDto(CertificationResponseDto( universityId = university.Id!!, university = university.universityName))
-            false -> ResponseDto(null,"인증번호가 일치하지 않거나 유효시간이 지났습니다.", 404)
+            true -> CertificationResponseDto( universityId = university.Id!!, university = university.universityName)
+            false -> throw Exception("인증번호가 일치하지 않거나 유효시간이 지났습니다.")
         }
 
     }
