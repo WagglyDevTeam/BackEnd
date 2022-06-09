@@ -29,9 +29,10 @@ class UserController(
     fun signupController(@Valid @RequestBody signupRequestDto: SignupReqeustDto, bindingResult: BindingResult): ResponseDto<Any> {
         val error = ErrorMessage(bindingResult).getError()
         if(error.isError){
-            return ResponseDto(null,error.errorMsg,404)
+            throw Exception(error.errorMsg)
         }
-        return signupService.userSignup(signupRequestDto)
+        signupService.userSignup(signupRequestDto)
+        return ResponseDto(null, "회원가입이 완료되었습니다.", 201)
     }
 
     @GetMapping("/user/profile")
@@ -43,14 +44,15 @@ class UserController(
     fun sendEmailController(@Valid @RequestBody emailCertificationRequestDto: EmailRequestDto, bindingResult: BindingResult): ResponseDto<Any> {
         val error = ErrorMessage(bindingResult).getError()
         if(error.isError){
-            return ResponseDto(null,error.errorMsg,404)
+            throw Exception(error.errorMsg)
         }
-        return sendEmailService.emailCertification(emailCertificationRequestDto)
+        sendEmailService.emailCertification(emailCertificationRequestDto)
+        return ResponseDto(null, "이메일 전송이 완료되었습니다.", 200)
     }
 
     @PostMapping("/user/email/certification")
     fun certificationController(@RequestBody certificationRequestDto: CertificationRequestDto): ResponseDto<Any> {
-        return certificationService.certificationEmail(certificationRequestDto)
+        return ResponseDto(certificationService.certificationEmail(certificationRequestDto),"이메일 인증이 완료되었습니다.", 200)
     }
 
     @PutMapping("/user/profile")
@@ -95,9 +97,9 @@ class UserController(
     ): ResponseDto<Any> {
         val error = ErrorMessage(bindingResult).getError()
         if(error.isError){
-            return ResponseDto(null,error.errorMsg,404)
+            throw Exception(error.errorMsg)
         }
         signupService.checkUserNickname(checkNicknameRequestDto)
-        return ResponseDto()
+        return ResponseDto(null, "닉네임 중복 확인에 성공하였습니다." , 200)
     }
 }
