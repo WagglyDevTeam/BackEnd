@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.postDto.*
-import team.waggly.backend.model.Post
-import team.waggly.backend.model.PostImage
-import team.waggly.backend.model.PostLike
-import team.waggly.backend.model.User
+import team.waggly.backend.model.*
 import team.waggly.backend.repository.CommentRepository
 import team.waggly.backend.repository.PostImageRepository
 import team.waggly.backend.repository.PostLikeRepository
@@ -96,18 +93,20 @@ class PostService(
         if (post.activeStatus == ActiveStatusType.INACTIVE) {
             throw IllegalArgumentException("삭제된 게시글입니다.")
         }
-        val postDetailDto = PostDetailDto(post)
 
+        val postDetailDto = PostDetailDto(post)
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(post.id!!)
         if (postImages != null) {
             for (postImage in postImages) {
                 postDetailDto.postImages.add(postImage.imageUrl)
             }
         }
-
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
         postDetailDto.isLikedByMe = if (userId != null) postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE) else false
+
+        // TODO: 1. 댓글, 대댓글 넣기
+        val comments: List<Comment> = commentRepository.findByPostAndActiveStatusOrderByCreatedAtDesc(post, ActiveStatusType.ACTIVE)
 
         return postDetailDto
     }
