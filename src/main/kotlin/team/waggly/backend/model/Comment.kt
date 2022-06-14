@@ -23,7 +23,7 @@ class Comment(
     val description: String,
 
     @Column(columnDefinition = "TINYINT(1)")
-    var isAnonymous: Boolean = false,
+    var isAnonymous: Int = 0,
 
     @Column(columnDefinition = "VARCHAR(10)")
     @Enumerated(EnumType.STRING)
