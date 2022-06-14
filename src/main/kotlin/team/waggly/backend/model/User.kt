@@ -22,12 +22,14 @@ class User(
     var password: String,
 
     @Column(columnDefinition = "VARCHAR(6)")
+    @Enumerated(EnumType.STRING)
     val gender: GenderType,
 
     @Column(columnDefinition = "INTEGER(3)")
     var classNum: Int,
 
     @Column(columnDefinition = "VARCHAR(10)")
+    @Enumerated(EnumType.STRING)
     var activeStatus: UserActiveStatusType = UserActiveStatusType.ACTIVE,
 
     @ManyToOne
@@ -37,6 +39,7 @@ class User(
     var withdrawalDate: LocalDateTime? = null,
 
     @Column(columnDefinition = "VARCHAR(20)")
+    @Enumerated(EnumType.STRING)
     val auth: AuthType = AuthType.USER,
 
     @Column(nullable = true, columnDefinition = "VARCHAR(100)")    //자기소개 몇자 내외?
