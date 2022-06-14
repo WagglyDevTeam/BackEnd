@@ -60,6 +60,10 @@ class CommentService(
         val commentLike: CommentLike? = commentLikeRepository.findByUserIdAndCommentId(user.id!!, commentId)
         var isLikedByMe = false
 
+        if (comment.activeStatus == ActiveStatusType.INACTIVE){
+            throw Exception("삭제된 댓글에 좋아요를 추가할 수 없습니다.")
+        }
+
         // 처음 좋아요 누를 때
         if (commentLike == null) {
             val newCommentLike = CommentLike(
@@ -97,6 +101,9 @@ class CommentService(
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
         if (comment.parentComment != null) {
             throw Exception("1계층 대댓글만 가능합니다.")
+        }
+        if (comment.activeStatus == ActiveStatusType.INACTIVE){
+            throw Exception("삭제된 댓글에 대댓글을 작성할 수 없습니다.")
         }
         val user = userDetails.user
         val reply: Comment = replyRequestDto.toEntity(comment, user)
