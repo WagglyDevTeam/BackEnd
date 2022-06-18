@@ -7,10 +7,11 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import team.waggly.backend.exception.security.FromLoginBadRequestException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-@Order(2)
+@Order(3)
 class FormLoginFilter : UsernamePasswordAuthenticationFilter {
     private val objectMapper: ObjectMapper
 
@@ -27,11 +28,10 @@ class FormLoginFilter : UsernamePasswordAuthenticationFilter {
             val password = requestBody.get("password").asText()
             authRequest = UsernamePasswordAuthenticationToken(username, password)
         } catch (e: Exception) {
-            throw RuntimeException("username, password 입력이 필요합니다.")
+            throw FromLoginBadRequestException("username, password 입력이 필요합니다.")
         }
 
         setDetails(request, authRequest)
-
         return this.authenticationManager.authenticate(authRequest)
     }
 }
