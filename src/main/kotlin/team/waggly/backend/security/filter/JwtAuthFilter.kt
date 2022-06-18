@@ -1,5 +1,6 @@
 package team.waggly.backend.security.filter
 
+import org.springframework.core.annotation.Order
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
@@ -10,6 +11,7 @@ import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+@Order(3)
 class JwtAuthFilter(
         requiresAuthenticationRequestMatcher: RequestMatcher
 ) : AbstractAuthenticationProcessingFilter(requiresAuthenticationRequestMatcher) {

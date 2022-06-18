@@ -49,10 +49,6 @@ class SecurityConfig(
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-        http
-                .addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter::class.java)
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter::class.java)
-
         http.authorizeRequests()
                 .anyRequest().permitAll()
                 .and()
