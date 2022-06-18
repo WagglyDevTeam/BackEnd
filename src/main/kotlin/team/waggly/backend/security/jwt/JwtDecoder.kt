@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import org.springframework.stereotype.Component
+import team.waggly.backend.exception.security.JwtTokenExpiredException
+import team.waggly.backend.exception.security.JwtTokenInvalidException
 import java.util.*
 
 @Component
@@ -17,7 +19,7 @@ class JwtDecoder(private val jwtTokenUtils: JwtTokenUtils) {
 
         val now = Date()
         if (expiredDate.before(now)) {
-            throw java.lang.IllegalArgumentException("유효한 토큰이 아닙니다")
+            throw JwtTokenExpiredException()
         }
 
         return decodedJWT
@@ -34,7 +36,7 @@ class JwtDecoder(private val jwtTokenUtils: JwtTokenUtils) {
 
             return verifier.verify(token)
         } catch (e: Exception) {
-            throw IllegalArgumentException("유효한 토큰이 아닙니다")
+            throw JwtTokenInvalidException()
         }
     }
 }

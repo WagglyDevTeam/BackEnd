@@ -6,6 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import team.waggly.backend.exception.security.FromLoginInvalidException
 import team.waggly.backend.security.UserDetailsImpl
 import javax.annotation.Resource
 
@@ -21,7 +22,7 @@ class FormLoginAuthProvider(
 
         val userDetails = userDetailsService.loadUserByUsername(username) as UserDetailsImpl
         if (!passwordEncoder.matches(password, userDetails.password)) {
-            throw BadCredentialsException(userDetails.username + "Invalid password")
+            throw FromLoginInvalidException(userDetails.username + "Invalid password")
         }
 
         return UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
