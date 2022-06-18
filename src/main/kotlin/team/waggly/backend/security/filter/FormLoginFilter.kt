@@ -25,7 +25,7 @@ class FormLoginFilter : UsernamePasswordAuthenticationFilter {
             val password = requestBody.get("password").asText()
             authRequest = UsernamePasswordAuthenticationToken(username, password)
         } catch (e: Exception) {
-            throw java.lang.RuntimeException("username, password 입력이 필요합니다.")
+            throw RuntimeException("username, password 입력이 필요합니다.")
         }
 
         setDetails(request, authRequest)

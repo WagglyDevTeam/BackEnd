@@ -11,9 +11,8 @@ import javax.annotation.Resource
 
 class FormLoginAuthProvider(
         @Resource(name = "userDetailsServiceImpl") private val userDetailsService: UserDetailsService,
-        private val passwordEncoder: BCryptPasswordEncoder)
-    : AuthenticationProvider {
-
+        private val passwordEncoder: BCryptPasswordEncoder,
+) : AuthenticationProvider {
     override fun authenticate(authentication: Authentication): Authentication {
         val token = authentication as UsernamePasswordAuthenticationToken
 
