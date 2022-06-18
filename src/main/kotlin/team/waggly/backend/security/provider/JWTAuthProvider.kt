@@ -9,10 +9,14 @@ import team.waggly.backend.repository.UserRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.security.jwt.JwtDecoder
 import team.waggly.backend.security.jwt.JwtPreProcessingToken
+import team.waggly.backend.security.jwt.JwtTokenUtils
 import java.lang.IllegalArgumentException
 
-class JWTAuthProvider(private val userRepository: UserRepository): AuthenticationProvider {
-    private val jwtDecoder = JwtDecoder()
+class JWTAuthProvider(
+        private val userRepository: UserRepository,
+        private val jwtTokenUtils: JwtTokenUtils,
+): AuthenticationProvider {
+    private val jwtDecoder = JwtDecoder(jwtTokenUtils)
 
     override fun authenticate(authentication: Authentication): Authentication {
         val token = authentication.principal as String

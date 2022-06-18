@@ -10,10 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import team.waggly.backend.commomenum.HttpMethodEnum
 import team.waggly.backend.repository.UserRepository
 import team.waggly.backend.security.filter.FormLoginFilter
 import team.waggly.backend.security.filter.JwtAuthFilter
-import team.waggly.backend.security.jwt.HeaderTokenExtractor
+import team.waggly.backend.security.jwt.JwtTokenUtils
 import team.waggly.backend.security.provider.FormLoginAuthProvider
 import team.waggly.backend.security.provider.JWTAuthProvider
 
@@ -21,10 +22,9 @@ import team.waggly.backend.security.provider.JWTAuthProvider
 @EnableWebSecurity
 class SecurityConfig(
         private val userDetailsServiceImpl: UserDetailsServiceImpl,
-        private val userRepository: UserRepository
+        private val userRepository: UserRepository,
+        private val jwtTokenUtils: JwtTokenUtils,
 ) : WebSecurityConfigurerAdapter() {
-    private val headerTokenExtractor = HeaderTokenExtractor()
-
     @Bean
     fun encodePassword() : BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
@@ -33,7 +33,7 @@ class SecurityConfig(
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth
                 .authenticationProvider(FormLoginAuthProvider(userDetailsServiceImpl, encodePassword()))
-                .authenticationProvider(JWTAuthProvider(userRepository))
+                .authenticationProvider(JWTAuthProvider(userRepository, jwtTokenUtils))
     }
 
     override fun configure(web: WebSecurity) {
@@ -70,19 +70,19 @@ class SecurityConfig(
 
     @Bean
     fun jwtAuthFilter(): JwtAuthFilter {
-        val skipPathList = mutableListOf<String>()
+        val skipPathList = mutableListOf<Pair<HttpMethodEnum, String>>()
 
-        skipPathList.add("GET,/h2-console/**")
-        skipPathList.add("POST,/h2-console/**")
-        skipPathList.add("POST,/user/signup")
-        skipPathList.add("POST,/user/email")
-        skipPathList.add("POST,/major")
-        skipPathList.add("POST,/user/nickname")
-        skipPathList.add("POST,/user/email/certification")
+        skipPathList.add(Pair(HttpMethodEnum.GET, "/h2-console/**"))
+        skipPathList.add(Pair(HttpMethodEnum.POST,"/h2-console/**"))
+        skipPathList.add(Pair(HttpMethodEnum.POST,"/user/signup"))
+        skipPathList.add(Pair(HttpMethodEnum.POST,"/user/email"))
+        skipPathList.add(Pair(HttpMethodEnum.POST,"/major"))
+        skipPathList.add(Pair(HttpMethodEnum.POST,"/user/nickname"))
+        skipPathList.add(Pair(HttpMethodEnum.POST,"/user/email/certification"))
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 
-        val filter = JwtAuthFilter(headerTokenExtractor, matcher)
+        val filter = JwtAuthFilter(matcher)
         filter.setAuthenticationManager(super.authenticationManager())
 
         return filter
