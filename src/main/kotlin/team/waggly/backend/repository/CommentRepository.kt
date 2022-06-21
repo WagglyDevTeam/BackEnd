@@ -15,7 +15,7 @@ interface CommentRepository : JpaRepository<Comment, Long> {
     // 게시글의 댓글 수
     fun countByPostId(postId: Long): Int
 
-    fun findByPostAndActiveStatusOrderByCreatedAtDesc(post: Post, activeStatus: ActiveStatusType): List<Comment>
+    fun findByPostAndActiveStatusAndParentCommentNullOrderByCreatedAtAsc(post: Post, activeStatus: ActiveStatusType): List<Comment>
 
     // 대댓글 (reply)
     fun findByParentCommentAndActiveStatus(parentComment: Comment, activeStatus: ActiveStatusType): List<Comment>
