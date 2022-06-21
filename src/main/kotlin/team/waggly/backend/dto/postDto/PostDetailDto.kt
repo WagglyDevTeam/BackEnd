@@ -24,7 +24,7 @@ data class PostDetailDto(
         post.title,
         post.description,
         post.createdAt,
-        arrayListOf(),
+        arrayListOf<String>(),
         null,
         null,
         null,
