@@ -18,7 +18,7 @@ class Major (
 
     @Column(columnDefinition = "VARCHAR(30)")
     @Enumerated(EnumType.STRING)
-    val collegeEnum: CollegeType, // 이넘
+    val college: CollegeType, // 이넘
 
     @Column
     @Enumerated(EnumType.STRING)
