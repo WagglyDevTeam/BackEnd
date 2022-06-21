@@ -103,7 +103,7 @@ class PostService(
         postDetailDto.isLikedByMe = if (userId != null) postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE) else false
 
         // TODO: 1. 댓글, 대댓글 넣기
-        val comments: List<Comment> = commentRepository.findByPostAndActiveStatusOrderByCreatedAtDesc(post, ActiveStatusType.ACTIVE)
+        val comments: List<Comment> = commentRepository.findByPostAndActiveStatusAndParentCommentNullOrderByCreatedAtAsc(post, ActiveStatusType.ACTIVE)
         val commentsDto: MutableList<PostDetailCommentDto> = arrayListOf()
         if (comments.isNotEmpty()) {
             for (comment in comments) {
@@ -262,7 +262,7 @@ class PostService(
 
         val replyDtoList: MutableList<PostDetailReplyDto> = arrayListOf()
         for (reply in replies) {
-            val replyDto: PostDetailReplyDto = this.updatePostDetailReplyDto(comment, userId)
+            val replyDto: PostDetailReplyDto = this.updatePostDetailReplyDto(reply, userId)
 
             replyDtoList.add(replyDto)
         }
