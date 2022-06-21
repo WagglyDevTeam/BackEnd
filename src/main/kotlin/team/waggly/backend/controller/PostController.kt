@@ -49,7 +49,7 @@ class PostController (
     @GetMapping("/{boardId}")
     fun getPostDetails(@PathVariable boardId: Long,
                        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?):
-            ResponseDto<PostDetailDto> {
+            ResponseDto<PostDetailResponseDto> {
         val user: User? = userDetailsImpl?.user ?: null
         return ResponseDto(postService.getPostDetails(boardId, user), HttpStatus.OK.value())
     }
