@@ -23,6 +23,7 @@ class ChatParticipantsInfo(
     val isAlarmOn: Boolean = true,
 
     @Column(columnDefinition = "VARCHAR(10)")
+    @Enumerated(EnumType.STRING)
     val activeStatus: ActiveStatusType = ActiveStatusType.ACTIVE, // 이넘
 
     @Column

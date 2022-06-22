@@ -13,12 +13,13 @@ class Major (
     @ManyToOne
     val university: University,
 
-    @Column(columnDefinition = "VARCHAR(30)")
+    @Column(columnDefinition = "VARCHAR(255)")
     val majorName: String,
 
     @Column(columnDefinition = "VARCHAR(30)")
     @Enumerated(EnumType.STRING)
-    val collegeEnum: CollegeType, // 이넘
+    val college: CollegeType, // 이넘
+
 
     @Column
     @Enumerated(EnumType.STRING)

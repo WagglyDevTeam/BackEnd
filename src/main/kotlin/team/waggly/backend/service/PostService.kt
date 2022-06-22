@@ -9,18 +9,11 @@ import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.postDto.*
-import team.waggly.backend.model.Post
-import team.waggly.backend.model.PostImage
-import team.waggly.backend.model.PostLike
-import team.waggly.backend.model.User
-import team.waggly.backend.repository.CommentRepository
-import team.waggly.backend.repository.PostImageRepository
-import team.waggly.backend.repository.PostLikeRepository
-import team.waggly.backend.repository.PostRepository
+import team.waggly.backend.model.*
+import team.waggly.backend.repository.*
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.awsS3.S3Uploader
 import java.time.LocalDateTime
-import java.util.*
 import javax.transaction.Transactional
 
 @Service
@@ -29,6 +22,7 @@ class PostService(
         private val postLikeRepository: PostLikeRepository,
         private val commentRepository: CommentRepository,
         private val postImageRepository: PostImageRepository,
+        private val commentLikeRepository: CommentLikeRepository,
         private val s3Uploader: S3Uploader,
 ) {
     @Value("\${cloud.aws.s3.dir}")
@@ -88,7 +82,7 @@ class PostService(
     }
 
     // 게시글 상세 조회하기
-    fun getPostDetails(postId: Long, user: User?): PostDetailDto {
+    fun getPostDetails(postId: Long, user: User?): PostDetailResponseDto {
         val userId: Long? = user?.id
         val post: Post = postRepository.findById(postId).orElse(null) ?: throw NotFoundException()
 
@@ -96,20 +90,29 @@ class PostService(
         if (post.activeStatus == ActiveStatusType.INACTIVE) {
             throw IllegalArgumentException("삭제된 게시글입니다.")
         }
-        val postDetailDto = PostDetailDto(post)
 
+        val postDetailDto = PostDetailDto(post)
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(post.id!!)
         if (postImages != null) {
             for (postImage in postImages) {
                 postDetailDto.postImages.add(postImage.imageUrl)
             }
         }
-
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
         postDetailDto.isLikedByMe = if (userId != null) postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE) else false
 
-        return postDetailDto
+        // TODO: 1. 댓글, 대댓글 넣기
+        val comments: List<Comment> = commentRepository.findByPostAndActiveStatusAndParentCommentNullOrderByCreatedAtAsc(post, ActiveStatusType.ACTIVE)
+        val commentsDto: MutableList<PostDetailCommentDto> = arrayListOf()
+        if (comments.isNotEmpty()) {
+            for (comment in comments) {
+                val dto: PostDetailCommentDto = updatePostDetailCommentDto(comment, userId!!)
+                commentsDto.add(dto)
+            }
+        }
+
+        return PostDetailResponseDto(postDetailDto, commentsDto)
     }
 
     // 게시글 작성
@@ -120,6 +123,11 @@ class PostService(
         if (user.id == null) {
             throw NotFoundException()
         }
+
+        if (postCreateDto.college != user.major.college) {
+            throw IllegalArgumentException("본인이 속한 학부 게시판에만 게시글 작성이 가능합니다.")
+        }
+
         val post: Post = postCreateDto.toEntity(user)
         postRepository.save(post)
 
@@ -241,4 +249,33 @@ class PostService(
         return postSummaryResponseDto
     }
 
+    private fun updatePostDetailCommentDto(comment: Comment, userId: Long): PostDetailCommentDto {
+        val postDetailCommentDto = PostDetailCommentDto(comment)
+
+        postDetailCommentDto.commentLikeCnt = commentLikeRepository.countByCommentIdAndActiveStatus(comment.id!!, ActiveStatusType.ACTIVE)
+        postDetailCommentDto.isLikedByMe = commentLikeRepository.existsByIdAndUserIdAndActiveStatus(comment.id, userId, ActiveStatusType.ACTIVE)
+
+        // reply
+        val replies = commentRepository.findByParentCommentAndActiveStatus(comment, ActiveStatusType.ACTIVE)
+
+        val replyDtoList: MutableList<PostDetailReplyDto> = arrayListOf()
+        for (reply in replies) {
+            val replyDto: PostDetailReplyDto = this.updatePostDetailReplyDto(reply, userId)
+
+            replyDtoList.add(replyDto)
+        }
+
+        postDetailCommentDto.replies = replyDtoList
+
+        return postDetailCommentDto
+    }
+
+    private fun updatePostDetailReplyDto(reply: Comment, userId: Long): PostDetailReplyDto {
+        val postDetailReplyDto = PostDetailReplyDto(reply)
+
+        postDetailReplyDto.replyLikeCnt = commentLikeRepository.countByCommentIdAndActiveStatus(reply.id!!, ActiveStatusType.ACTIVE)
+        postDetailReplyDto.isLikedByMe = commentLikeRepository.existsByIdAndUserIdAndActiveStatus(reply.id, userId, ActiveStatusType.ACTIVE)
+
+        return postDetailReplyDto
+    }
 }
