@@ -22,17 +22,15 @@ class SendEmailService(
 )
 {
     //Post 인증번호 전송 Controller Main 서비스 함수
-    fun emailCertification(emailCertificationRequestDto: EmailRequestDto): ResponseDto<Any>{
+    fun emailCertification(emailCertificationRequestDto: EmailRequestDto){
         val email = emailCertificationRequestDto.email
         if(!universityEmailValidation(email))
-            return ResponseDto(null,"이메일 형식이 학교이메일이 아닙니다.",404)
+            throw Exception("이메일 형식이 학교이메일이 아닙니다.")
 
         val key = createKey()
         println(key)
         saveHashMapToRedis(email,key)
         certificationNumSender(email,key)
-
-        return ResponseDto(null)
     }
 
     //학교이메일 유효성 검사 ac.kr , .edu 없으면 학교이메일 취금 x

@@ -20,6 +20,7 @@ class Major (
     @Enumerated(EnumType.STRING)
     val college: CollegeType, // 이넘
 
+
     @Column
     @Enumerated(EnumType.STRING)
     val majorStatus: ActiveStatusType = ActiveStatusType.ACTIVE
