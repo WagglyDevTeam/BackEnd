@@ -11,6 +11,7 @@ class ChatRoom (
     val id: Long? = null,
 
     @Column(columnDefinition = "VARCHAR(10)")
+    @Enumerated(EnumType.STRING)
     var chatPurpose: ChatPurposeType,
 
     @Column
