@@ -21,7 +21,7 @@ class S3Uploader(
     @Value("\${cloud.aws.s3.dir}")
     lateinit var dir: String
 
-    fun upload(file: MultipartFile): String {
+    fun upload(file: MultipartFile, mimeType: String): String {
         val s3Object = makeS3ObjectName(file.originalFilename!!)
 
         val bytes = IOUtils.toByteArray(file.inputStream)
@@ -29,7 +29,7 @@ class S3Uploader(
 
         val metadata = ObjectMetadata()
         metadata.contentLength = bytes.size.toLong()
-        metadata.contentType = file.contentType
+        metadata.contentType = mimeType
 
         amazonS3Client.putObject(PutObjectRequest(bucket, s3Object, byteArray, metadata)
                 .withCannedAcl(CannedAccessControlList.PublicRead))

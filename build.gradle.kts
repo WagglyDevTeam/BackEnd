@@ -60,6 +60,9 @@ dependencies {
 
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    // Tika
+    implementation("org.apache.tika:tika-parsers:1.18")
 }
 
 

@@ -13,6 +13,7 @@ import team.waggly.backend.model.*
 import team.waggly.backend.repository.*
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.awsS3.S3Uploader
+import team.waggly.backend.service.tika.TikaService
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
@@ -24,6 +25,7 @@ class PostService(
         private val postImageRepository: PostImageRepository,
         private val commentLikeRepository: CommentLikeRepository,
         private val s3Uploader: S3Uploader,
+        private val tikaService: TikaService,
 ) {
     @Value("\${cloud.aws.s3.dir}")
     lateinit var dir: String
@@ -133,12 +135,11 @@ class PostService(
 
         if (postCreateDto.file != null) {
             for (file in postCreateDto.file) {
-                val extName: String = file.originalFilename!!.substringAfterLast(".")
-                if (!listOf("jpg", "jpeg", "gif", "png").contains(extName)) {
+                if (!tikaService.typeCheck(file)) {
                     throw IllegalArgumentException("올바른 파일 형식이 아닙니다. (.jpg, .jpeg, .gif, .png)")
                 }
 
-                val fileUrl: String = s3Uploader.upload(file)
+                val fileUrl: String = s3Uploader.upload(file, tikaService.mimeType(file))
                 val image = PostImage(post, fileUrl, file.originalFilename!!, fileUrl)
                 postImageRepository.save(image)
             }
@@ -160,7 +161,11 @@ class PostService(
 
         if (postUpdateDto.file != null) {
             for (file in postUpdateDto.file) {
-                val fileUrl: String = s3Uploader.upload(file)
+                if (!tikaService.typeCheck(file)) {
+                    throw IllegalArgumentException("올바른 파일 형식이 아닙니다. (.jpg, .jpeg, .gif, .png)")
+                }
+
+                val fileUrl: String = s3Uploader.upload(file, tikaService.mimeType(file))
                 val image = PostImage(post, fileUrl, file.originalFilename!!, fileUrl)
                 postImageRepository.save(image)
             }

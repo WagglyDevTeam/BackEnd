@@ -10,8 +10,8 @@ import java.util.*
 
 @Component
 class JwtTokenUtils {
-    @Value("\${spring.auth.secret.key}")
-    lateinit var JWT_SECRET: String
+//    @Value("\${spring.auth.secret.key}")
+    var JWT_SECRET: String = "asdf"
 
     private val SEC = 1
     private val MINUTE = 60 * SEC
@@ -31,6 +31,7 @@ class JwtTokenUtils {
                     .withClaim(CLAIM_EXPIRED_DATE, Date(System.currentTimeMillis() + JWT_TOKEN_VALID_MILLI_SEC))
                     .sign(Algorithm.HMAC256(JWT_SECRET)) as String
         } catch (e: Exception) {
+            println(e)
             throw JwtTokenInvalidException("Error Create JWT Token")
         }
     }

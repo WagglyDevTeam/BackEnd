@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.postDto.*
 import team.waggly.backend.dto.ResponseDto
@@ -16,12 +17,14 @@ import team.waggly.backend.model.User
 import team.waggly.backend.repository.PostLikeRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.PostService
+import team.waggly.backend.service.tika.TikaService
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/board")
 class PostController (
         private val postService: PostService,
+        private val tikaService: TikaService,
 ) {
     // 모든 게시글 (학부 필터링 포함)
     @GetMapping
@@ -109,5 +112,11 @@ class PostController (
                  @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<PostLikeResponseDto> {
         val userId: Long = userDetailsImpl.user.id ?: throw NoSuchElementException()
         return ResponseDto(postService.likePost(boardId, userId), HttpStatus.OK.value())
+    }
+
+    // 파일 타입 체크
+    @PostMapping("/fileType")
+    fun fileTypeCheck(@ModelAttribute file: MultipartFile) {
+        tikaService.mimeType(file)
     }
 }
