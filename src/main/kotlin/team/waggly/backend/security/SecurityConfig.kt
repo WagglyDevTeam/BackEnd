@@ -59,7 +59,7 @@ class SecurityConfig(
     fun formLoginFilter() : FormLoginFilter {
         val formLoginFilter = FormLoginFilter(authenticationManager())
         formLoginFilter.setFilterProcessesUrl("/user/login")
-        formLoginFilter.setAuthenticationSuccessHandler(FormLoginSuccessHandler())
+        formLoginFilter.setAuthenticationSuccessHandler(FormLoginSuccessHandler(jwtTokenUtils))
         formLoginFilter.afterPropertiesSet()
         return formLoginFilter
     }
