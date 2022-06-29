@@ -23,7 +23,6 @@ class S3Uploader(
 
     fun upload(file: MultipartFile, mimeType: String): String {
         val s3Object = makeS3ObjectName(file.originalFilename!!)
-
         val bytes = IOUtils.toByteArray(file.inputStream)
         val byteArray = ByteArrayInputStream(bytes)
 
@@ -43,6 +42,6 @@ class S3Uploader(
     }
 
     private fun makeS3ObjectName(filename: String): String {
-        return "${dir}/${UUID.randomUUID()}.${filename.substringAfterLast(".")}"
+        return "${dir}${UUID.randomUUID()}.${filename.substringAfterLast(".")}"
     }
 }

@@ -28,7 +28,6 @@ class SendEmailService(
             throw Exception("이메일 형식이 학교이메일이 아닙니다.")
 
         val key = createKey()
-        println(key)
         saveHashMapToRedis(email,key)
         certificationNumSender(email,key)
     }

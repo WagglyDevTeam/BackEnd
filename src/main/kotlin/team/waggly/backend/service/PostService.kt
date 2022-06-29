@@ -133,8 +133,6 @@ class PostService(
 
         val post: Post = postCreateDto.toEntity(user)
         postRepository.save(post)
-        println(postCreateDto)
-        println(postCreateDto.file)
 
         if (postCreateDto.file != null) {
             for (file in postCreateDto.file) {
@@ -177,7 +175,6 @@ class PostService(
             for (target in postUpdateDto.deleteTargetUrl) {
                 val targetImage: PostImage = postImageRepository.findByImageUrlAndDeletedAtNull(target)
                         ?: throw NotFoundException()
-                println(dir + targetImage.uploadName)
                 s3Uploader.delete(targetImage.uploadName)
                 postImageRepository.delete(targetImage)
             }
@@ -218,7 +215,6 @@ class PostService(
         val post: Post = postRepository.findById(postId).orElseThrow()
 
         val postLike: PostLike? = postLikeRepository.findByPostAndUserId(post, userId)
-        println(postLike)
 
         var isLikedByMe: Boolean = false
 
