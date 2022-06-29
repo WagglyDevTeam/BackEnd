@@ -1,5 +1,6 @@
 package team.waggly.backend.service
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.PageImpl
@@ -132,13 +133,14 @@ class PostService(
 
         val post: Post = postCreateDto.toEntity(user)
         postRepository.save(post)
+        println(postCreateDto)
+        println(postCreateDto.file)
 
         if (postCreateDto.file != null) {
             for (file in postCreateDto.file) {
                 if (!tikaService.typeCheck(file)) {
                     throw IllegalArgumentException("올바른 파일 형식이 아닙니다. (.jpg, .jpeg, .gif, .png)")
                 }
-
                 val fileUrl: String = s3Uploader.upload(file, tikaService.mimeType(file))
                 val image = PostImage(post, fileUrl, file.originalFilename!!, fileUrl)
                 postImageRepository.save(image)

@@ -43,6 +43,6 @@ class S3Uploader(
     }
 
     private fun makeS3ObjectName(filename: String): String {
-        return "newsroom/${UUID.randomUUID()}.${filename.substringAfterLast(".")}"
+        return "${dir}/${UUID.randomUUID()}.${filename.substringAfterLast(".")}"
     }
 }
