@@ -38,6 +38,7 @@ class S3Uploader(
 
     fun delete(fileName: String) {
 //        val deleteObjectRequest = DeleteObjectRequest(bucket, (dir + fileName))
+        
         amazonS3Client.deleteObject(bucket, dir + fileName)
     }
 
