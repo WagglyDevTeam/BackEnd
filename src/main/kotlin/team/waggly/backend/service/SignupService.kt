@@ -1,15 +1,10 @@
 package team.waggly.backend.service
 
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
-import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.user.CheckNicknameRequestDto
 import team.waggly.backend.dto.user.SignupReqeustDto
-import team.waggly.backend.dto.user.SignupResponseDto
 import team.waggly.backend.model.User
 import team.waggly.backend.repository.MajorRepository
 import team.waggly.backend.repository.UserRepository
