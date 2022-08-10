@@ -1,5 +1,6 @@
 package team.waggly.backend.service
 
+import com.uwyn.jhighlight.fastutil.Hash
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
@@ -25,6 +26,7 @@ class PostService(
         private val commentRepository: CommentRepository,
         private val postImageRepository: PostImageRepository,
         private val commentLikeRepository: CommentLikeRepository,
+        private val hashtagRepository: HashTagRepository,
         private val s3Uploader: S3Uploader,
         private val tikaService: TikaService,
 ) {
@@ -94,7 +96,10 @@ class PostService(
             throw IllegalArgumentException("삭제된 게시글입니다.")
         }
 
-        val postDetailDto = PostDetailDto(post)
+        var postDetailDto = PostDetailDto(post)
+        postDetailDto.hashtags = hashtagRepository.findAllByPostAndDeletedAtNull(post)
+        print(postDetailDto.hashtags)
+
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(post.id!!)
         if (postImages != null) {
             for (postImage in postImages) {
@@ -133,6 +138,18 @@ class PostService(
 
         val post: Post = postCreateDto.toEntity(user)
         postRepository.save(post)
+
+        val hashtagString: List<String>? = postCreateDto.hashtags
+
+        if (hashtagString != null && hashtagString.isNotEmpty()) {
+            for (hashtag in hashtagString) {
+                val newHashtag: HashTag = HashTag(
+                    post = post,
+                    hashTagName = hashtag)
+
+             hashtagRepository.save(newHashtag)
+            }
+        }
 
         if (postCreateDto.file != null) {
             for (file in postCreateDto.file) {
@@ -179,6 +196,8 @@ class PostService(
                 postImageRepository.delete(targetImage)
             }
         }
+        // TODO: 게시글 수정할 때 해시태그 수정하는 로직 만들어야 함.
+
         val updatedPost = postRepository.save(post)
         val postDetailDto = PostDetailDto(updatedPost)
 
@@ -206,6 +225,8 @@ class PostService(
         post.activeStatus = ActiveStatusType.INACTIVE
         post.deletedAt = LocalDateTime.now()
         postRepository.save(post)
+
+        // TODO: 게시글 삭제할 때 해시태그도 같이 삭제하는 로직 만들어야 함.
 
         return DeletePostResponseDto(true)
     }

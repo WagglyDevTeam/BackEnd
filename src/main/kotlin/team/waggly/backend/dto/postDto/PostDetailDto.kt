@@ -1,6 +1,7 @@
 package team.waggly.backend.dto.postDto
 
 import team.waggly.backend.commomenum.ActiveStatusType
+import team.waggly.backend.model.HashTag
 import team.waggly.backend.model.Post
 import java.time.LocalDateTime
 
@@ -18,6 +19,7 @@ data class PostDetailDto(
     val authorNickname: String,
     val isBlind: Boolean,
     val isAnonymous: Boolean,
+    var hashtags: List<HashTag>,
 ) {
     constructor(post: Post): this(
         post.id,
@@ -33,5 +35,6 @@ data class PostDetailDto(
         post.author.nickName,
         post.activeStatus == ActiveStatusType.INACTIVE,
         post.isAnonymous != 0,
+        arrayListOf<HashTag>()
     )
 }

@@ -5,6 +5,7 @@ import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.model.Post
 import team.waggly.backend.model.User
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Pattern
 
 data class CreatePostRequestDto (
     @field:NotBlank(message = "제목을 입력해주세요.")
@@ -12,6 +13,8 @@ data class CreatePostRequestDto (
 
     @field:NotBlank(message = "내용을 입력해주세요.")
     val description: String?,
+
+    val hashtags: List<String>?,
 
     val college: CollegeType,
 

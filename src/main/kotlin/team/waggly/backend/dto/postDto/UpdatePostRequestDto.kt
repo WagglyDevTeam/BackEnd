@@ -18,6 +18,8 @@ data class UpdatePostRequestDto(
         val college: CollegeType?,
         val file: List<MultipartFile>?,
         val deleteTargetUrl: List<String>?,
+        // TODO: 게시글 수정할 때 해시태그 수정하는 로직 만들어야 함.
+        val hashtags: List<String>,
 ) {
     fun updateEntity(post: Post) {
         post.title = title ?: post.title
