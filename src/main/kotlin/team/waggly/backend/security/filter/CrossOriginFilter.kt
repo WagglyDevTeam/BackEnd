@@ -15,7 +15,7 @@ class CrossOriginFilter : Filter {
     override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
         val response = response as HttpServletResponse
         response.setHeader("Access-Control-Allow-Origin", "*")
-        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, DELETE, PUT")
+        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, DELETE, PUT, PATCH")
         response.setHeader("Access-Control-Max-Age", "3600")
         response.setHeader(
                 "Access-Control-Allow-Headers",
