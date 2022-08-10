@@ -24,11 +24,10 @@ class S3Uploader(
     fun upload(file: MultipartFile): String {
         val s3Object = makeS3ObjectName(file.originalFilename!!)
 
-        val bytes = IOUtils.toByteArray(file.inputStream)
-        val byteArray = ByteArrayInputStream(bytes)
+        val byteArray = ByteArrayInputStream(file.bytes)
 
         val metadata = ObjectMetadata()
-        metadata.contentLength = bytes.size.toLong()
+        metadata.contentLength = file.bytes.size.toLong()
         metadata.contentType = file.contentType
 
         amazonS3Client.putObject(PutObjectRequest(bucket, s3Object, byteArray, metadata)
