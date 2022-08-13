@@ -83,6 +83,9 @@ class SecurityConfig(
         // Home
         skipPathList.add(Pair(HttpMethod.GET,"/board/home"))
 
+        // Swagger
+        skipPathList.add(Pair(HttpMethod.GET, "/docs/**"))
+
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 
         val filter = JwtAuthFilter(matcher)
