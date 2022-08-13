@@ -8,6 +8,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
+import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.postDto.*
 import team.waggly.backend.model.*
 import team.waggly.backend.repository.*
@@ -27,6 +28,11 @@ class PostService(
 ) {
     @Value("\${cloud.aws.s3.dir}")
     lateinit var dir: String
+
+    // 게시판 홈
+    fun getPostsInHome(user: User?): ResponseDto<PostsInHomeResponseDto> {
+        TODO("Not yet implemented")
+    }
 
     // 전체 게시글 조회
     fun getAllPosts(pageable: Pageable, user: User?): List<PostSummaryResponseDto> {
