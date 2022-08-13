@@ -5,6 +5,7 @@ import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
@@ -15,6 +16,7 @@ import team.waggly.backend.repository.*
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.awsS3.S3Uploader
 import java.time.LocalDateTime
+import java.util.Random
 import javax.transaction.Transactional
 
 @Service
@@ -31,7 +33,28 @@ class PostService(
 
     // 게시판 홈
     fun getPostsInHome(user: User?): ResponseDto<PostsInHomeResponseDto> {
-        TODO("Not yet implemented")
+        val colleges = CollegeType.values()
+        val userCollege = user?.major?.college ?: colleges[Random().nextInt(colleges.size)]
+
+        val otherCollegePosts: MutableList<PostsInHomeResponseDto.CollegePosts> = mutableListOf()
+        var userCollegePosts: PostsInHomeResponseDto.CollegePosts? = null
+        for (college in colleges) {
+            val collegePosts = PostsInHomeResponseDto.CollegePosts(
+                    collegeType = college,
+                    collegeTypeName = college.desc,
+                    posts = postRepository.findHomePostsByCollege(college, ActiveStatusType.ACTIVE)
+            )
+            if (userCollege == college) {
+                userCollegePosts = collegePosts
+            } else {
+                otherCollegePosts.add(collegePosts)
+            }
+        }
+
+        return ResponseDto(
+                PostsInHomeResponseDto(userCollegePosts!!, otherCollegePosts),
+                HttpStatus.OK.value(),
+        )
     }
 
     // 전체 게시글 조회

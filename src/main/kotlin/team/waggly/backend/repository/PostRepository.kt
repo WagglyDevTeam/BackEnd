@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
+import team.waggly.backend.dto.postDto.PostsInHomeResponseDto
 import team.waggly.backend.model.Post
 import team.waggly.backend.model.User
 
@@ -20,4 +21,14 @@ interface PostRepository: JpaRepository<Post, Long> {
 
     // MyPageController.getAllMyPosts - 자신이 쓴 게시글 리스트
     fun findByAuthorAndActiveStatusOrderByCreatedAtDesc(user: User, activeStatus: ActiveStatusType): List<Post>
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT p.id, m.major_name, p.title FROM post p " +
+                    "join user u on u.id = p.author_id " +
+                    "join major m on m.id = u.major_id " +
+                    "WHERE p.college = :college and p.active_status = :activeStatus " +
+                    "order by p.created_at desc LIMIT 5"
+    )
+    fun findHomePostsByCollege(college: CollegeType, activeStatus: ActiveStatusType): List<PostsInHomeResponseDto.PostHomeDto>
 }

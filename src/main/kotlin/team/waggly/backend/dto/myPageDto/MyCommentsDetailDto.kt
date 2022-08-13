@@ -1,6 +1,5 @@
 package team.waggly.backend.dto.myPageDto
 
-import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.model.Comment
 import java.time.LocalDateTime
 
@@ -18,6 +17,6 @@ class MyCommentsDetailDto (
         comment.description,
         comment.post.id!!,
         comment.post.title,
-        comment.post.college.str,
+        comment.post.college.desc,
     )
 }

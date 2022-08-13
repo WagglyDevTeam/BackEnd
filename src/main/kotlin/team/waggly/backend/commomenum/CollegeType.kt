@@ -1,6 +1,6 @@
 package team.waggly.backend.commomenum
 
-enum class CollegeType(val str: String) {
+enum class CollegeType(val desc: String) {
     ENGINEERING("공학계열"),
     SOCIAL("인문사회계열"),
     NATURE("자연과학계열"),

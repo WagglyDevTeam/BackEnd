@@ -75,6 +75,7 @@ class SecurityConfig(
         skipPathList.add(Pair(HttpMethodEnum.POST,"/major"))
         skipPathList.add(Pair(HttpMethodEnum.POST,"/user/nickname"))
         skipPathList.add(Pair(HttpMethodEnum.POST,"/user/email/certification"))
+        skipPathList.add(Pair(HttpMethodEnum.GET,"/board/home"))
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 

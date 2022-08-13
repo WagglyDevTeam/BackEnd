@@ -14,6 +14,7 @@ class PostsInHomeResponseDto(
 
     class PostHomeDto(
             val postId: Long,
+            val majorName: String,
             val postTitle: String,
     )
 }
