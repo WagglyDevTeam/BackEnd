@@ -3,6 +3,7 @@ package team.waggly.backend.service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -42,7 +43,13 @@ class PostService(
             val collegePosts = PostsInHomeResponseDto.CollegePosts(
                     collegeType = college,
                     collegeTypeName = college.desc,
-                    posts = postRepository.findHomePostsByCollege(college, ActiveStatusType.ACTIVE)
+                    posts = postRepository.findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(college, ActiveStatusType.ACTIVE, PageRequest.of(0, 5)).map {
+                        PostsInHomeResponseDto.PostHomeDto(
+                                postId = it.id!!,
+                                majorName = it.author.major.majorName,
+                                postTitle = it.title
+                        )
+                    }
             )
             if (userCollege == college) {
                 userCollegePosts = collegePosts
