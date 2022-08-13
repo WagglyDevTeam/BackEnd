@@ -1,4 +1,4 @@
-package team.waggly.backend.dto.postDto
+package team.waggly.backend.dto.post
 
 class PostLikeResponseDto (
     val isLikedByMe: Boolean,

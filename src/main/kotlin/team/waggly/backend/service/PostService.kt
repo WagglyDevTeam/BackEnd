@@ -11,9 +11,10 @@ import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.ResponseDto
-import team.waggly.backend.dto.postDto.*
+import team.waggly.backend.dto.post.*
 import team.waggly.backend.model.*
 import team.waggly.backend.repository.*
+import team.waggly.backend.repository.querydsl.QPostRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.awsS3.S3Uploader
 import java.time.LocalDateTime
@@ -23,6 +24,7 @@ import javax.transaction.Transactional
 @Service
 class PostService(
         private val postRepository: PostRepository,
+        private val qPostRepository: QPostRepository,
         private val postLikeRepository: PostLikeRepository,
         private val commentRepository: CommentRepository,
         private val postImageRepository: PostImageRepository,
@@ -43,7 +45,7 @@ class PostService(
             val collegePosts = PostsInHomeResponseDto.CollegePosts(
                     collegeType = college,
                     collegeTypeName = college.desc,
-                    posts = postRepository.findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(college, ActiveStatusType.ACTIVE, PageRequest.of(0,5)).map {
+                    posts = postRepository.findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(college, ActiveStatusType.ACTIVE, PageRequest.of(0, 5)).map {
                         PostsInHomeResponseDto.PostHomeDto(
                                 postId = it.id!!,
                                 majorName = it.author.major.majorName,
@@ -64,58 +66,81 @@ class PostService(
         )
     }
 
-    // 전체 게시글 조회
-    fun getAllPosts(pageable: Pageable, user: User?): List<PostSummaryResponseDto> {
-        val userId: Long? = user?.id
-        val allPosts: List<Post> = postRepository.findAllByActiveStatusOrderByIdDesc(ActiveStatusType.ACTIVE)
-
-        // 게시글이 없을 경우 빈 배열
-        if (allPosts.isEmpty()) {
-            return emptyList()
-        }
-
-        val postsDto: MutableList<PostSummaryResponseDto> = arrayListOf()
-        if (allPosts.isNotEmpty()) {
-            for (post in allPosts) {
-                val dto: PostSummaryResponseDto = updatePostSummaryResponseDto(post, userId!!)
-                postsDto.add(dto)
-            }
-        }
-
-        val start: Long = pageable.offset
-        val end: Long = if ((start + pageable.pageSize) > postsDto.size) postsDto.size.toLong() else (start + pageable.pageSize)
-        return PageImpl(postsDto.subList(start.toInt(), end.toInt()), pageable, postsDto.size.toLong()).toList()
-    }
-
-    // 단과대 별 게시글 조회
-    fun getAllCollegePosts(college: CollegeType, pageable: Pageable, user: User?): CollegePostsResponseDto {
-        val userId: Long? = user?.id
-        val allPosts: List<Post> = postRepository.findAllByCollegeAndActiveStatusOrderByIdDesc(college, ActiveStatusType.ACTIVE)
-
-        // 게시글이 없을 경우 null + 빈 배열
-        if (allPosts.isEmpty()) {
-            return CollegePostsResponseDto(null, emptyList())
-        }
-        // 해당 단과대의 베스트 게시글 ID
-        val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(college.toString()) ?: 0
-        val best: Post = postRepository.findById(collegeBestId).orElse(allPosts[0])
+    fun searchPostsByCollege(searchPostsByCollege: SearchPostsByCollege): ResponseDto<SearchPostsByCollegeResponseDto> {
+        val college = searchPostsByCollege.college
 
         // Best 게시글
-        val bestDto: PostSummaryResponseDto = this.updatePostSummaryResponseDto(best, userId!!)
+        val collegeBestId: Long = college?.let { postLikeRepository.getMostLikedPostInCollege(it) } ?: 0
+        val bestPost = postRepository.findByIdOrNull(collegeBestId)
 
-        // 게시글 리스트
-        val postsDto: MutableList<PostSummaryResponseDto> = arrayListOf()
-        for (post in allPosts) {
-            val postDto: PostSummaryResponseDto = this.updatePostSummaryResponseDto(post, userId)
-            postsDto.add(postDto)
-        }
+        // 학과 전체 게시글
+        val allPosts = qPostRepository.searchPostsByCollege(searchPostsByCollege.college, searchPostsByCollege.pageable)
 
-        val start: Long = pageable.offset
-        val end: Long = if ((start + pageable.pageSize) > postsDto.size) postsDto.size.toLong() else (start + pageable.pageSize)
-        val postsDtoToPageable: List<PostSummaryResponseDto> = PageImpl(postsDto.subList(start.toInt(), end.toInt()), pageable, postsDto.size.toLong()).toList()
-
-        return CollegePostsResponseDto(bestDto, postsDtoToPageable)
+        return ResponseDto(
+                SearchPostsByCollegeResponseDto(
+                        bestPost = bestPost?.let { PostDto(it) },
+                        posts = allPosts.content.map {
+                            // 이미지, 좋아요, 댓글 개수 업데이트
+                            updatePostDto(it, searchPostsByCollege.user!!.id!!)
+                        }
+                ),
+                HttpStatus.OK.value()
+        )
     }
+
+
+// 전체 게시글 조회
+//    fun getAllPosts(pageable: Pageable, user: User?): List<PostDto> {
+//        val userId: Long? = user?.id
+//        val allPosts: List<Post> = postRepository.findAllByActiveStatusOrderByIdDesc(ActiveStatusType.ACTIVE)
+//
+//        // 게시글이 없을 경우 빈 배열
+//        if (allPosts.isEmpty()) {
+//            return emptyList()
+//        }
+//
+//        val postsDto: MutableList<PostDto> = arrayListOf()
+//        if (allPosts.isNotEmpty()) {
+//            for (post in allPosts) {
+//                val dto: PostDto = updatePostSummaryResponseDto(post, userId!!)
+//                postsDto.add(dto)
+//            }
+//        }
+//
+//        val start: Long = pageable.offset
+//        val end: Long = if ((start + pageable.pageSize) > postsDto.size) postsDto.size.toLong() else (start + pageable.pageSize)
+//        return PageImpl(postsDto.subList(start.toInt(), end.toInt()), pageable, postsDto.size.toLong()).toList()
+//    }
+
+    // 단과대 별 게시글 조회
+//    fun getAllCollegePosts(college: CollegeType, pageable: Pageable, user: User?): SearchPostsByCollegeResponseDto {
+//        val userId: Long? = user?.id
+//        val allPosts: List<Post> = postRepository.findAllByCollegeAndActiveStatusOrderByIdDesc(college, ActiveStatusType.ACTIVE)
+//
+//        // 게시글이 없을 경우 null + 빈 배열
+//        if (allPosts.isEmpty()) {
+//            return SearchPostsByCollegeResponseDto(null, emptyList())
+//        }
+//        // 해당 단과대의 베스트 게시글 ID
+//        val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(college.toString()) ?: 0
+//        val best: Post = postRepository.findById(collegeBestId).orElse(allPosts[0])
+//
+//        // Best 게시글
+//        val bestDto: PostDto = this.updatePostDto(best, userId!!)
+//
+//        // 게시글 리스트
+//        val postsDto: MutableList<PostDto> = arrayListOf()
+//        for (post in allPosts) {
+//            val postDto: PostDto = this.updatePostDto(post, userId)
+//            postsDto.add(postDto)
+//        }
+//
+//        val start: Long = pageable.offset
+//        val end: Long = if ((start + pageable.pageSize) > postsDto.size) postsDto.size.toLong() else (start + pageable.pageSize)
+//        val postsDtoToPageable: List<PostDto> = PageImpl(postsDto.subList(start.toInt(), end.toInt()), pageable, postsDto.size.toLong()).toList()
+//
+//        return SearchPostsByCollegeResponseDto(bestDto, postsDtoToPageable)
+//    }
 
     // 게시글 상세 조회하기
     fun getPostDetails(postId: Long, user: User?): PostDetailResponseDto {
@@ -274,15 +299,13 @@ class PostService(
         )
     }
 
-    private fun updatePostSummaryResponseDto(post: Post, userId: Long): PostSummaryResponseDto {
-        val postSummaryResponseDto = PostSummaryResponseDto(post)
+    private fun updatePostDto(postDto: PostDto, userId: Long): PostDto {
+        postDto.postImageCnt = postImageRepository.countByPostId(postDto.postId!!)
+        postDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(postDto.postId, ActiveStatusType.ACTIVE)
+        postDto.postCommentCnt = commentRepository.countByPostId(postDto.postId)
+        postDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(postDto.postId, userId, ActiveStatusType.ACTIVE)
 
-        postSummaryResponseDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
-        postSummaryResponseDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
-        postSummaryResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        postSummaryResponseDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
-
-        return postSummaryResponseDto
+        return postDto
     }
 
     private fun updatePostDetailCommentDto(comment: Comment, userId: Long): PostDetailCommentDto {
