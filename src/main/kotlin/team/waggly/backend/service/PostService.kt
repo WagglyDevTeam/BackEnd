@@ -43,7 +43,7 @@ class PostService(
             val collegePosts = PostsInHomeResponseDto.CollegePosts(
                     collegeType = college,
                     collegeTypeName = college.desc,
-                    posts = postRepository.findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(college, ActiveStatusType.ACTIVE, PageRequest.of(0, 5)).map {
+                    posts = postRepository.findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(college, ActiveStatusType.ACTIVE, PageRequest.of(0,5)).map {
                         PostsInHomeResponseDto.PostHomeDto(
                                 postId = it.id!!,
                                 majorName = it.author.major.majorName,
