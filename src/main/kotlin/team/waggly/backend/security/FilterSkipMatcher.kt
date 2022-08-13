@@ -1,5 +1,6 @@
 package team.waggly.backend.security
 
+import org.springframework.http.HttpMethod
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.security.web.util.matcher.OrRequestMatcher
 import org.springframework.security.web.util.matcher.RequestMatcher
@@ -11,7 +12,7 @@ class FilterSkipMatcher() : RequestMatcher {
     private lateinit var orRequestMatcher: OrRequestMatcher
     private lateinit var processingMatcher: RequestMatcher
 
-    constructor(pathToSkip: MutableList<Pair<HttpMethodEnum, String>>, processingPath: String) : this() {
+    constructor(pathToSkip: MutableList<Pair<HttpMethod, String>>, processingPath: String) : this() {
         this.orRequestMatcher = OrRequestMatcher(
                 pathToSkip
                         .stream()
@@ -22,8 +23,8 @@ class FilterSkipMatcher() : RequestMatcher {
         this.processingMatcher = AntPathRequestMatcher(processingPath)
     }
 
-    private fun httpPath(skipPath: Pair<HttpMethodEnum, String>): AntPathRequestMatcher {
-        return AntPathRequestMatcher(skipPath.second, skipPath.first.toString())
+    private fun httpPath(skipPath: Pair<HttpMethod, String>): AntPathRequestMatcher {
+        return AntPathRequestMatcher(skipPath.second, skipPath.first.name)
     }
 
     override fun matches(request: HttpServletRequest?): Boolean {
