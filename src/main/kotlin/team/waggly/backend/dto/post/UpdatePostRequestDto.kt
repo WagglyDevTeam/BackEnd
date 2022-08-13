@@ -1,4 +1,4 @@
-package team.waggly.backend.dto.postDto
+package team.waggly.backend.dto.post
 
 import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType

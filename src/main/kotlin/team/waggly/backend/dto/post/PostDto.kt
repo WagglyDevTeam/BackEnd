@@ -1,11 +1,12 @@
-package team.waggly.backend.dto.postDto
+package team.waggly.backend.dto.post
 
+import com.querydsl.core.annotations.QueryProjection
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.model.Post
 import java.time.LocalDateTime
 
 // 수정
-data class PostSummaryResponseDto(
+data class PostDto @QueryProjection constructor(
     val postId: Long?,
     val postTitle: String,
     val postDesc: String,

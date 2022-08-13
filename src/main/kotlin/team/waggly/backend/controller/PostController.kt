@@ -3,24 +3,22 @@ package team.waggly.backend.controller
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.*
 import team.waggly.backend.commomenum.CollegeType
-import team.waggly.backend.dto.postDto.*
+import team.waggly.backend.dto.post.*
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.exception.CustomException
 import team.waggly.backend.model.User
-import team.waggly.backend.repository.PostLikeRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.PostService
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/board")
-class PostController (
+class PostController(
         private val postService: PostService,
 ) {
     // 게시판 홈 (로그인, 비로그인)
@@ -31,24 +29,12 @@ class PostController (
 
     // 모든 게시글 (학부 필터링 포함)
     @GetMapping
-    fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
-                    @RequestParam college: String?,
-                    @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseDto<Any> {
-        val user: User? = userDetailsImpl?.user ?: null
-        if (college == null) {
-            return ResponseDto(postService.getAllPosts(pageable, user))
-        } else {
-            val collegeEnum = when (college) {
-                "test" -> CollegeType.TEST
-                "artsports" -> CollegeType.ARTSPORTS
-                "engineering" -> CollegeType.ENGINEERING
-                "medical" -> CollegeType.MEDICAL
-                "nature" -> CollegeType.NATURE
-                "social" -> CollegeType.SOCIAL
-                else -> throw NoSuchElementException("올바른 학부를 선택해주세요.")
-            }
-            return ResponseDto(postService.getAllCollegePosts(collegeEnum, pageable, user), HttpStatus.OK.value())
-        }
+    fun searchPostsByCollege(
+            @RequestParam searchPostsByCollege: SearchPostsByCollege,
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl
+    ): ResponseDto<SearchPostsByCollegeResponseDto> {
+        searchPostsByCollege.user = userDetailsImpl.user
+        return postService.searchPostsByCollege(searchPostsByCollege)
     }
 
     // 게시글 상세
@@ -62,7 +48,7 @@ class PostController (
 
     // 게시글 작성
     @PostMapping
-    fun createPost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
+    fun createPost(@AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
                    @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
                    bindingResult: BindingResult): ResponseDto<Any> {
         if (bindingResult.hasErrors()) {
@@ -72,8 +58,8 @@ class PostController (
                 val message = it.defaultMessage
                 msg.add("${field.field} : $message")
             }
-            val result = bindingResult.allErrors.map {
-                    error -> CustomException.ValidatorExceptionReturnType(error.code!!, error.defaultMessage!!)
+            val result = bindingResult.allErrors.map { error ->
+                CustomException.ValidatorExceptionReturnType(error.code!!, error.defaultMessage!!)
             }
             return ResponseDto(CustomException.ValidatorException(result))
         }
@@ -82,7 +68,7 @@ class PostController (
 
     // 게시글 수정
     @PutMapping("/{boardId}")
-    fun updatePost(@AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl,
+    fun updatePost(@AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
                    @PathVariable boardId: Long,
                    @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
                    bindingResult: BindingResult): ResponseDto<Any> {
@@ -104,7 +90,7 @@ class PostController (
     // 게시글 삭제
     @DeleteMapping("/{boardId}")
     fun deletePost(@PathVariable boardId: Long,
-                   @AuthenticationPrincipal  userDetailsImpl: UserDetailsImpl): ResponseDto<DeletePostResponseDto> {
+                   @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<DeletePostResponseDto> {
         postService.deletePost(boardId, userDetailsImpl.user)
         return ResponseDto(DeletePostResponseDto(true), HttpStatus.NO_CONTENT.value())
     }

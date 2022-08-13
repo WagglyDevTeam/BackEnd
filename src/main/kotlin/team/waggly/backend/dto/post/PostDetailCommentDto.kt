@@ -1,8 +1,7 @@
-package team.waggly.backend.dto.postDto
+package team.waggly.backend.dto.post
 
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.model.Comment
-import team.waggly.backend.model.Post
 import java.time.LocalDateTime
 
 data class PostDetailCommentDto (

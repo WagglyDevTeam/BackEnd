@@ -1,4 +1,4 @@
-package team.waggly.backend.dto.postDto
+package team.waggly.backend.dto.post
 
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.model.Comment
