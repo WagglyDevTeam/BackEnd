@@ -23,6 +23,12 @@ import javax.validation.Valid
 class PostController (
         private val postService: PostService,
 ) {
+    // 게시판 홈 (로그인, 비로그인)
+    @GetMapping("/home")
+    fun getPostsInHome(@AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseDto<PostsInHomeResponseDto> {
+        return postService.getPostsInHome(userDetailsImpl?.user)
+    }
+
     // 모든 게시글 (학부 필터링 포함)
     @GetMapping
     fun getAllPosts(@PageableDefault(size = 10, page = 0) pageable: Pageable,
