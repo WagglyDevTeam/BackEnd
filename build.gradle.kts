@@ -60,6 +60,9 @@ dependencies {
 
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    // Docs
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
 }
 
 
