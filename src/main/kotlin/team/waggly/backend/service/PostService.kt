@@ -208,7 +208,7 @@ class PostService(
 
     // 좋아요
     fun likePost(postId: Long, userId: Long): PostLikeResponseDto {
-        val post: Post = postRepository.findById(postId).orElseThrow()
+        val post: Post = postRepository.findByIdOrNull(postId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
 
         val postLike: PostLike? = postLikeRepository.findByPostAndUserId(post, userId)
         println(postLike)

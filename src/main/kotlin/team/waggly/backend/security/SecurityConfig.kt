@@ -69,12 +69,14 @@ class SecurityConfig(
         val skipPathList = mutableListOf<Pair<HttpMethodEnum, String>>()
 
         skipPathList.add(Pair(HttpMethodEnum.GET, "/h2-console/**"))
+        skipPathList.add(Pair(HttpMethodEnum.GET, "/home"))
         skipPathList.add(Pair(HttpMethodEnum.POST,"/h2-console/**"))
         skipPathList.add(Pair(HttpMethodEnum.POST,"/user/signup"))
         skipPathList.add(Pair(HttpMethodEnum.POST,"/user/email"))
         skipPathList.add(Pair(HttpMethodEnum.POST,"/major"))
         skipPathList.add(Pair(HttpMethodEnum.POST,"/user/nickname"))
         skipPathList.add(Pair(HttpMethodEnum.POST,"/user/email/certification"))
+
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 
