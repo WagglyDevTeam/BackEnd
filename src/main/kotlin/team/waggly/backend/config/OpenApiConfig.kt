@@ -6,11 +6,14 @@ import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
 import org.springdoc.core.GroupedOpenApi
+import org.springdoc.core.SpringDocUtils
 import org.springdoc.core.SwaggerUiConfigProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpHeaders
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+
 
 @Profile("default", "dev")
 @Configuration
@@ -26,12 +29,14 @@ class OpenApiConfig {
 
         // Security 요청 설정
         val addSecurityItem = SecurityRequirement().addList("JWT")
-        return OpenAPI().info(
-                Info()
-                        .title("Dalock Admin API")
-                        .description("와글리 API")
-                        .version("v1")
-        ).components(Components().addSecuritySchemes("JWT", bearerAuth))
+        return OpenAPI()
+                .info(
+                        Info()
+                                .title("Dalock Admin API")
+                                .description("와글리 API")
+                                .version("v1")
+                )
+                .components(Components().addSecuritySchemes("JWT", bearerAuth))
                 .addSecurityItem(addSecurityItem)
     }
 
@@ -61,6 +66,7 @@ class OpenApiConfig {
 
     @Bean
     fun swaggerUiConfig(config: SwaggerUiConfigProperties): SwaggerUiConfigProperties {
+        SpringDocUtils.getConfig().addAnnotationsToIgnore(AuthenticationPrincipal::class.java)
         config.path = "/docs/swagger-ui.html"
         config.tagsSorter = "alpha"
         config.operationsSorter = "alpha"
