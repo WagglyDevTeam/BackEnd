@@ -172,28 +172,17 @@ class PostService(
 
     // 게시글 작성
     @Transactional
-    fun createPost(postCreateDto: CreatePostRequestDto,
-                   userDetailsImpl: UserDetailsImpl): CreatePostResponseDto {
-        val user = userDetailsImpl.user
-        if (user.id == null) {
-            throw NotFoundException()
-        }
-
+    fun createPost(postCreateDto: CreatePostRequestDto, user: User): CreatePostResponseDto {
         if (postCreateDto.college != user.major.college) {
             throw IllegalArgumentException("본인이 속한 학부 게시판에만 게시글 작성이 가능합니다.")
         }
 
-        val post: Post = postCreateDto.toEntity(user)
+        val post = postCreateDto.toEntity(user)
         postRepository.save(post)
 
         if (postCreateDto.file != null) {
             for (file in postCreateDto.file) {
-                val extName: String = file.originalFilename!!.substringAfterLast(".")
-                if (!listOf("jpg", "jpeg", "gif", "png").contains(extName)) {
-                    throw IllegalArgumentException("올바른 파일 형식이 아닙니다. (.jpg, .jpeg, .gif, .png)")
-                }
-
-                val fileUrl: String = s3Uploader.upload(file)
+                val fileUrl = s3Uploader.upload(file)
                 val image = PostImage(post, fileUrl, file.originalFilename!!, fileUrl)
                 postImageRepository.save(image)
             }
