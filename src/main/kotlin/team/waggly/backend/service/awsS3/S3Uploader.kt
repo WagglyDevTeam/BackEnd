@@ -22,6 +22,7 @@ class S3Uploader(
     lateinit var dir: String
 
     fun upload(file: MultipartFile): String {
+        validateImage(file.originalFilename!!.substringAfterLast("."))
         val s3Object = makeS3ObjectName(file.originalFilename!!)
 
         val byteArray = ByteArrayInputStream(file.bytes)
@@ -43,5 +44,11 @@ class S3Uploader(
 
     private fun makeS3ObjectName(filename: String): String {
         return "newsroom/${UUID.randomUUID()}.${filename.substringAfterLast(".")}"
+    }
+
+    private fun validateImage(extName: String) {
+        if (!listOf("jpg", "jpeg", "gif", "png").contains(extName)) {
+            throw IllegalArgumentException("올바른 파일 형식이 아닙니다. (.jpg, .jpeg, .gif, .png)")
+        }
     }
 }

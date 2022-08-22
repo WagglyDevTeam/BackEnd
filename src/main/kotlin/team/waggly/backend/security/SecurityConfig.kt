@@ -2,6 +2,7 @@ package team.waggly.backend.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
@@ -66,17 +67,24 @@ class SecurityConfig(
 
     @Bean
     fun jwtAuthFilter(): JwtAuthFilter {
-        val skipPathList = mutableListOf<Pair<HttpMethodEnum, String>>()
+        val skipPathList = mutableListOf<Pair<HttpMethod, String>>()
 
-        skipPathList.add(Pair(HttpMethodEnum.GET, "/h2-console/**"))
-        skipPathList.add(Pair(HttpMethodEnum.GET, "/home"))
-        skipPathList.add(Pair(HttpMethodEnum.POST,"/h2-console/**"))
-        skipPathList.add(Pair(HttpMethodEnum.POST,"/user/signup"))
-        skipPathList.add(Pair(HttpMethodEnum.POST,"/user/email"))
-        skipPathList.add(Pair(HttpMethodEnum.POST,"/major"))
-        skipPathList.add(Pair(HttpMethodEnum.POST,"/user/nickname"))
-        skipPathList.add(Pair(HttpMethodEnum.POST,"/user/email/certification"))
+        // DB
+        skipPathList.add(Pair(HttpMethod.GET, "/h2-console/**"))
+        skipPathList.add(Pair(HttpMethod.POST,"/h2-console/**"))
 
+        // Sign Up
+        skipPathList.add(Pair(HttpMethod.POST,"/user/signup"))
+        skipPathList.add(Pair(HttpMethod.POST,"/user/email"))
+        skipPathList.add(Pair(HttpMethod.POST,"/major"))
+        skipPathList.add(Pair(HttpMethod.POST,"/user/nickname"))
+        skipPathList.add(Pair(HttpMethod.POST,"/user/email/certification"))
+
+        // Home
+        skipPathList.add(Pair(HttpMethod.GET,"/board/home"))
+
+        // Swagger
+        skipPathList.add(Pair(HttpMethod.GET, "/docs/**"))
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 

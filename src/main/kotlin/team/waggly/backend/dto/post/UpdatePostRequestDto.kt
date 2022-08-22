@@ -1,4 +1,4 @@
-package team.waggly.backend.dto.postDto
+package team.waggly.backend.dto.post
 
 import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
@@ -8,10 +8,10 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 data class UpdatePostRequestDto(
-        @field:NotBlank(message = "제목을 입력해주세요.")
+        @field:NotBlank
         val title: String?,
 
-        @field:NotBlank(message = "내용을 입력해주세요.")
+        @field:NotBlank
         val description: String?,
 
         @field:NotNull(message = "학부를 선택해주세요.")
