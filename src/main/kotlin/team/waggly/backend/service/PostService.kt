@@ -143,14 +143,10 @@ class PostService(
 //    }
 
     // 게시글 상세 조회하기
-    fun getPostDetails(postId: Long, user: User?): PostDetailResponseDto {
-        val userId: Long? = user?.id
-        val post: Post = postRepository.findById(postId).orElse(null) ?: throw NotFoundException()
-
-        // 삭제된 게시글 처리
-        if (post.activeStatus == ActiveStatusType.INACTIVE) {
-            throw IllegalArgumentException("삭제된 게시글입니다.")
-        }
+    fun getPostDetails(postId: Long, user: User): PostDetailResponseDto {
+        val userId = user.id!!
+        val post: Post = postRepository.findByIdAndActiveStatus(postId, ActiveStatusType.ACTIVE)
+                ?: throw NotFoundException()
 
         val postDetailDto = PostDetailDto(post)
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(post.id!!)
@@ -161,16 +157,14 @@ class PostService(
         }
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        postDetailDto.isLikedByMe = if (userId != null) postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE) else false
+        postDetailDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
 
         // TODO: 1. 댓글, 대댓글 넣기
-        val comments: List<Comment> = commentRepository.findByPostAndActiveStatusAndParentCommentNullOrderByCreatedAtAsc(post, ActiveStatusType.ACTIVE)
-        val commentsDto: MutableList<PostDetailCommentDto> = arrayListOf()
-        if (comments.isNotEmpty()) {
-            for (comment in comments) {
-                val dto: PostDetailCommentDto = updatePostDetailCommentDto(comment, userId!!)
-                commentsDto.add(dto)
-            }
+        val comments = commentRepository.findByPostAndActiveStatusAndParentCommentNullOrderByCreatedAtAsc(post, ActiveStatusType.ACTIVE)
+        val commentsDto: MutableList<PostDetailCommentDto> = mutableListOf()
+        for (comment in comments) {
+            val postDetailCommentDto = updatePostDetailCommentDto(comment, userId)
+            commentsDto.add(postDetailCommentDto)
         }
 
         return PostDetailResponseDto(postDetailDto, commentsDto)

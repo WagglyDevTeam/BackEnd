@@ -20,4 +20,6 @@ interface PostRepository: JpaRepository<Post, Long> {
     fun findByAuthorAndActiveStatusOrderByCreatedAtDesc(user: User, activeStatus: ActiveStatusType): List<Post>
 
     fun findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(college: CollegeType, activeStatus: ActiveStatusType, pageable: Pageable): List<Post>
+
+    fun findByIdAndActiveStatus(id: Long, activeStatus: ActiveStatusType): Post?
 }
