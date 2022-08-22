@@ -71,17 +71,27 @@ class PostController(
 
     // 게시글 삭제
     @DeleteMapping("/{boardId}")
-    fun deletePost(@PathVariable boardId: Long,
-                   @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<DeletePostResponseDto> {
-        postService.deletePost(boardId, userDetailsImpl.user)
-        return ResponseDto(DeletePostResponseDto(true), HttpStatus.NO_CONTENT.value())
+    fun deletePost(
+            @PathVariable boardId: Long,
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl
+    ): ResponseDto<DeletePostResponseDto> {
+        val user = userDetailsImpl.user
+        return ResponseDto(
+                postService.deletePost(boardId, user),
+                HttpStatus.NO_CONTENT.value()
+        )
     }
 
     // 게시글 좋아요
     @PutMapping("/{boardId}/like")
-    fun likePost(@PathVariable boardId: Long,
-                 @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl): ResponseDto<PostLikeResponseDto> {
-        val userId: Long = userDetailsImpl.user.id ?: throw NoSuchElementException()
-        return ResponseDto(postService.likePost(boardId, userId), HttpStatus.OK.value())
+    fun likePost(
+            @PathVariable boardId: Long,
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl
+    ): ResponseDto<PostLikeResponseDto> {
+        val userId = userDetailsImpl.user.id!!
+        return ResponseDto(
+                postService.likePost(boardId, userId),
+                HttpStatus.OK.value()
+        )
     }
 }
