@@ -231,7 +231,7 @@ class PostService(
     // 게시글 삭제
     @Transactional
     fun deletePost(postId: Long, user: User): DeletePostResponseDto {
-        val post: Post = postRepository.findByIdOrNull(postId) ?: throw Exception("해당하는 게시글이 없습니다.")
+        val post = postRepository.findByIdOrNull(postId) ?: throw Exception("해당하는 게시글이 없습니다.")
         if (post.author.id != user.id) {
             throw Exception("본인의 게시글만 삭제 가능합니다.")
         }
@@ -244,14 +244,14 @@ class PostService(
 
     // 좋아요
     fun likePost(postId: Long, userId: Long): PostLikeResponseDto {
-        val post: Post = postRepository.findById(postId).orElseThrow()
+        val post = postRepository.findByIdOrNull(postId) ?: throw Exception("해당하는 게시글이 없습니다.")
 
-        val postLike: PostLike? = postLikeRepository.findByPostAndUserId(post, userId)
+        val postLike = postLikeRepository.findByPostAndUserId(post, userId)
         println(postLike)
 
-        var isLikedByMe: Boolean = false
+        var isLikedByMe = false
 
-        // 좋아요를 안눌렀으면, PostLike 추가
+        // 좋아요를 한 번도 누른적이 없으면, PostLike 추가
         if (postLike == null) {
             postLikeRepository.save(PostLike(post, userId))
             isLikedByMe = true
@@ -263,11 +263,10 @@ class PostService(
                 }
                 ActiveStatusType.ACTIVE -> postLike.status = ActiveStatusType.INACTIVE
             }
-
             postLikeRepository.save(postLike)
         }
 
-        val postLikeCnt: Int = postLikeRepository.countByPostIdAndStatus(postId, ActiveStatusType.ACTIVE)
+        val postLikeCnt = postLikeRepository.countByPostIdAndStatus(postId, ActiveStatusType.ACTIVE)
         return PostLikeResponseDto(
                 isLikedByMe,
                 postLikeCnt,
