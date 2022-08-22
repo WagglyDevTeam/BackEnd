@@ -2,9 +2,7 @@ package team.waggly.backend.service
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -15,10 +13,9 @@ import team.waggly.backend.dto.post.*
 import team.waggly.backend.model.*
 import team.waggly.backend.repository.*
 import team.waggly.backend.repository.querydsl.QPostRepository
-import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.awsS3.S3Uploader
 import java.time.LocalDateTime
-import java.util.Random
+import java.util.*
 import javax.transaction.Transactional
 
 @Service
@@ -180,7 +177,7 @@ class PostService(
         val post = postCreateDto.toEntity(user)
         postRepository.save(post)
 
-        if (postCreateDto.file != null) {
+        postCreateDto.file?.run {
             for (file in postCreateDto.file) {
                 val fileUrl = s3Uploader.upload(file)
                 val image = PostImage(post, fileUrl, file.originalFilename!!, fileUrl)
@@ -192,17 +189,11 @@ class PostService(
 
     // 게시글 수정
     @Transactional
-    fun updatePost(postId: Long,
-                   postUpdateDto: UpdatePostRequestDto,
-                   userDetailsImpl: UserDetailsImpl): PostDetailDto {
-        val user = userDetailsImpl.user
-        if (user.id == null) {
-            throw NotFoundException()
-        }
-        val post: Post = postRepository.findByIdOrNull(postId) ?: throw NotFoundException()
+    fun updatePost(postId: Long, postUpdateDto: UpdatePostRequestDto, user: User): PostDetailDto {
+        val post = postRepository.findByIdOrNull(postId) ?: throw NotFoundException()
         postUpdateDto.updateEntity(post)
 
-        if (postUpdateDto.file != null) {
+        postUpdateDto.file?.run {
             for (file in postUpdateDto.file) {
                 val fileUrl: String = s3Uploader.upload(file)
                 val image = PostImage(post, fileUrl, file.originalFilename!!, fileUrl)
@@ -210,20 +201,21 @@ class PostService(
             }
         }
 
-        if ((postUpdateDto.deleteTargetUrl != null) && postUpdateDto.deleteTargetUrl.isNotEmpty()) {
+        if (!postUpdateDto.deleteTargetUrl.isNullOrEmpty()) {
             for (target in postUpdateDto.deleteTargetUrl) {
-                val targetImage: PostImage = postImageRepository.findByImageUrlAndDeletedAtNull(target)
+                val targetImage = postImageRepository.findByImageUrlAndDeletedAtNull(target)
                         ?: throw NotFoundException()
                 println(dir + targetImage.uploadName)
                 s3Uploader.delete(targetImage.uploadName)
                 postImageRepository.delete(targetImage)
             }
         }
+
         val updatedPost = postRepository.save(post)
         val postDetailDto = PostDetailDto(updatedPost)
 
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(updatedPost.id!!)
-        if (postImages != null) {
+        postImages?.run {
             for (postImage in postImages) {
                 postDetailDto.postImages.add(postImage.imageUrl)
             }
@@ -231,7 +223,7 @@ class PostService(
 
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(updatedPost.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id)
-        postDetailDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id!!, user.id, ActiveStatusType.ACTIVE)
+        postDetailDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id!!, user.id!!, ActiveStatusType.ACTIVE)
 
         return postDetailDto
     }
