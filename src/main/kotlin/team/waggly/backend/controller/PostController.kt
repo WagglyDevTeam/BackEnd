@@ -57,23 +57,16 @@ class PostController(
 
     // 게시글 수정
     @PutMapping("/{boardId}")
-    fun updatePost(@AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
-                   @PathVariable boardId: Long,
-                   @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
-                   bindingResult: BindingResult): ResponseDto<Any> {
-        if (bindingResult.hasErrors()) {
-            val msg: MutableList<String> = arrayListOf()
-            bindingResult.allErrors.forEach {
-                val field = it as FieldError
-                val message = it.defaultMessage
-                msg.add("${field.field} : $message")
-            }
-            val result = bindingResult.allErrors.map { error ->
-                CustomException.ValidatorExceptionReturnType(error.code!!, error.defaultMessage!!)
-            }
-            return ResponseDto(CustomException.ValidatorException(result), "Validation Error", HttpStatus.UNPROCESSABLE_ENTITY.value())
-        }
-        return ResponseDto(postService.updatePost(boardId, postUpdateDto, userDetailsImpl), HttpStatus.OK.value())
+    fun updatePost(
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+            @PathVariable boardId: Long,
+            @Valid @RequestBody postUpdateDto: UpdatePostRequestDto,
+    ): ResponseDto<Any> {
+        val user = userDetailsImpl.user
+        return ResponseDto(
+                postService.updatePost(boardId, postUpdateDto, user),
+                HttpStatus.OK.value()
+        )
     }
 
     // 게시글 삭제
