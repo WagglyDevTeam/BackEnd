@@ -40,9 +40,9 @@ class PostController(
     // 게시글 상세
     @GetMapping("/{boardId}")
     fun getPostDetails(@PathVariable boardId: Long,
-                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?):
-            ResponseDto<PostDetailResponseDto> {
-        val user: User? = userDetailsImpl?.user ?: null
+                       @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl
+    ): ResponseDto<PostDetailResponseDto> {
+        val user = userDetailsImpl.user
         return ResponseDto(postService.getPostDetails(boardId, user), HttpStatus.OK.value())
     }
 
