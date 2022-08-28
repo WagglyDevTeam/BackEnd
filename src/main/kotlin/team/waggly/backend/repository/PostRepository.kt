@@ -22,4 +22,6 @@ interface PostRepository: JpaRepository<Post, Long> {
     fun findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(college: CollegeType, activeStatus: ActiveStatusType, pageable: Pageable): List<Post>
 
     fun findByIdAndActiveStatus(id: Long, activeStatus: ActiveStatusType): Post?
+
+    fun findFirstByCollegeAndActiveStatusOrderByIdDesc(college: CollegeType, activeStatus: ActiveStatusType): Post?
 }
