@@ -4,10 +4,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
-import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.home.HomeResponseDto
-import team.waggly.backend.dto.postDto.CollegePostsResponseDto
-import team.waggly.backend.dto.postDto.PostSummaryResponseDto
+import team.waggly.backend.dto.post.PostDto
 import team.waggly.backend.model.Post
 import team.waggly.backend.model.User
 import team.waggly.backend.repository.*
@@ -27,30 +25,46 @@ class HomeService(
         val randomCollege = colleges[Random().nextInt(colleges.size)]
 
         // 해당 단과대의 베스트 게시글 ID -> 게시글 찾아옴 -> summary dto 생성
-        val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(userCollege.toString()) ?: 0
-        val bestPost: Post = postRepository.findByIdOrNull(collegeBestId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
-        val bestPostSummary: PostSummaryResponseDto = this.updatePostSummaryResponseDto(bestPost, userId)
+        val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(userCollege)
+            ?: 1
+//            postRepository.findFirstByCollegeAndActiveStatusOrderByIdDesc(userCollege, ActiveStatusType.ACTIVE).id
+//            ?: throw IllegalArgumentException("해당 학과에 게시글이 없습니다.")
 
-        val bestPostWithCollegeType = Pair(userCollege, bestPostSummary)
+        val bestPost: Post =
+            postRepository.findByIdOrNull(collegeBestId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
 
-        val randomCollegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(randomCollege.toString()) ?: 0
-        val randomBestPost: Post = postRepository.findByIdOrNull(randomCollegeBestId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
-        val randomBestPostSummary: PostSummaryResponseDto = this.updatePostSummaryResponseDto(randomBestPost, userId)
+        val bestPostDto: PostDto = this.updatePostDto(bestPost, userId)
 
-        return HomeResponseDto(bestPostWithCollegeType,randomBestPostSummary)
+        val bestPostWithCollegeType = Pair(userCollege, bestPostDto)
+
+        val randomCollegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(randomCollege)
+            ?: 1
+//            postRepository.findFirstByCollegeAndActiveStatusOrderByIdDesc(randomCollege, ActiveStatusType.ACTIVE).id
+//            ?: throw IllegalArgumentException("해당 학과에 게시글이 없습니다.")
+
+        val randomBestPost: Post =
+            postRepository.findByIdOrNull(randomCollegeBestId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
+
+        val randomBestPostDto: PostDto = this.updatePostDto(randomBestPost, userId)
+
+        return HomeResponseDto(bestPostWithCollegeType, randomBestPostDto)
     }
 
 
-    private fun updatePostSummaryResponseDto(post: Post, userId: Long?): PostSummaryResponseDto {
-        val postSummaryResponseDto = PostSummaryResponseDto(post)
+    private fun updatePostDto(post: Post, userId: Long?): PostDto {
+        val postDto = PostDto(post)
 
-        postSummaryResponseDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
-        postSummaryResponseDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
-        postSummaryResponseDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        postSummaryResponseDto.isLikedByMe =
-            if(userId != null) postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
+        postDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
+        postDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
+        postDto.postCommentCnt = commentRepository.countByPostId(post.id)
+        postDto.isLikedByMe =
+            if (userId != null) postLikeRepository.existsByIdAndUserIdAndStatus(
+                post.id,
+                userId,
+                ActiveStatusType.ACTIVE
+            )
             else false
 
-        return postSummaryResponseDto
+        return postDto
     }
 }

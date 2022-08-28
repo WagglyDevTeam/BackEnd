@@ -10,8 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import team.waggly.backend.commomenum.HttpMethodEnum
 import team.waggly.backend.repository.UserRepository
 import team.waggly.backend.security.filter.FormLoginFilter
 import team.waggly.backend.security.filter.JwtAuthFilter
@@ -82,6 +80,8 @@ class SecurityConfig(
 
         // Home
         skipPathList.add(Pair(HttpMethod.GET,"/board/home"))
+
+        skipPathList.add(Pair(HttpMethod.GET,"/home"))
 
         // Swagger
         skipPathList.add(Pair(HttpMethod.GET, "/docs/**"))
