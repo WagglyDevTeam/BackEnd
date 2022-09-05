@@ -32,6 +32,18 @@ class UserService(
     }
 
     @Transactional
+    fun updateUserProfileImg(user: User, updateUserProfileImgRequestDto: UpdateUserProfileImgRequestDto): UpdateUserProfileImgDto {
+        val updateUser = userRepository.findByIdOrNull(user.id!!)
+            ?: throw java.lang.IllegalArgumentException("해당 유저가 존재하지 않습니다.")
+        print(updateUserProfileImgRequestDto.profileImg)
+        updateUser.profileImgUrl = s3Uploader.upload(updateUserProfileImgRequestDto.profileImg)
+
+        return UpdateUserProfileImgDto(
+            updateUser.profileImgUrl,
+        )
+    }
+
+    @Transactional
     fun updateUserIntroduction(user: User, updateUserIntroductionRequestDto: UpdateUserIntroductionRequestDto): UpdateUserIntroductionDto {
         val updateUser = userRepository.findByIdOrNull(user.id!!)
                 ?: throw java.lang.IllegalArgumentException("해당 유저가 존재하지 않습니다.")

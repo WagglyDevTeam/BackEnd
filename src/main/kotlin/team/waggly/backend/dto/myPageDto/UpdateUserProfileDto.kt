@@ -4,3 +4,7 @@ class UpdateUserProfileDto(
         val profileImg: String,
         val nickname: String
 )
+
+class UpdateUserProfileImgDto(
+        val profileImg: String,
+)
