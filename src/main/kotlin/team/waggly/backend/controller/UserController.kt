@@ -55,13 +55,22 @@ class UserController(
         return ResponseDto(certificationService.certificationEmail(certificationRequestDto),"이메일 인증이 완료되었습니다.", 200)
     }
 
-    @PutMapping("/user/profile")
-    fun updateUserProfile(
+    @PutMapping("/user/profile/nickname")
+    fun updateUserProfileNickname(
         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
         @RequestBody updateUserProfileRequestDto: UpdateUserProfileRequestDto,
     ): ResponseDto<UpdateUserProfileDto> {
         val user = userDetailsImpl.user
         return ResponseDto(userService.updateUserProfile(user, updateUserProfileRequestDto))
+    }
+
+    @PutMapping("/user/profile/img")
+    fun updateUserProfileImg(
+        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+        @ModelAttribute updateUserProfileImgRequestDto: UpdateUserProfileImgRequestDto,
+    ): ResponseDto<UpdateUserProfileImgDto> {
+        val user = userDetailsImpl.user
+        return ResponseDto(userService.updateUserProfileImg(user, updateUserProfileImgRequestDto))
     }
 
     @PutMapping("/user/introduction")
