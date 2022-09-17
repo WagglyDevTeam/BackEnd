@@ -74,6 +74,7 @@ class SecurityConfig(
         // Sign Up
         skipPathList.add(Pair(HttpMethod.POST,"/user/signup"))
         skipPathList.add(Pair(HttpMethod.POST,"/user/email"))
+        skipPathList.add(Pair(HttpMethod.GET,"/major"))
         skipPathList.add(Pair(HttpMethod.POST,"/major"))
         skipPathList.add(Pair(HttpMethod.POST,"/user/nickname"))
         skipPathList.add(Pair(HttpMethod.POST,"/user/email/certification"))
