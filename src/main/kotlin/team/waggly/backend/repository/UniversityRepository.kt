@@ -7,4 +7,5 @@ import team.waggly.backend.model.University
 @Repository
 interface UniversityRepository : JpaRepository<University, Long> {
     fun findByUniversityEmail(email: String): University?
+    fun findByUniversityName(universityName: String): University?
 }

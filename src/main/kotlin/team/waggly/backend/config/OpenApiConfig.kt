@@ -32,12 +32,20 @@ class OpenApiConfig {
         return OpenAPI()
                 .info(
                         Info()
-                                .title("Dalock Admin API")
+                                .title("Waggly Develop API")
                                 .description("와글리 API")
                                 .version("v1")
                 )
                 .components(Components().addSecuritySchemes("JWT", bearerAuth))
                 .addSecurityItem(addSecurityItem)
+    }
+
+    @Bean
+    fun groupedOpenApiAll(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("All")
+            .pathsToMatch("/user/**", "/major/**", "/alarm/**", "/board/**", "/comment/**", "/reply/**", "/like/**", "/chat/**", "/groupchat/**")
+            .build()
     }
 
     @Bean
