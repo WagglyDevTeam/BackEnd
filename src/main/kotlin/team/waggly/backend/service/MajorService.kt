@@ -1,6 +1,7 @@
 package team.waggly.backend.service
 
 import org.springframework.stereotype.Service
+import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.dto.major.MajorResponseDto
 import team.waggly.backend.dto.major.MajorSearchReqeustDto
 import team.waggly.backend.model.Major
@@ -23,7 +24,7 @@ class MajorService(val qMajorRepository: QMajorRepository, val majorRepository: 
         var majorResponseDtolist = mutableListOf<MajorResponseDto>()
         val university = universityRepository.findByUniversityName(universityName)
         if (university != null) {
-            val majorList = majorRepository.findAllByUniversityOrderByMajorNameAsc(university)
+            val majorList = majorRepository.findAllByUniversityAndMajorStatusOrderByMajorNameAsc(university, ActiveStatusType.ACTIVE)
             majorList?.map {
                 majorResponseDtolist.add(MajorResponseDto.fromEntity(it))
             }
