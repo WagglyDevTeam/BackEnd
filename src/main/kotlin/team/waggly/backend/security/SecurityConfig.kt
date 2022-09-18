@@ -79,6 +79,9 @@ class SecurityConfig(
         skipPathList.add(Pair(HttpMethod.POST,"/user/nickname"))
         skipPathList.add(Pair(HttpMethod.POST,"/user/email/certification"))
 
+        // Find Password
+        skipPathList.add(Pair(HttpMethod.POST,"/user/check/email"))
+
         // Home
         skipPathList.add(Pair(HttpMethod.GET,"/board/home"))
 

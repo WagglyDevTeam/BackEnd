@@ -4,6 +4,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import team.waggly.backend.dto.ResponseDto
+import team.waggly.backend.dto.email.EmailRequestDto
 import team.waggly.backend.dto.myPageDto.*
 import team.waggly.backend.model.User
 import team.waggly.backend.repository.UserRepository
@@ -55,5 +57,13 @@ class UserService(
                 ?: throw java.lang.IllegalArgumentException("해당 유저가 존재하지 않습니다.")
 
         dbUser.password = passwordEncoder.encode(updatePasswordRequestDto.password)
+    }
+
+    fun existUserByEmail(emailRequestDto: EmailRequestDto): ResponseDto<Any> {
+        if (userRepository.existsByEmail(emailRequestDto.email)) {
+            return ResponseDto()
+        } else {
+            throw java.lang.IllegalArgumentException("해당 이메일이 존재하지 않습니다.")
+        }
     }
 }

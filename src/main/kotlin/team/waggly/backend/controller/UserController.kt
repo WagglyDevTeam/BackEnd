@@ -40,6 +40,11 @@ class UserController(
         return ResponseDto(SignupResponseDto(true))
     }
 
+    @PostMapping("/user/check/email")
+    fun existUserByEmail(@Valid @RequestBody emailRequestDto: EmailRequestDto): ResponseDto<Any> {
+        return userService.existUserByEmail(emailRequestDto)
+    }
+
     @PostMapping("/user/email")
     fun sendEmailController(@Valid @RequestBody emailCertificationRequestDto: EmailRequestDto, bindingResult: BindingResult): ResponseDto<Any> {
         val error = ErrorMessage(bindingResult).getError()
@@ -84,6 +89,15 @@ class UserController(
 
     @PutMapping("/user/password")
     fun updatePassword(
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+            @RequestBody updatePasswordRequestDto: PasswordRequestDto,
+    ): ResponseDto<Any> {
+        val user = userDetailsImpl.user
+        return ResponseDto(userService.updatePassword(user, updatePasswordRequestDto))
+    }
+
+    @PutMapping("/user/reset/password")
+    fun resetPassword(
             @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
             @RequestBody updatePasswordRequestDto: PasswordRequestDto,
     ): ResponseDto<Any> {
