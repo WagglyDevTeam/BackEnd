@@ -2,5 +2,6 @@ package team.waggly.backend.dto.certification
 
 data class CertificationResponseDto (
     val universityId: Long,
-    val university: String
+    val university: String,
+    val token: String?,
     )
