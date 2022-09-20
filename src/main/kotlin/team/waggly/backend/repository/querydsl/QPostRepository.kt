@@ -42,10 +42,10 @@ class QPostRepository {
                         post.title,
                         post.description,
                         post.createdAt,
-                        Expressions.nullExpression(),
-                        Expressions.nullExpression(),
-                        Expressions.nullExpression(),
-                        Expressions.nullExpression(),
+                        Expressions.asNumber(0),
+                        Expressions.asNumber(0),
+                        Expressions.asNumber(0),
+                        Expressions.asBoolean(false),
                         CaseBuilder()
                                 .`when`(post.activeStatus.eq(ActiveStatusType.INACTIVE)).then(true)
                                 .otherwise(false),

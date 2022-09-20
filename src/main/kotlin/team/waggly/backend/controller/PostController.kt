@@ -1,13 +1,12 @@
 package team.waggly.backend.controller
 
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.validation.BindingResult
-import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.*
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.post.*
-import team.waggly.backend.exception.CustomException
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.PostService
 import javax.validation.Valid
@@ -26,9 +25,11 @@ class PostController(
     // 모든 게시글 (학부 필터링 포함)
     @GetMapping
     fun searchPostsByCollege(
-            @RequestParam searchPostsByCollege: SearchPostsByCollege,
+            searchPostsByCollege: SearchPostsByCollege,
+            @PageableDefault(size = 10, page = 0) pageable: Pageable?,
             @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl
     ): ResponseDto<SearchPostsByCollegeResponseDto> {
+        searchPostsByCollege.pageable = pageable
         searchPostsByCollege.user = userDetailsImpl.user
         return postService.searchPostsByCollege(searchPostsByCollege)
     }
