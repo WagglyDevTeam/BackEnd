@@ -64,14 +64,15 @@ class PostService(
     }
 
     fun searchPostsByCollege(searchPostsByCollege: SearchPostsByCollege): ResponseDto<SearchPostsByCollegeResponseDto> {
-        val college = searchPostsByCollege.college
-
         // Best 게시글
-        val collegeBestId: Long = college?.let { postLikeRepository.getMostLikedPostInCollege(it) } ?: 0
-        val bestPost = postRepository.findByIdOrNull(collegeBestId)
+        val collegeBestId = postLikeRepository.getMostLikedPostInCollege(searchPostsByCollege.college)
+        var bestPost: Post? = null
+        if (collegeBestId != null) {
+            bestPost = postRepository.findByIdOrNull(collegeBestId)
+        }
 
         // 학과 전체 게시글
-        val allPosts = qPostRepository.searchPostsByCollege(searchPostsByCollege.college, searchPostsByCollege.pageable)
+        val allPosts = qPostRepository.searchPostsByCollege(searchPostsByCollege.college, searchPostsByCollege.pageable!!)
 
         return ResponseDto(
                 SearchPostsByCollegeResponseDto(
