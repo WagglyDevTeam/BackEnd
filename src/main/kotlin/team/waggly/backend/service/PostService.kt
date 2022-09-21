@@ -65,7 +65,8 @@ class PostService(
 
     fun searchPostsByCollege(searchPostsByCollege: SearchPostsByCollege): ResponseDto<SearchPostsByCollegeResponseDto> {
         // Best 게시글
-        val collegeBestId = postLikeRepository.getMostLikedPostInCollege(searchPostsByCollege.college)
+        val collegeBestId = postLikeRepository.getMostLikedPostInCollege(searchPostsByCollege.college.name)
+        println("bestId: $collegeBestId")
         var bestPost: Post? = null
         if (collegeBestId != null) {
             bestPost = postRepository.findByIdOrNull(collegeBestId)
