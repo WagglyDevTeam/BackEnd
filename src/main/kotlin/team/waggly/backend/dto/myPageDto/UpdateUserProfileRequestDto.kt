@@ -6,3 +6,7 @@ class UpdateUserProfileRequestDto(
         val nickname: String,
         val profileImg: MultipartFile
 )
+
+class UpdateUserProfileImgRequestDto(
+        val profileImg: MultipartFile
+)
