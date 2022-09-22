@@ -59,9 +59,9 @@ class PostController(
     // 게시글 수정
     @PutMapping("/{boardId}")
     fun updatePost(
-            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
-            @PathVariable boardId: Long,
-            @Valid @RequestBody postUpdateDto: UpdatePostRequestDto,
+        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+        @PathVariable boardId: Long,
+        @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
     ): ResponseDto<Any> {
         val user = userDetailsImpl.user
         return ResponseDto(
