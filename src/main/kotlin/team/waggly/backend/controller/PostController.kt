@@ -46,8 +46,8 @@ class PostController(
     // 게시글 작성
     @PostMapping
     fun createPost(
-            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
-            @Valid @RequestBody postCreateDto: CreatePostRequestDto,
+        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+        @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
     ): ResponseDto<Any> {
         val user = userDetailsImpl.user
         return ResponseDto(
