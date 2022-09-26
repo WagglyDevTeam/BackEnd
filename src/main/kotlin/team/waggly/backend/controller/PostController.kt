@@ -19,6 +19,7 @@ class PostController(
     // 게시판 홈 (로그인, 비로그인)
     @GetMapping("/home")
     fun getPostsInHome(@AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseDto<PostsInHomeResponseDto> {
+        println(userDetailsImpl.toString())
         return postService.getPostsInHome(userDetailsImpl?.user)
     }
 

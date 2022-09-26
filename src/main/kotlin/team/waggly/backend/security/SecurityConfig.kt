@@ -82,9 +82,6 @@ class SecurityConfig(
         // Find Password
         skipPathList.add(Pair(HttpMethod.POST,"/user/check/email"))
 
-        // Home
-        skipPathList.add(Pair(HttpMethod.GET,"/board/home"))
-
         skipPathList.add(Pair(HttpMethod.GET,"/home"))
 
         // Swagger
