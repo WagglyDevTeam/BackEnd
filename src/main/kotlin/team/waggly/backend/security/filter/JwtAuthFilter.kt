@@ -19,6 +19,9 @@ class JwtAuthFilter(
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse?): Authentication? {
         val tokenPayload = request.getHeader("Authorization")
         if (tokenPayload.isNullOrEmpty()) {
+            if (request.requestURI == "/board/home") {
+                return null
+            }
             throw JwtTokenInvalidException("Not Found Jwt Token")
         }
         val principal = tokenPayload.substring(
