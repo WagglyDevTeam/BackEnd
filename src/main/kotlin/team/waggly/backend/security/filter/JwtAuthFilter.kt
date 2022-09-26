@@ -1,6 +1,7 @@
 package team.waggly.backend.security.filter
 
 import org.springframework.core.annotation.Order
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder

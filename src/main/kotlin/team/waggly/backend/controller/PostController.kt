@@ -5,6 +5,7 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.post.*
 import team.waggly.backend.security.UserDetailsImpl
@@ -18,8 +19,8 @@ class PostController(
 ) {
     // 게시판 홈 (로그인, 비로그인)
     @GetMapping("/home")
-    fun getPostsInHome(@AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?): ResponseDto<PostsInHomeResponseDto> {
-        return postService.getPostsInHome(userDetailsImpl?.user)
+    fun getPostsInHome(@RequestParam college: CollegeType?): ResponseDto<PostsInHomeResponseDto> {
+        return postService.getPostsInHome(college)
     }
 
     // 모든 게시글 (학부 필터링 포함)
