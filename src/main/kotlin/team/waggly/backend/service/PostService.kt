@@ -32,9 +32,9 @@ class PostService(
     lateinit var dir: String
 
     // 게시판 홈
-    fun getPostsInHome(user: User?): ResponseDto<PostsInHomeResponseDto> {
+    fun getPostsInHome(college: CollegeType?): ResponseDto<PostsInHomeResponseDto> {
         val colleges = CollegeType.values()
-        val userCollege = user?.major?.college ?: colleges[Random().nextInt(colleges.size)]
+        val userCollege = college ?: colleges[Random().nextInt(colleges.size)]
 
         val otherCollegePosts: MutableList<PostsInHomeResponseDto.CollegePosts> = mutableListOf()
         var userCollegePosts: PostsInHomeResponseDto.CollegePosts? = null
