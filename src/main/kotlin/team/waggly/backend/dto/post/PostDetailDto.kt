@@ -16,6 +16,7 @@ data class PostDetailDto(
     val authorId: Long,
     var authorMajor: String,
     val authorNickname: String,
+    val authorProfileImg: String,
     val isBlind: Boolean,
     val isAnonymous: Boolean,
 ) {
@@ -31,6 +32,7 @@ data class PostDetailDto(
         post.author.id!!,
         post.author.major.majorName,
         post.author.nickName,
+        post.author.profileImgUrl,
         post.activeStatus == ActiveStatusType.INACTIVE,
         post.isAnonymous != 0,
     )
