@@ -1,6 +1,9 @@
 package team.waggly.backend.dto.commentdto
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 data class CommentLikeResponseDto(
-    val isLikedByMe : Boolean,
-    val commentLikeCnt : Int
+        @get:JsonProperty("isLikedByMe")
+        val isLikedByMe: Boolean,
+        val commentLikeCnt: Int
 )
