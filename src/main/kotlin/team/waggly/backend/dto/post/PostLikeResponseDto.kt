@@ -1,6 +1,9 @@
 package team.waggly.backend.dto.post
 
-class PostLikeResponseDto (
-    val isLikedByMe: Boolean,
-    val postLikeCnt: Int,
+import com.fasterxml.jackson.annotation.JsonProperty
+
+class PostLikeResponseDto(
+        @get:JsonProperty("isLikedByMe")
+        val isLikedByMe: Boolean,
+        val postLikeCnt: Int,
 )
