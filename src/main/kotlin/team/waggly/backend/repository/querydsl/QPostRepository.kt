@@ -42,6 +42,7 @@ class QPostRepository {
                         post.title,
                         post.description,
                         post.createdAt,
+                        post.author.major.majorName,
                         Expressions.asNumber(0),
                         Expressions.asNumber(0),
                         Expressions.asNumber(0),
