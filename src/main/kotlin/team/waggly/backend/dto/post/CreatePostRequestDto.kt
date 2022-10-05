@@ -1,5 +1,6 @@
 package team.waggly.backend.dto.post
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.model.Post
@@ -17,6 +18,7 @@ data class CreatePostRequestDto (
 
     val file: List<MultipartFile>?,
 
+    @get:JsonProperty("isAnonymous")
     val isAnonymous: Boolean = false,
 ) {
     fun toEntity(user: User): Post = Post(

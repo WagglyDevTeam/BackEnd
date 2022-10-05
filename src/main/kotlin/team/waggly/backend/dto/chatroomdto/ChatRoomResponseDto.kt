@@ -1,5 +1,6 @@
 package team.waggly.backend.dto.chatroomdto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import team.waggly.backend.model.ChatParticipantsInfo
 
 data class ChatRoomResponseDto(
@@ -8,6 +9,7 @@ data class ChatRoomResponseDto(
     val profileImage: String,
     //val chatLastMsg: String,
     //val chatLastMsgTime: LocalDateTime,
+    @get:JsonProperty("isAlarmOn")
     val isAlarmOn: Boolean,
     //val unreadMsgCnt: Int
 ){

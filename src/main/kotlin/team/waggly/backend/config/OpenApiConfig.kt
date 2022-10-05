@@ -41,38 +41,6 @@ class OpenApiConfig {
     }
 
     @Bean
-    fun groupedOpenApiAll(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-            .group("All")
-            .pathsToMatch("/user/**", "/major/**", "/alarm/**", "/board/**", "/comment/**", "/reply/**", "/like/**", "/chat/**", "/groupchat/**")
-            .build()
-    }
-
-    @Bean
-    fun groupedOpenApiUser(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-                .group("User")
-                .pathsToMatch("/user/**", "/major/**", "/alarm/**")
-                .build()
-    }
-
-    @Bean
-    fun groupedOpenApiBoard(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-                .group("Board")
-                .pathsToMatch("/board/**", "/comment/**", "/reply/**", "/like/**")
-                .build()
-    }
-
-    @Bean
-    fun groupedOpenApiChat(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-                .group("Chat")
-                .pathsToMatch("/chat/**", "/groupchat/**")
-                .build()
-    }
-
-    @Bean
     fun swaggerUiConfig(config: SwaggerUiConfigProperties): SwaggerUiConfigProperties {
         SpringDocUtils.getConfig().addAnnotationsToIgnore(AuthenticationPrincipal::class.java)
         config.path = "/docs/swagger-ui.html"
