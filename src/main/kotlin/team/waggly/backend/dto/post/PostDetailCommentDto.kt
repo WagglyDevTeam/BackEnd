@@ -15,6 +15,7 @@ data class PostDetailCommentDto (
     val authorNickname: String,
     val authorProfileImg: String,
     val isBlind: Boolean,
+    val isAnonymous: Int,
     var replies: List<PostDetailReplyDto>
 ) {
     constructor(comment: Comment): this(
@@ -28,6 +29,7 @@ data class PostDetailCommentDto (
         comment.user.nickName,
         comment.user.profileImgUrl,
         comment.activeStatus == ActiveStatusType.INACTIVE,
+            comment.isAnonymous,
         arrayListOf(),
     )
 }
