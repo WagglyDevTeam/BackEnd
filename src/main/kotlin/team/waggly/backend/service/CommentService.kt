@@ -3,9 +3,7 @@ package team.waggly.backend.service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
-import team.waggly.backend.dto.commentdto.CommentLikeResponseDto
-import team.waggly.backend.dto.commentdto.CommentRequestDto
-import team.waggly.backend.dto.commentdto.ReplyRequestDto
+import team.waggly.backend.dto.commentdto.*
 import team.waggly.backend.model.Comment
 import team.waggly.backend.model.CommentLike
 import team.waggly.backend.repository.CommentLikeRepository
@@ -28,11 +26,13 @@ class CommentService(
         postId: Long,
         commentRequestDto: CommentRequestDto,
         userDetails: UserDetailsImpl
-    ) {
+    ): CommentResponseDto {
         val post = postRepository.findByIdOrNull(postId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
         val user = userDetails.user
         val comment: Comment = commentRequestDto.toEntity(post, user)
-        commentRepository.save(comment)
+        return CommentResponseDto(
+            commentRepository.save(comment).id
+        )
     }
 
     //댓글 삭제
@@ -97,7 +97,11 @@ class CommentService(
 
     //대댓글 생성
     @Transactional
-    fun createReply(commentId: Long, replyRequestDto: ReplyRequestDto, userDetails: UserDetailsImpl) {
+    fun createReply(
+        commentId: Long,
+        replyRequestDto: ReplyRequestDto,
+        userDetails: UserDetailsImpl
+    ): ReplyResponseDto {
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw IllegalArgumentException("해당 댓글이 없습니다.")
 
         if (comment.parentComment != null) {
@@ -109,6 +113,8 @@ class CommentService(
         }
         val user = userDetails.user
         val reply: Comment = replyRequestDto.toEntity(comment, user)
-        commentRepository.save(reply)
+        return ReplyResponseDto(
+            commentRepository.save(reply).id
+        )
     }
 }

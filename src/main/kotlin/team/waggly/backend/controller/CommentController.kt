@@ -18,10 +18,7 @@ class CommentController(private val commentService: CommentService) {
         @RequestBody commentRequestDto: CommentRequestDto,
         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl // null 불가능
     ): ResponseDto<Any> {
-
-        commentService.createComment(postId, commentRequestDto, userDetailsImpl)
-
-        return ResponseDto()
+        return ResponseDto(commentService.createComment(postId, commentRequestDto, userDetailsImpl))
     }
 
     //댓글 삭제
@@ -30,9 +27,7 @@ class CommentController(private val commentService: CommentService) {
         @PathVariable commentId: Long,
         @AuthenticationPrincipal userDetailImpl: UserDetailsImpl
     ): ResponseDto<Any> {
-
         commentService.deleteComment(commentId, userDetailImpl)
-
         return ResponseDto()
     }
 
@@ -52,12 +47,6 @@ class CommentController(private val commentService: CommentService) {
         @RequestBody replyRequestDto: ReplyRequestDto,
         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl // null 불가능
     ): ResponseDto<Any> {
-
-        commentService.createReply(commentId, replyRequestDto, userDetailsImpl)
-
-        return ResponseDto()
+        return ResponseDto(commentService.createReply(commentId, replyRequestDto, userDetailsImpl))
     }
-
-    //대댓글 삭제, 대댓글 좋아요 불필요
-
 }

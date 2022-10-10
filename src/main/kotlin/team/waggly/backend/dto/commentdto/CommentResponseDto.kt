@@ -1,4 +1,5 @@
 package team.waggly.backend.dto.commentdto
 
-class CommentResponseDto {
-}
+data class CommentResponseDto(
+    val commentId: Long?,
+)
