@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
+import team.waggly.backend.dto.PagingResponseDto
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.post.*
 import team.waggly.backend.model.*
@@ -63,7 +64,7 @@ class PostService(
         )
     }
 
-    fun searchPostsByCollege(searchPostsByCollege: SearchPostsByCollege): ResponseDto<SearchPostsByCollegeResponseDto> {
+    fun searchPostsByCollege(searchPostsByCollege: SearchPostsByCollege): PagingResponseDto<SearchPostsByCollegeResponseDto> {
         // Best 게시글
         val collegeBestId = postLikeRepository.getMostLikedPostInCollege(searchPostsByCollege.college.name)
         println("bestId: $collegeBestId")
@@ -75,15 +76,16 @@ class PostService(
         // 학과 전체 게시글
         val allPosts = qPostRepository.searchPostsByCollege(searchPostsByCollege.college, searchPostsByCollege.pageable!!)
 
-        return ResponseDto(
+        return PagingResponseDto(
+                allPosts.totalElements,
+                allPosts.totalPages,
                 SearchPostsByCollegeResponseDto(
                         bestPost = bestPost?.let { PostDto(it) },
                         posts = allPosts.content.map {
                             // 이미지, 좋아요, 댓글 개수 업데이트
                             updatePostDto(it, searchPostsByCollege.user!!.id!!)
                         }
-                ),
-                HttpStatus.OK.value()
+                )
         )
     }
 
