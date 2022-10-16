@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import team.waggly.backend.commomenum.CollegeType
+import team.waggly.backend.dto.PagingResponseDto
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.post.*
 import team.waggly.backend.security.UserDetailsImpl
@@ -29,7 +30,7 @@ class PostController(
             searchPostsByCollege: SearchPostsByCollege,
             @PageableDefault(size = 10, page = 0) pageable: Pageable?,
             @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl
-    ): ResponseDto<SearchPostsByCollegeResponseDto> {
+    ): PagingResponseDto<SearchPostsByCollegeResponseDto> {
         searchPostsByCollege.pageable = pageable
         searchPostsByCollege.user = userDetailsImpl.user
         return postService.searchPostsByCollege(searchPostsByCollege)
