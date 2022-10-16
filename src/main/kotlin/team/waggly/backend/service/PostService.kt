@@ -176,8 +176,7 @@ class PostService(
             throw IllegalArgumentException("본인이 속한 학부 게시판에만 게시글 작성이 가능합니다.")
         }
 
-        val post = postCreateDto.toEntity(user)
-        postRepository.save(post)
+        val post = postRepository.save(postCreateDto.toEntity(user))
 
         postCreateDto.file?.run {
             for (file in postCreateDto.file) {
@@ -186,7 +185,7 @@ class PostService(
                 postImageRepository.save(image)
             }
         }
-        return CreatePostResponseDto(true)
+        return CreatePostResponseDto(post.id!!)
     }
 
     // 게시글 수정

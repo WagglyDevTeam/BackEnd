@@ -49,7 +49,7 @@ class PostController(
     fun createPost(
         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
         @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
-    ): ResponseDto<Any> {
+    ): ResponseDto<CreatePostResponseDto> {
         val user = userDetailsImpl.user
         return ResponseDto(
                 postService.createPost(postCreateDto, user),
