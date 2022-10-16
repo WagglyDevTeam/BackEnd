@@ -148,6 +148,8 @@ class PostService(
                 ?: throw NotFoundException()
 
         val postDetailDto = PostDetailDto(post)
+        postDetailDto.checkIsAnonymous()
+
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(post.id!!)
         if (postImages != null) {
             for (postImage in postImages) {
@@ -214,6 +216,7 @@ class PostService(
 
         val updatedPost = postRepository.save(post)
         val postDetailDto = PostDetailDto(updatedPost)
+        postDetailDto.checkIsAnonymous()
 
         val postImages = postImageRepository.findAllByPostIdAndDeletedAtNull(updatedPost.id!!)
         postImages?.run {

@@ -17,8 +17,8 @@ data class PostDetailDto(
     var isLikedByMe: Boolean?,
     val authorId: Long,
     var authorMajor: String,
-    val authorNickname: String,
-    val authorProfileImg: String,
+    var authorNickname: String,
+    var authorProfileImg: String,
     @get:JsonProperty("isBlind")
     val isBlind: Boolean,
     @get:JsonProperty("isAnonymous")
@@ -40,4 +40,11 @@ data class PostDetailDto(
         post.activeStatus == ActiveStatusType.INACTIVE,
         post.isAnonymous != 0,
     )
+
+    fun checkIsAnonymous() {
+        if (this.isAnonymous) {
+            this.authorNickname = "익명"
+            this.authorProfileImg = "https://d2u3dcdbebyaiu.cloudfront.net/uploads/atch_img/309/59932b0eb046f9fa3e063b8875032edd_crop.jpeg"
+        }
+    }
 }
