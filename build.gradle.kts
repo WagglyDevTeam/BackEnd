@@ -63,6 +63,9 @@ dependencies {
 
     // Docs
     implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
+
+    // Websocket
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 }
 
 

@@ -90,6 +90,11 @@ class SecurityConfig(
         // Swagger
         skipPathList.add(Pair(HttpMethod.GET, "/docs/**"))
 
+        // Temp
+        skipPathList.add(Pair(HttpMethod.GET, "/**"))
+        skipPathList.add(Pair(HttpMethod.GET, "/ws/**"))
+        skipPathList.add(Pair(HttpMethod.GET, "/app/**"))
+
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 
         val filter = JwtAuthFilter(matcher)
