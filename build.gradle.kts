@@ -24,6 +24,15 @@ sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourc
     kotlin.srcDir("$buildDir/generated/source/kapt/main")
 }
 
+dependencyManagement {
+    dependencies {
+        dependencySet("org.slf4j:1.7.33") {
+            entry("slf4j-api")
+            entry("slf4j-simple")
+        }
+    }
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -50,10 +59,10 @@ dependencies {
     // QueryDSL
     implementation("com.querydsl:querydsl-jpa:$qeurydslVersion")
     kapt("com.querydsl:querydsl-apt:$qeurydslVersion:jpa")
-    kapt("org.springframework.boot:spring-boot-configuration-processor:2.6.7")
+    kapt("org.springframework.boot:spring-boot-configuration-processor:2.7.5")
 
     // S3
-    implementation("org.springframework.cloud:spring-cloud-starter-aws:2.0.1.RELEASE")
+    implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
 
     //Email send
     implementation("org.springframework.boot:spring-boot-starter-mail")
@@ -62,13 +71,22 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     // Docs
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.13")
 
-    // Websocket
+    // WebSocket
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+    // Stomp
+    implementation("org.webjars:stomp-websocket:2.3.4")
+
+    //Sockjs
+    implementation("org.webjars:sockjs-client:1.5.1")
+
+    // Log
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.codehaus.janino:janino:3.1.9")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
 }
-
-
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
