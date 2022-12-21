@@ -71,6 +71,9 @@ class SecurityConfig(
         skipPathList.add(Pair(HttpMethod.GET, "/h2-console/**"))
         skipPathList.add(Pair(HttpMethod.POST,"/h2-console/**"))
 
+        // Common
+        skipPathList.add(Pair(HttpMethod.GET, "/profile-images/default"))
+
         // Sign Up
         skipPathList.add(Pair(HttpMethod.POST,"/user/signup"))
         skipPathList.add(Pair(HttpMethod.POST,"/user/email"))
