@@ -67,6 +67,9 @@ class SecurityConfig(
     fun jwtAuthFilter(): JwtAuthFilter {
         val skipPathList = mutableListOf<Pair<HttpMethod, String>>()
 
+        // Common
+        skipPathList.add(Pair(HttpMethod.GET, "/_c/**"))
+
         // DB
         skipPathList.add(Pair(HttpMethod.GET, "/h2-console/**"))
         skipPathList.add(Pair(HttpMethod.POST,"/h2-console/**"))
