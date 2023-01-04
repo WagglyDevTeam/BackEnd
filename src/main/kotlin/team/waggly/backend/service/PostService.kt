@@ -28,14 +28,16 @@ class PostService(
         private val postImageRepository: PostImageRepository,
         private val commentLikeRepository: CommentLikeRepository,
         private val s3Uploader: S3Uploader,
+        private val userRepository: UserRepository,
 ) {
     @Value("\${cloud.aws.s3.dir}")
     lateinit var dir: String
 
     // 게시판 홈
-    fun getPostsInHome(college: CollegeType?): ResponseDto<PostsInHomeResponseDto> {
+    fun getPostsInHome(userId: Long?): ResponseDto<PostsInHomeResponseDto> {
+        val user = userRepository.findByIdOrNull(userId)
         val colleges = CollegeType.values()
-        val userCollege = college ?: colleges[Random().nextInt(colleges.size)]
+        val userCollege = user?.major?.college ?: colleges[Random().nextInt(colleges.size)]
 
         val otherCollegePosts: MutableList<PostsInHomeResponseDto.CollegePosts> = mutableListOf()
         var userCollegePosts: PostsInHomeResponseDto.CollegePosts? = null

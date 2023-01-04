@@ -5,7 +5,6 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.PagingResponseDto
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.post.*
@@ -20,8 +19,8 @@ class PostController(
 ) {
     // 게시판 홈 (로그인, 비로그인)
     @GetMapping("/home")
-    fun getPostsInHome(@RequestParam college: CollegeType?): ResponseDto<PostsInHomeResponseDto> {
-        return postService.getPostsInHome(college)
+    fun getPostsInHome(@RequestParam userId: Long? = null): ResponseDto<PostsInHomeResponseDto> {
+        return postService.getPostsInHome(userId)
     }
 
     // 모든 게시글 (학부 필터링 포함)
@@ -48,8 +47,8 @@ class PostController(
     // 게시글 작성
     @PostMapping
     fun createPost(
-        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
-        @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+            @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
     ): ResponseDto<CreatePostResponseDto> {
         val user = userDetailsImpl.user
         return ResponseDto(
@@ -61,9 +60,9 @@ class PostController(
     // 게시글 수정
     @PutMapping("/{boardId}")
     fun updatePost(
-        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
-        @PathVariable boardId: Long,
-        @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
+            @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+            @PathVariable boardId: Long,
+            @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
     ): ResponseDto<Any> {
         val user = userDetailsImpl.user
         return ResponseDto(
