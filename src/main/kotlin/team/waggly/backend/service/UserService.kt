@@ -23,10 +23,8 @@ class UserService(
         val updateUser = userRepository.findByIdOrNull(user.id!!)
                 ?: throw java.lang.IllegalArgumentException("해당 유저가 존재하지 않습니다.")
         updateUser.nickName = updateUserProfileRequestDto.nickname
-        updateUser.profileImgUrl = s3Uploader.upload(updateUserProfileRequestDto.profileImg)
 
         return UpdateUserProfileDto(
-                updateUser.profileImgUrl,
                 updateUser.nickName
         )
     }
