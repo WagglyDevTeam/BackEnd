@@ -7,9 +7,7 @@ import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.certification.CertificationRequestDto
 import team.waggly.backend.dto.email.EmailRequestDto
 import team.waggly.backend.dto.myPageDto.*
-import team.waggly.backend.dto.user.CheckNicknameRequestDto
-import team.waggly.backend.dto.user.SignupReqeustDto
-import team.waggly.backend.dto.user.SignupResponseDto
+import team.waggly.backend.dto.user.*
 import team.waggly.backend.exception.ErrorMessage
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.SignupService
@@ -124,5 +122,26 @@ class UserController(
         }
         signupService.checkUserNickname(checkNicknameRequestDto)
         return ResponseDto(null, "닉네임 중복 확인에 성공하였습니다." , 200)
+    }
+
+    @GetMapping("/user/device-token")
+    fun getDeviceToken(@Valid @RequestBody getDeviceTokenRequestDto: GetDeviceTokenRequestDto,
+                       bindingResult: BindingResult
+    ): ResponseDto<Any> {
+        val error = ErrorMessage(bindingResult).getError()
+        if(error.isError){
+            throw Exception(error.errorMsg)
+        }
+        return ResponseDto(userService.getDeviceToken(getDeviceTokenRequestDto))
+    }
+
+    @PutMapping("/user/device-token")
+    fun putDeviceToken(
+        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+        @RequestBody putDeviceTokenRequestDto: PutDeviceTokenRequestDto,
+    ): ResponseDto<Any> {
+        val user = userDetailsImpl.user
+        userService.updateDeviceToken(user, putDeviceTokenRequestDto)
+        return ResponseDto(null, "Device Token 업데이트에 성공했습니다." , 200)
     }
 }

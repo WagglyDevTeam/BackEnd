@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.email.EmailRequestDto
 import team.waggly.backend.dto.myPageDto.*
+import team.waggly.backend.dto.user.GetDeviceTokenRequestDto
+import team.waggly.backend.dto.user.PutDeviceTokenRequestDto
 import team.waggly.backend.model.User
 import team.waggly.backend.repository.UserRepository
 import team.waggly.backend.service.awsS3.S3Uploader
@@ -75,5 +77,17 @@ class UserService(
         } else {
             throw java.lang.IllegalArgumentException("해당 이메일이 존재하지 않습니다.")
         }
+    }
+
+    fun getDeviceToken(getDeviceTokenRequestDto: GetDeviceTokenRequestDto): String? {
+        return userRepository.findByIdOrNull(getDeviceTokenRequestDto.userId)?.deviceToken
+    }
+
+    @Transactional
+    fun updateDeviceToken(user: User, putDeviceTokenRequestDto: PutDeviceTokenRequestDto) {
+        val updateUser = userRepository.findByIdOrNull(user.id!!)
+            ?: throw java.lang.IllegalArgumentException("해당 유저가 존재하지 않습니다.")
+
+        updateUser.deviceToken = putDeviceTokenRequestDto.deviceToken
     }
 }

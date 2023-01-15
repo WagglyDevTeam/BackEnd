@@ -43,7 +43,10 @@ class User(
     val auth: AuthType = AuthType.USER,
 
     @Column(nullable = true, columnDefinition = "VARCHAR(100)")    //자기소개 몇자 내외?
-    var introduction: String? = ""// 추 후 협의 null vs ""
+    var introduction: String? = "", // 추 후 협의 null vs ""
+
+    @Column(nullable = true)
+    var deviceToken: String? = null,
 ) {
     enum class GenderType{
         MALE,
