@@ -124,21 +124,17 @@ class UserController(
         return ResponseDto(null, "닉네임 중복 확인에 성공하였습니다." , 200)
     }
 
-    @GetMapping("/user/device-token")
-    fun getDeviceToken(@Valid @RequestBody getDeviceTokenRequestDto: GetDeviceTokenRequestDto,
-                       bindingResult: BindingResult
+    @GetMapping("/user/{userId}/device-token")
+    fun getDeviceToken(@PathVariable userId: Long,
     ): ResponseDto<Any> {
-        val error = ErrorMessage(bindingResult).getError()
-        if(error.isError){
-            throw Exception(error.errorMsg)
-        }
-        return ResponseDto(userService.getDeviceToken(getDeviceTokenRequestDto))
+        return ResponseDto(userService.getDeviceToken(userId))
     }
 
-    @PutMapping("/user/device-token")
+    @PutMapping("/user/{userId}/device-token")
     fun putDeviceToken(
         @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
-        @RequestBody putDeviceTokenRequestDto: PutDeviceTokenRequestDto,
+        @PathVariable userId: Long,
+        @RequestBody putDeviceTokenRequestDto: PutDeviceTokenRequestDto
     ): ResponseDto<Any> {
         val user = userDetailsImpl.user
         userService.updateDeviceToken(user, putDeviceTokenRequestDto)

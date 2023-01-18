@@ -79,8 +79,8 @@ class UserService(
         }
     }
 
-    fun getDeviceToken(getDeviceTokenRequestDto: GetDeviceTokenRequestDto): String? {
-        return userRepository.findByIdOrNull(getDeviceTokenRequestDto.userId)?.deviceToken
+    fun getDeviceToken(userId: Long): String? {
+        return userRepository.findByIdOrNull(userId)?.deviceToken
     }
 
     @Transactional
@@ -88,6 +88,12 @@ class UserService(
         val updateUser = userRepository.findByIdOrNull(user.id!!)
             ?: throw java.lang.IllegalArgumentException("해당 유저가 존재하지 않습니다.")
 
+        // 이미 해당 Device Token을 사용하고 있는 유저가 있다면, 기존 Device Token을 제거
+        val duplicateDeviceTokenUser = userRepository.findByDeviceToken(putDeviceTokenRequestDto.deviceToken)
+        if (duplicateDeviceTokenUser != null) {
+            duplicateDeviceTokenUser.deviceToken = null
+        }
+        // Device Token 업데이트
         updateUser.deviceToken = putDeviceTokenRequestDto.deviceToken
     }
 }
