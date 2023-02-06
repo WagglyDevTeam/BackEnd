@@ -18,7 +18,7 @@ interface PostLikeRepository : JpaRepository<PostLike, Long> {
     fun countByPostId(postId: Long): Int
     fun countByPostIdAndStatus(postId: Long, status: ActiveStatusType): Int
 
-    fun existsByIdAndUserIdAndStatus(postId: Long, userId: Long, status: ActiveStatusType): Boolean
+    fun existsByPostIdAndUserIdAndStatus(postId: Long, userId: Long, status: ActiveStatusType): Boolean
 
     fun findByPostAndUserId(post: Post, userId: Long): PostLike?
 }
