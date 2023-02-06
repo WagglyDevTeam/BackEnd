@@ -162,7 +162,8 @@ class PostService(
         }
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
-        postDetailDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
+        postDetailDto.isLikedByMe = postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
+        println(postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE))
 
         // TODO: 1. 댓글, 대댓글 넣기
         val comments = commentRepository.findByPostAndActiveStatusAndParentCommentNullOrderByCreatedAtAsc(post, ActiveStatusType.ACTIVE)
@@ -231,7 +232,7 @@ class PostService(
 
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(updatedPost.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostId(updatedPost.id)
-        postDetailDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(post.id!!, user.id!!, ActiveStatusType.ACTIVE)
+        postDetailDto.isLikedByMe = postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id!!, user.id!!, ActiveStatusType.ACTIVE)
 
         return postDetailDto
     }
@@ -285,7 +286,7 @@ class PostService(
         postDto.postImageCnt = postImageRepository.countByPostId(postDto.postId!!)
         postDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(postDto.postId, ActiveStatusType.ACTIVE)
         postDto.postCommentCnt = commentRepository.countByPostId(postDto.postId)
-        postDto.isLikedByMe = postLikeRepository.existsByIdAndUserIdAndStatus(postDto.postId, userId, ActiveStatusType.ACTIVE)
+        postDto.isLikedByMe = postLikeRepository.existsByPostIdAndUserIdAndStatus(postDto.postId, userId, ActiveStatusType.ACTIVE)
 
         return postDto
     }
