@@ -214,8 +214,10 @@ class PostService(
                 val targetImage = postImageRepository.findByImageUrlAndDeletedAtNull(target)
                         ?: throw NotFoundException()
                 println(dir + targetImage.uploadName)
-                s3Uploader.delete(targetImage.uploadName)
-                postImageRepository.delete(targetImage)
+                println("asdasdasd");
+//                s3Uploader.delete(targetImage.uploadName)
+                val postImage = postImageRepository.findByImageUrl(targetImage.uploadName)
+                postImage?.deletedAt = LocalDateTime.now();
             }
         }
 

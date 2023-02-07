@@ -10,5 +10,6 @@ interface PostImageRepository : JpaRepository<PostImage, Long> {
     fun findAllByPostId(postId: Long): List<PostImage>
     fun countByPostId(postId: Long): Int
     fun findByImageUrlAndDeletedAtNull(imageUrl: String): PostImage?
+    fun findByImageUrl(imageUrl: String) : PostImage?
     fun findAllByPostIdAndDeletedAtNull(postId: Long): List<PostImage>?
 }
