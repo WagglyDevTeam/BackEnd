@@ -12,7 +12,7 @@ import team.waggly.backend.security.jwt.JwtTokenUtils
 
 @Service
 class CertificationService(
-    private val redisTemplate: RedisTemplate<Any, Any>,
+    private val redisTemplate: RedisTemplate<String, Any>,
     private val universityRepository: UniversityRepository,
     private val jwtTokenUtils: JwtTokenUtils,
     private val userRepository: UserRepository,
