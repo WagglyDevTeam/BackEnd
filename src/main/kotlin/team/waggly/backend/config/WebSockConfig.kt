@@ -24,6 +24,6 @@ class WebSockConfig(
     }
 
     override fun configureClientInboundChannel(registration: ChannelRegistration) {
-        registration.interceptors(stompHandler)
+//        registration.interceptors(stompHandler)
     }
 }

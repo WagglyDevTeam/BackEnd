@@ -17,7 +17,7 @@ import javax.mail.internet.MimeMessage
 @Service
 class SendEmailService(
     private val mailSender: JavaMailSender,
-    private val redisTemplate: RedisTemplate<Any, Any>,
+    private val redisTemplate: RedisTemplate<String, Any>,
     private val universityRepository: UniversityRepository
 )
 {

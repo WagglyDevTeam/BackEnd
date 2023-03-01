@@ -18,7 +18,8 @@ class ChatMessageService(
 
         redisPublisher.publish(
                 ChatMessageResponseDto(
-                        roomId = chatRoom.id!!
+                        roomId = chatRoom.id!!,
+                        message = requestDto.message,
                 )
         )
     }

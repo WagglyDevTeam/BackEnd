@@ -7,7 +7,7 @@ import team.waggly.backend.dto.chat.ChatMessageResponseDto
 
 @Service
 class RedisPublisher(
-        private val redisTemplate: RedisTemplate<Any, Any>,
+        private val redisTemplate: RedisTemplate<String, Any>,
         private val channelTopic: ChannelTopic
 ) {
     fun publish(messageDto: ChatMessageResponseDto) {

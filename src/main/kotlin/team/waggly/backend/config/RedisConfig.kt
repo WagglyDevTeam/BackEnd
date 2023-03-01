@@ -21,7 +21,7 @@ class RedisConfig(
 ) {
 
     @Bean
-    fun redisConnectionFactory(): RedisConnectionFactory{
+    fun redisConnectionFactory(): RedisConnectionFactory {
         return LettuceConnectionFactory(redisProperties.host, redisProperties.port)
     }
 
@@ -47,12 +47,13 @@ class RedisConfig(
         return MessageListenerAdapter(subscriber, "sendMessage")
     }
 
+
     @Bean
-    fun redisTemplate(): RedisTemplate<Any, Any>{
-        val redisTemplate = RedisTemplate<Any, Any>()
+    fun redisTemplate(): RedisTemplate<String, Any> {
+        val redisTemplate = RedisTemplate<String, Any>()
         redisTemplate.setConnectionFactory(redisConnectionFactory())
         redisTemplate.keySerializer = StringRedisSerializer()
-        redisTemplate.valueSerializer = Jackson2JsonRedisSerializer(String::class.java)
-        return  redisTemplate
+        redisTemplate.valueSerializer = Jackson2JsonRedisSerializer(Any::class.java)
+        return redisTemplate
     }
 }
