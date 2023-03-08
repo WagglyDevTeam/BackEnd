@@ -48,11 +48,11 @@ class SecurityConfig(
     override fun configure(http: HttpSecurity) {
         http.csrf().disable().httpBasic()
 
-
         // cors설정 추가
         http
                 .cors()
                 .configurationSource(corsConfigurationSource())
+
 
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -104,6 +104,9 @@ class SecurityConfig(
 
         // Chatting
         skipPathList.add(Pair(HttpMethod.GET, "/ws-stomp/**"))
+        skipPathList.add(Pair(HttpMethod.POST, "/ws-stomp/**"))
+        skipPathList.add(Pair(HttpMethod.GET, "/chat/**"))
+        skipPathList.add(Pair(HttpMethod.GET, "/ws/**"))
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 
