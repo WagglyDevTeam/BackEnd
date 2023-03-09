@@ -12,7 +12,7 @@ class RedisPublisher(
         private val channelTopic: ChannelTopic,
         private val messagingTemplate: SimpMessageSendingOperations
 ) {
-    fun publish(messageDto: ChatMessageResponseDto) {
+    fun chatMessagePublish(messageDto: ChatMessageResponseDto) {
         messagingTemplate.convertAndSend("/sub/chat/room/1", messageDto)
 //        redisTemplate.convertAndSend("/sub/chat/room/1", messageDto)
     }
