@@ -6,15 +6,14 @@ import team.waggly.backend.model.User
 
 data class ReplyRequestDto(
     val replyDesc : String,
-    @get:JsonProperty("isAnonymous")
-    val isAnonymous : Boolean = false
+    val anonymous : Boolean
 ){
     fun toEntity(comment: Comment, user: User) = Comment(
         post = comment.post,
         user = user,
         parentComment = comment,
         description = replyDesc,
-        isAnonymous = if (isAnonymous) 1 else 0
+        isAnonymous = if (anonymous) 1 else 0
     )
 }
 
