@@ -18,6 +18,8 @@ data class PostDetailReplyDto (
     val authorProfileImg: String,
     @get:JsonProperty("isBlind")
     val isBlind: Boolean,
+    @get:JsonProperty("isAnonymous")
+    val isAnonymous: Boolean,
 ) {
     constructor(comment: Comment): this(
         comment.id!!,
@@ -30,5 +32,6 @@ data class PostDetailReplyDto (
         comment.user.nickName,
         comment.user.profileImgUrl,
         comment.activeStatus == ActiveStatusType.INACTIVE,
+        comment.isAnonymous == 1
     )
 }
