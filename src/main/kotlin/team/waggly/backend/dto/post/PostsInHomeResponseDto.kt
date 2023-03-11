@@ -1,6 +1,7 @@
 package team.waggly.backend.dto.post
 
 import team.waggly.backend.commomenum.CollegeType
+import java.time.LocalDateTime
 
 class PostsInHomeResponseDto(
         val userCollegePosts: CollegePosts,
@@ -13,8 +14,9 @@ class PostsInHomeResponseDto(
     )
 
     class PostHomeDto(
-            val postId: Long,
-            val majorName: String,
-            val postTitle: String,
+        val postId: Long,
+        val majorName: String,
+        val postTitle: String,
+        val postCreatedAt: LocalDateTime,
     )
 }
