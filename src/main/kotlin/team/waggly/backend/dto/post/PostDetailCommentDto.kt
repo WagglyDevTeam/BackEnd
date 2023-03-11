@@ -19,7 +19,7 @@ data class PostDetailCommentDto (
     @get:JsonProperty("isBlind")
     val isBlind: Boolean,
     @get:JsonProperty("isAnonymous")
-    val isAnonymous: Int,
+    val isAnonymous: Boolean,
     var replies: List<PostDetailReplyDto>
 ) {
     constructor(comment: Comment): this(
@@ -33,7 +33,7 @@ data class PostDetailCommentDto (
         comment.user.nickName,
         comment.user.profileImgUrl,
         comment.activeStatus == ActiveStatusType.INACTIVE,
-            comment.isAnonymous,
+        comment.isAnonymous == 1,
         arrayListOf(),
     )
 }

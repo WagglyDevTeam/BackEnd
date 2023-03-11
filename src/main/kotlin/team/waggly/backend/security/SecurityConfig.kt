@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import team.waggly.backend.repository.UserRepository
 import team.waggly.backend.security.filter.FormLoginFilter
 import team.waggly.backend.security.filter.JwtAuthFilter
@@ -44,6 +47,12 @@ class SecurityConfig(
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http.csrf().disable().httpBasic()
+
+
+        // cors설정 추가
+        http
+                .cors()
+                .configurationSource(corsConfigurationSource())
 
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -93,11 +102,28 @@ class SecurityConfig(
         // Swagger
         skipPathList.add(Pair(HttpMethod.GET, "/docs/**"))
 
+        // Chatting
+        skipPathList.add(Pair(HttpMethod.GET, "/ws-stomp/**"))
+
         val matcher = FilterSkipMatcher(skipPathList, "/**")
 
         val filter = JwtAuthFilter(matcher)
         filter.setAuthenticationManager(super.authenticationManager())
 
         return filter
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.addAllowedOrigin("http://localhost:3000") // local 테스트 시
+        configuration.allowCredentials = true
+        configuration.addAllowedMethod("*")
+        configuration.addAllowedHeader("*")
+        configuration.addExposedHeader("Authorization")
+        configuration.addAllowedOriginPattern("*") // 배포 전 모두 허용
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 }

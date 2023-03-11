@@ -61,6 +61,11 @@ dependencies {
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
+    //Socket
+    implementation("org.webjars:stomp-websocket:2.3.3-1")
+    implementation("org.webjars:sockjs-client:1.1.2")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+
     // Docs
     implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
 }

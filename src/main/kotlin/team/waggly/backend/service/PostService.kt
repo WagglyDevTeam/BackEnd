@@ -49,7 +49,8 @@ class PostService(
                         PostsInHomeResponseDto.PostHomeDto(
                                 postId = it.id!!,
                                 majorName = it.author.major.majorName,
-                                postTitle = it.title
+                                postTitle = it.title,
+                                postCreatedAt = it.createdAt
                         )
                     }
             )
@@ -214,8 +215,10 @@ class PostService(
                 val targetImage = postImageRepository.findByImageUrlAndDeletedAtNull(target)
                         ?: throw NotFoundException()
                 println(dir + targetImage.uploadName)
-                s3Uploader.delete(targetImage.uploadName)
-                postImageRepository.delete(targetImage)
+                println("asdasdasd");
+//                s3Uploader.delete(targetImage.uploadName)
+                val postImage = postImageRepository.findByImageUrl(targetImage.uploadName)
+                postImage?.deletedAt = LocalDateTime.now();
             }
         }
 
