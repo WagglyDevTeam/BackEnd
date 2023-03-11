@@ -49,7 +49,8 @@ class PostService(
                         PostsInHomeResponseDto.PostHomeDto(
                                 postId = it.id!!,
                                 majorName = it.author.major.majorName,
-                                postTitle = it.title
+                                postTitle = it.title,
+                                postCreatedAt = it.createdAt
                         )
                     }
             )
