@@ -96,4 +96,16 @@ class PostController(
                 HttpStatus.OK.value()
         )
     }
+
+    @GetMapping("/search")
+    fun searchPost(
+        searchPostRequest: SearchPostRequest,
+        @PageableDefault(size = 10, page = 0) pageable: Pageable?,
+        @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
+    ): ResponseDto<SearchPostResponse> {
+        searchPostRequest.pageable = pageable
+        return ResponseDto(
+                postService.searchPost(searchPostRequest, userDetailsImpl.user.id!!)
+        )
+    }
 }

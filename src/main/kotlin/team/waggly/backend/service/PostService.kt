@@ -273,6 +273,7 @@ class PostService(
                     postLike.status = ActiveStatusType.ACTIVE
                     isLikedByMe = true
                 }
+
                 ActiveStatusType.ACTIVE -> postLike.status = ActiveStatusType.INACTIVE
             }
             postLikeRepository.save(postLike)
@@ -282,6 +283,13 @@ class PostService(
         return PostLikeResponseDto(
                 isLikedByMe,
                 postLikeCnt,
+        )
+    }
+
+    fun searchPost(searchPostRequest: SearchPostRequest, userId: Long): SearchPostResponse {
+        val posts = qPostRepository.searchPostsByKeyWord(searchPostRequest)
+        return SearchPostResponse(
+                posts.content.map { post -> updatePostDto(post, userId) }
         )
     }
 
