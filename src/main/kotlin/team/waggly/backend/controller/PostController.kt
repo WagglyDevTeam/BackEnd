@@ -4,10 +4,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import team.waggly.backend.dto.PagingResponseDto
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.post.*
+import team.waggly.backend.exception.ErrorMessage
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.PostService
 import javax.validation.Valid
@@ -49,8 +51,14 @@ class PostController(
     fun createPost(
             @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
             @Valid @ModelAttribute postCreateDto: CreatePostRequestDto,
+            bindingResult: BindingResult
     ): ResponseDto<CreatePostResponseDto> {
         val user = userDetailsImpl.user
+        val error = ErrorMessage(bindingResult).getError()
+        if(error.isError){
+            throw Exception(error.errorMsg)
+        }
+
         return ResponseDto(
                 postService.createPost(postCreateDto, user),
                 HttpStatus.CREATED.value()
@@ -63,8 +71,13 @@ class PostController(
             @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
             @PathVariable boardId: Long,
             @Valid @ModelAttribute postUpdateDto: UpdatePostRequestDto,
+            bindingResult: BindingResult
     ): ResponseDto<Any> {
         val user = userDetailsImpl.user
+        val error = ErrorMessage(bindingResult).getError()
+        if(error.isError){
+            throw Exception(error.errorMsg)
+        }
         return ResponseDto(
                 postService.updatePost(boardId, postUpdateDto, user),
                 HttpStatus.OK.value()
