@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 data class PostDetailReplyDto (
     val replyId: Long,
     val replyCreatedAt: LocalDateTime,
+    val replyDeletedAt: LocalDateTime?,
     var replyLikeCnt: Int?,
     val replyDesc: String,
     @get:JsonProperty("isLikedByMe")
@@ -24,6 +25,7 @@ data class PostDetailReplyDto (
     constructor(comment: Comment): this(
         comment.id!!,
         comment.createdAt,
+        comment.deletedAt,
         null,
         comment.description,
         null,
