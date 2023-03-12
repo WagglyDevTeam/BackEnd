@@ -56,7 +56,7 @@ class HomeService(
 
         postDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
         postDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
-        postDto.postCommentCnt = commentRepository.countByPostId(post.id)
+        postDto.postCommentCnt = commentRepository.countByPostIdAndActiveStatus(post.id, ActiveStatusType.ACTIVE)
         postDto.isLikedByMe =
             if (userId != null) postLikeRepository.existsByPostIdAndUserIdAndStatus(
                 post.id,
