@@ -16,11 +16,12 @@ class HomeService(
     private val postRepository: PostRepository,
     private val postLikeRepository: PostLikeRepository,
     private val postImageRepository: PostImageRepository,
-    private val commentRepository: CommentRepository
+    private val commentRepository: CommentRepository,
+    private val userRepository: UserRepository,
 ) {
-    fun getHome(user: User?): HomeResponseDto {
+    fun getHome(userId: Long?): HomeResponseDto {
         val colleges = CollegeType.values()
-        val userId: Long? = user?.id
+        val user = userRepository.findByIdOrNull(userId)
         val userCollege = user?.major?.college ?: colleges[Random().nextInt(colleges.size)]
         val randomCollege = colleges[Random().nextInt(colleges.size)]
 
