@@ -5,29 +5,29 @@ import javax.persistence.*
 
 @Entity
 class RequestForChat (
-    @Id
+        @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @ManyToOne
+        @ManyToOne
     val receiver: User,
 
-    @ManyToOne
+        @ManyToOne
     val sender: User,
 
-    @Column(columnDefinition = "VARCHAR(100)")
+        @Column(columnDefinition = "VARCHAR(100)")
     val requestMsg: String,
 
-    @Column
+        @Column
     val isAccepted: Boolean = false,
 
-    @Column(columnDefinition = "VARCHAR(100)")
+        @Column(columnDefinition = "VARCHAR(100)")
     val chatPurpose: ChatPurposeType,
 
-    @Column(columnDefinition = "VARCHAR(100)")
-    val chatClass: chatClassType, // 선배 후배 동기 선택하는거임
+        @Column(columnDefinition = "VARCHAR(100)")
+    val chatClass: ChatClassType, // 선배 후배 동기 선택하는거임
 ) {
-    enum class chatClassType {
+    enum class ChatClassType {
         SENIOR,
         MATE,
         JUNIOR
