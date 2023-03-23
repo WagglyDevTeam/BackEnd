@@ -67,7 +67,7 @@ class QPostRepository {
         val builder = BooleanBuilder()
 
         builder.and(post.title.contains(searchPostRequest.keyword))
-        builder.and(post.description.contains(searchPostRequest.keyword))
+        builder.or(post.description.contains(searchPostRequest.keyword))
 
         query.from(post)
                 .where(builder)
