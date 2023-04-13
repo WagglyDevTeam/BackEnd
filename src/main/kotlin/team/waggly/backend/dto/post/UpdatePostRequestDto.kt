@@ -1,5 +1,6 @@
 package team.waggly.backend.dto.post
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.web.multipart.MultipartFile
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.model.Post
@@ -21,11 +22,15 @@ data class UpdatePostRequestDto(
         val college: CollegeType?,
         val file: List<MultipartFile>?,
         val deleteTargetUrl: List<String>?,
+
+        @get:JsonProperty("isAnonymous")
+        val isAnonymous: Boolean = false,
 ) {
     fun updateEntity(post: Post) {
         post.title = title ?: post.title
         post.description = description ?: post.description
         post.college = college ?: post.college
         post.modifiedAt = LocalDateTime.now()
+        post.isAnonymous = if (isAnonymous) 1 else 0
     }
 }

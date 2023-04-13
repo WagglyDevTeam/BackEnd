@@ -200,6 +200,7 @@ class PostService(
     @Transactional
     fun updatePost(postId: Long, postUpdateDto: UpdatePostRequestDto, user: User): PostDetailDto {
         val post = postRepository.findByIdOrNull(postId) ?: throw NotFoundException()
+        print(postUpdateDto.isAnonymous)
         postUpdateDto.updateEntity(post)
 
         postUpdateDto.file?.run {
