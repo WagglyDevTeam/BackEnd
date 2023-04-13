@@ -20,7 +20,7 @@ class HomeService(
     private val userRepository: UserRepository,
 ) {
     fun getHome(userId: Long?): HomeResponseDto {
-        val user = userRepository.findByIdOrNull(userId)
+        val user = userId?.let { userRepository.findByIdOrNull(it) }
         val colleges = CollegeType.values()
         val userCollege = user?.major?.college ?: colleges[Random().nextInt(colleges.size)]
         val randomCollege = colleges[Random().nextInt(colleges.size)]
