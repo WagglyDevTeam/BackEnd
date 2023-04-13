@@ -12,6 +12,7 @@ import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
 import team.waggly.backend.dto.post.PostDto
 import team.waggly.backend.dto.post.QPostDto
+import team.waggly.backend.dto.post.SearchPostRequest
 import team.waggly.backend.model.QPost
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
@@ -57,5 +58,43 @@ class QPostRepository {
         ).fetchResults()
 
         return PageImpl(results.results, pageable, results.total)
+    }
+
+    fun searchPostsByKeyWord(searchPostRequest: SearchPostRequest): PageImpl<PostDto> {
+        val post = QPost.post
+
+        val query = JPAQuery<Any>(em)
+        val builder = BooleanBuilder()
+
+        builder.and(post.title.contains(searchPostRequest.keyword))
+        builder.or(post.description.contains(searchPostRequest.keyword))
+
+        query.from(post)
+                .where(builder)
+                .orderBy(post.id.desc())
+                .offset(searchPostRequest.pageable!!.offset)
+                .limit(searchPostRequest.pageable!!.pageSize.toLong())
+
+        val results: QueryResults<PostDto> = query.select(
+                QPostDto(
+                        post.id,
+                        post.title,
+                        post.description,
+                        post.createdAt,
+                        post.author.major.majorName,
+                        Expressions.asNumber(0),
+                        Expressions.asNumber(0),
+                        Expressions.asNumber(0),
+                        Expressions.asBoolean(false),
+                        CaseBuilder()
+                                .`when`(post.activeStatus.eq(ActiveStatusType.INACTIVE)).then(true)
+                                .otherwise(false),
+                        CaseBuilder()
+                                .`when`(post.isAnonymous.ne(0)).then(true)
+                                .otherwise(false)
+                )
+        ).fetchResults()
+
+        return PageImpl(results.results, searchPostRequest.pageable!!, results.total)
     }
 }

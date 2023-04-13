@@ -11,7 +11,7 @@ import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.ReportService
 
 @RestController
-@RequestMapping("report")
+@RequestMapping("/report")
 class ReportController(
         private val reportService: ReportService,
 ) {

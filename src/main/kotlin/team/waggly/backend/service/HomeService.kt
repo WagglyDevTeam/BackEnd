@@ -16,11 +16,12 @@ class HomeService(
     private val postRepository: PostRepository,
     private val postLikeRepository: PostLikeRepository,
     private val postImageRepository: PostImageRepository,
-    private val commentRepository: CommentRepository
+    private val commentRepository: CommentRepository,
+    private val userRepository: UserRepository,
 ) {
-    fun getHome(user: User?): HomeResponseDto {
+    fun getHome(userId: Long?): HomeResponseDto {
+        val user = userRepository.findByIdOrNull(userId)
         val colleges = CollegeType.values()
-        val userId: Long? = user?.id
         val userCollege = user?.major?.college ?: colleges[Random().nextInt(colleges.size)]
         val randomCollege = colleges[Random().nextInt(colleges.size)]
 
@@ -56,7 +57,7 @@ class HomeService(
 
         postDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
         postDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
-        postDto.postCommentCnt = commentRepository.countByPostId(post.id)
+        postDto.postCommentCnt = commentRepository.countByPostIdAndActiveStatus(post.id, ActiveStatusType.ACTIVE)
         postDto.isLikedByMe =
             if (userId != null) postLikeRepository.existsByPostIdAndUserIdAndStatus(
                 post.id,

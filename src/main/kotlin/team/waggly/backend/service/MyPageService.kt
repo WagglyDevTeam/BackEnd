@@ -32,7 +32,7 @@ class MyPageService (
 
                 myPostsDetailDto.postImageCnt = postImageRepository.countByPostId(post.id!!)
                 myPostsDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
-                myPostsDetailDto.postCommentCnt = commentRepository.countByPostId(post.id)
+                myPostsDetailDto.postCommentCnt = commentRepository.countByPostIdAndActiveStatus(post.id, ActiveStatusType.ACTIVE)
                 myPostsDetailDto.isLikedByMe = postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id, user.id!!, ActiveStatusType.ACTIVE)
 
                 postsDto.add(myPostsDetailDto)

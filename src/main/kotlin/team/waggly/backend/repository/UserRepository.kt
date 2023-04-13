@@ -10,4 +10,10 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findByNickName(nickname: String): User?
 
     fun existsByEmail(email: String): Boolean
+
+    fun findAllByClassNum(classNum: Int): List<User>
+
+    fun findAllByClassNumGreaterThan(classNum: Int): List<User>
+
+    fun findAllByClassNumIsLessThan(classNum: Int): List<User>
 }
