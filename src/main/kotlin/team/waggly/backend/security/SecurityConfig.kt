@@ -105,7 +105,6 @@ class SecurityConfig(
         // Chatting
         skipPathList.add(Pair(HttpMethod.GET, "/ws-stomp/**"))
         skipPathList.add(Pair(HttpMethod.POST, "/ws-stomp/**"))
-        skipPathList.add(Pair(HttpMethod.GET, "/chat/**"))
         skipPathList.add(Pair(HttpMethod.GET, "/ws/**"))
 
         val matcher = FilterSkipMatcher(skipPathList, "/**")

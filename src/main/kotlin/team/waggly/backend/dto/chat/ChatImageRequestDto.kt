@@ -1,7 +1,8 @@
 package team.waggly.backend.dto.chat
 
+import org.springframework.web.multipart.MultipartFile
+
 data class ChatImageRequestDto(
     val roomId: Long,
-    var token: String,
-    val imageCode: String,
+    val image: MultipartFile,
 )
