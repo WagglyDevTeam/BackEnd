@@ -1,13 +1,16 @@
 package team.waggly.backend.service
 
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import team.waggly.backend.config.redispubsub.RedisPublisher
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.chat.*
 import team.waggly.backend.model.User
+import team.waggly.backend.model.mongo.Message
 import team.waggly.backend.repository.ChatRoomRepository
 import team.waggly.backend.repository.UserRepository
+import team.waggly.backend.repository.mongo.MessageRepository
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.security.jwt.JwtDecoder
 import team.waggly.backend.service.awsS3.S3Uploader
@@ -18,7 +21,9 @@ class ChatMessageService(
     private val userRepository: UserRepository,
     private val redisPublisher: RedisPublisher,
     private val s3Uploader: S3Uploader,
-    private val jwtDecoder: JwtDecoder
+    private val jwtDecoder: JwtDecoder,
+    private val messageRepository: MessageRepository
+
 ) {
     fun sendChatMessage(requestDto: ChatMessageRequestDto) {
         val chatRoom = chatRoomRepository.findByIdOrNull(requestDto.roomId)
@@ -28,11 +33,15 @@ class ChatMessageService(
         token = token.substring(7)
         val username = jwtDecoder.decodeUsername(token)
         val user = userRepository.findByEmail(username)
+        var sender = SenderResponseDto(user!!)
+
+        var message = Message(sender = sender, message = requestDto.message)
+        messageRepository.insert(message)
 
         redisPublisher.chatMessagePublish(
                 ChatMessageResponseDto(
                         roomId = chatRoom.id!!,
-                        sender = SenderResponseDto(user!!),
+                        sender = sender,
                         message = requestDto.message,
                 )
         )
