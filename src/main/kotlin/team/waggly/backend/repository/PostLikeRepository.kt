@@ -15,6 +15,11 @@ interface PostLikeRepository : JpaRepository<PostLike, Long> {
         nativeQuery = true)
     fun getMostLikedPostInCollege(college: String): Long?
 
+    @Query("select a.* from post a left join post_like b on a.id=b.post_id where a.college = :college " +
+            "group by post_id order by COUNT(post_id) desc limit 5",
+        nativeQuery = true)
+    fun getMostLikedPostsInCollege(college: String): List<Post>
+
     fun countByPostId(postId: Long): Int
     fun countByPostIdAndStatus(postId: Long, status: ActiveStatusType): Int
 
