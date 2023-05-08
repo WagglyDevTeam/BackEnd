@@ -21,14 +21,14 @@ import javax.transaction.Transactional
 
 @Service
 class PostService(
-        private val postRepository: PostRepository,
-        private val qPostRepository: QPostRepository,
-        private val postLikeRepository: PostLikeRepository,
-        private val commentRepository: CommentRepository,
-        private val postImageRepository: PostImageRepository,
-        private val commentLikeRepository: CommentLikeRepository,
-        private val s3Uploader: S3Uploader,
-        private val userRepository: UserRepository,
+    private val postRepository: PostRepository,
+    private val qPostRepository: QPostRepository,
+    private val postLikeRepository: PostLikeRepository,
+    private val commentRepository: CommentRepository,
+    private val postImageRepository: PostImageRepository,
+    private val commentLikeRepository: CommentLikeRepository,
+    private val s3Uploader: S3Uploader,
+    private val userRepository: UserRepository,
 ) {
     @Value("\${cloud.aws.s3.dir}")
     lateinit var dir: String
@@ -43,16 +43,20 @@ class PostService(
         var userCollegePosts: PostsInHomeResponseDto.CollegePosts? = null
         for (college in colleges) {
             val collegePosts = PostsInHomeResponseDto.CollegePosts(
-                    collegeType = college,
-                    collegeTypeName = college.desc,
-                    posts = postRepository.findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(college, ActiveStatusType.ACTIVE, PageRequest.of(0, 5)).map {
-                        PostsInHomeResponseDto.PostHomeDto(
-                                postId = it.id!!,
-                                majorName = it.author.major.majorName,
-                                postTitle = it.title,
-                                postCreatedAt = it.createdAt
-                        )
-                    }
+                collegeType = college,
+                collegeTypeName = college.desc,
+                posts = postRepository.findAllByCollegeAndActiveStatusOrderByCreatedAtDesc(
+                    college,
+                    ActiveStatusType.ACTIVE,
+                    PageRequest.of(0, 5)
+                ).map {
+                    PostsInHomeResponseDto.PostHomeDto(
+                        postId = it.id!!,
+                        majorName = it.author.major.majorName,
+                        postTitle = it.title,
+                        postCreatedAt = it.createdAt
+                    )
+                }
             )
             if (userCollege == college) {
                 userCollegePosts = collegePosts
@@ -62,33 +66,29 @@ class PostService(
         }
 
         return ResponseDto(
-                PostsInHomeResponseDto(userCollegePosts!!, otherCollegePosts),
-                HttpStatus.OK.value(),
+            PostsInHomeResponseDto(userCollegePosts!!, otherCollegePosts),
+            HttpStatus.OK.value(),
         )
     }
 
     fun searchPostsByCollege(searchPostsByCollege: SearchPostsByCollege): PagingResponseDto<SearchPostsByCollegeResponseDto> {
         // Best 게시글
-        val collegeBestId = postLikeRepository.getMostLikedPostInCollege(searchPostsByCollege.college.name)
-        println("bestId: $collegeBestId")
-        var bestPost: Post? = null
-        if (collegeBestId != null) {
-            bestPost = postRepository.findByIdOrNull(collegeBestId)
-        }
+        val collegeBestPosts = postLikeRepository.getMostLikedPostsInCollege(searchPostsByCollege.college.name)
 
         // 학과 전체 게시글
-        val allPosts = qPostRepository.searchPostsByCollege(searchPostsByCollege.college, searchPostsByCollege.pageable!!)
+        val allPosts =
+            qPostRepository.searchPostsByCollege(searchPostsByCollege.college, searchPostsByCollege.pageable!!)
 
         return PagingResponseDto(
-                allPosts.totalElements,
-                allPosts.totalPages,
-                SearchPostsByCollegeResponseDto(
-                        bestPost = bestPost?.let { PostDto(it) },
-                        posts = allPosts.content.map {
-                            // 이미지, 좋아요, 댓글 개수 업데이트
-                            updatePostDto(it, searchPostsByCollege.user!!.id!!)
-                        }
-                )
+            allPosts.totalElements,
+            allPosts.totalPages,
+            SearchPostsByCollegeResponseDto(
+                bestPost = collegeBestPosts.map { updatePostDto(PostDto(it), searchPostsByCollege.user!!.id!!) },
+                posts = allPosts.content.map {
+                    // 이미지, 좋아요, 댓글 개수 업데이트
+                    updatePostDto(it, searchPostsByCollege.user!!.id!!)
+                }
+            )
         )
     }
 
@@ -150,7 +150,7 @@ class PostService(
     fun getPostDetails(postId: Long, user: User): PostDetailResponseDto {
         val userId = user.id!!
         val post: Post = postRepository.findByIdAndActiveStatus(postId, ActiveStatusType.ACTIVE)
-                ?: throw NotFoundException()
+            ?: throw NotFoundException()
 
         val postDetailDto = PostDetailDto(post)
         postDetailDto.checkIsAnonymous()
@@ -163,7 +163,8 @@ class PostService(
         }
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(post.id, ActiveStatusType.ACTIVE)
         postDetailDto.postCommentCnt = commentRepository.countByPostIdAndActiveStatus(post.id, ActiveStatusType.ACTIVE)
-        postDetailDto.isLikedByMe = postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
+        postDetailDto.isLikedByMe =
+            postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE)
         println(postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id, userId, ActiveStatusType.ACTIVE))
 
         // TODO: 1. 댓글, 대댓글 넣기
@@ -214,7 +215,7 @@ class PostService(
         if (!postUpdateDto.deleteTargetUrl.isNullOrEmpty()) {
             for (target in postUpdateDto.deleteTargetUrl) {
                 val targetImage = postImageRepository.findByImageUrlAndDeletedAtNull(target)
-                        ?: throw NotFoundException()
+                    ?: throw NotFoundException()
                 println(dir + targetImage.uploadName)
                 println("asdasdasd");
 //                s3Uploader.delete(targetImage.uploadName)
@@ -235,8 +236,10 @@ class PostService(
         }
 
         postDetailDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(updatedPost.id, ActiveStatusType.ACTIVE)
-        postDetailDto.postCommentCnt = commentRepository.countByPostIdAndActiveStatus(updatedPost.id, ActiveStatusType.ACTIVE)
-        postDetailDto.isLikedByMe = postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id!!, user.id!!, ActiveStatusType.ACTIVE)
+        postDetailDto.postCommentCnt =
+            commentRepository.countByPostIdAndActiveStatus(updatedPost.id, ActiveStatusType.ACTIVE)
+        postDetailDto.isLikedByMe =
+            postLikeRepository.existsByPostIdAndUserIdAndStatus(post.id!!, user.id!!, ActiveStatusType.ACTIVE)
 
         return postDetailDto
     }
@@ -282,15 +285,15 @@ class PostService(
 
         val postLikeCnt = postLikeRepository.countByPostIdAndStatus(postId, ActiveStatusType.ACTIVE)
         return PostLikeResponseDto(
-                isLikedByMe,
-                postLikeCnt,
+            isLikedByMe,
+            postLikeCnt,
         )
     }
 
     fun searchPost(searchPostRequest: SearchPostRequest, userId: Long): SearchPostResponse {
         val posts = qPostRepository.searchPostsByKeyWord(searchPostRequest)
         return SearchPostResponse(
-                posts.content.map { post -> updatePostDto(post, userId) }
+            posts.content.map { post -> updatePostDto(post, userId) }
         )
     }
 
@@ -298,7 +301,8 @@ class PostService(
         postDto.postImageCnt = postImageRepository.countByPostId(postDto.postId!!)
         postDto.postLikeCnt = postLikeRepository.countByPostIdAndStatus(postDto.postId, ActiveStatusType.ACTIVE)
         postDto.postCommentCnt = commentRepository.countByPostIdAndActiveStatus(postDto.postId, ActiveStatusType.ACTIVE)
-        postDto.isLikedByMe = postLikeRepository.existsByPostIdAndUserIdAndStatus(postDto.postId, userId, ActiveStatusType.ACTIVE)
+        postDto.isLikedByMe =
+            postLikeRepository.existsByPostIdAndUserIdAndStatus(postDto.postId, userId, ActiveStatusType.ACTIVE)
 
         return postDto
     }
@@ -306,8 +310,10 @@ class PostService(
     private fun updatePostDetailCommentDto(comment: Comment, userId: Long): PostDetailCommentDto {
         val postDetailCommentDto = PostDetailCommentDto(comment)
 
-        postDetailCommentDto.commentLikeCnt = commentLikeRepository.countByCommentIdAndActiveStatus(comment.id!!, ActiveStatusType.ACTIVE)
-        postDetailCommentDto.isLikedByMe = commentLikeRepository.existsByIdAndUserIdAndActiveStatus(comment.id, userId, ActiveStatusType.ACTIVE)
+        postDetailCommentDto.commentLikeCnt =
+            commentLikeRepository.countByCommentIdAndActiveStatus(comment.id!!, ActiveStatusType.ACTIVE)
+        postDetailCommentDto.isLikedByMe =
+            commentLikeRepository.existsByIdAndUserIdAndActiveStatus(comment.id, userId, ActiveStatusType.ACTIVE)
 
         // reply
         val replies = commentRepository.findByParentComment(comment)
@@ -326,8 +332,10 @@ class PostService(
     private fun updatePostDetailReplyDto(reply: Comment, userId: Long): PostDetailReplyDto {
         val postDetailReplyDto = PostDetailReplyDto(reply)
 
-        postDetailReplyDto.replyLikeCnt = commentLikeRepository.countByCommentIdAndActiveStatus(reply.id!!, ActiveStatusType.ACTIVE)
-        postDetailReplyDto.isLikedByMe = commentLikeRepository.existsByIdAndUserIdAndActiveStatus(reply.id, userId, ActiveStatusType.ACTIVE)
+        postDetailReplyDto.replyLikeCnt =
+            commentLikeRepository.countByCommentIdAndActiveStatus(reply.id!!, ActiveStatusType.ACTIVE)
+        postDetailReplyDto.isLikedByMe =
+            commentLikeRepository.existsByIdAndUserIdAndActiveStatus(reply.id, userId, ActiveStatusType.ACTIVE)
 
         return postDetailReplyDto
     }
