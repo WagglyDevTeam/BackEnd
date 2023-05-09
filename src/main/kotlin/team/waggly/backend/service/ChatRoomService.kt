@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
-import team.waggly.backend.dto.chatmessage.MessageResponseDto
+import team.waggly.backend.dto.chat.MessageResponseDto
 import team.waggly.backend.dto.chatroomdto.ChatRoomResponseDto
 import team.waggly.backend.model.ChatParticipantsInfo
 import team.waggly.backend.model.User
