@@ -22,6 +22,9 @@ class Message(
         @Field(name = "body")
         var body: String?,
 
+        @Field(name = "type")
+        var type: String?,
+
         @Field(name = "createAt")
         var createdAt: LocalDateTime = LocalDateTime.now()
 )

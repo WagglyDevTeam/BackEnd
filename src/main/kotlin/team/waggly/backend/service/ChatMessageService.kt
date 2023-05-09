@@ -30,9 +30,8 @@ class ChatMessageService(
         token = token.substring(7)
         val username = jwtDecoder.decodeUsername(token)
         val user = userRepository.findByEmail(username)
-        val mongoMessage = Message(roomId = chatRoom.id!!, sender = user?.id, body = requestDto.message)
 
-        println(mongoMessage.body)
+        val mongoMessage = Message(roomId = chatRoom.id!!, sender = user?.id, body = requestDto.message, type = "normal")
         messageRepository.save(mongoMessage)
 
         redisPublisher.chatMessagePublish(
@@ -50,6 +49,9 @@ class ChatMessageService(
 
         val file = requestDto.image
         val fileUrl = s3Uploader.upload(file)
+
+        val mongoMessage = Message(roomId = chatRoom.id!!, sender = user?.id, body = fileUrl, type = "image")
+        messageRepository.save(mongoMessage)
 
         redisPublisher.chatImagePublish(
             ChatImageResponseDto(
