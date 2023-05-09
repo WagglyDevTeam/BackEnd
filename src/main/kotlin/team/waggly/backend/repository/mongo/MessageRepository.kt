@@ -10,4 +10,6 @@ import team.waggly.backend.model.mongo.Message
 @Repository
 interface MessageRepository : MongoRepository<Message, String>{
     fun findAllByRoomId(roomId: Long, pageable: Pageable) : Page<Message>
+
+    fun findAllByType(type: String) : List<Message>
 }

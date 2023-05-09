@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.chat.MessageResponseDto
+import team.waggly.backend.dto.chat.WrapMessageResponseDto
 import team.waggly.backend.dto.chatroomdto.ChatRoomResponseDto
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.ChatRoomService
@@ -22,7 +23,7 @@ class ChatRoomController(private val chatRoomService: ChatRoomService) {
 
     // pageable 메시지 목록 불러오기
     @GetMapping("/chat/room")
-    fun getPageableAllChatMessage(@RequestParam roomId: Long, @RequestParam pageCount: Int, @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?) : ResponseDto<List<MessageResponseDto>> {
+    fun getPageableAllChatMessage(@RequestParam roomId: Long, @RequestParam pageCount: Int, @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?) : ResponseDto<WrapMessageResponseDto> {
         val user = userDetailsImpl?.user ?: throw Exception("회원 정보가 없습니다.")
         return ResponseDto(chatRoomService.getAllChatMessage(user, roomId, pageCount))
     }
