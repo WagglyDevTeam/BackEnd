@@ -13,11 +13,11 @@ class Message(
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: String? = null,
 
-        @Field(name = "roomId")
+        @Field(name = "room_id")
         var roomId: Long?,
 
-        @Field(name = "senderId")
-        var sender: Long?,
+        @Field(name = "sender_id")
+        var senderId: Long?,
 
         @Field(name = "body")
         var body: String?,
@@ -25,6 +25,6 @@ class Message(
         @Field(name = "type")
         var type: String?,
 
-        @Field(name = "createAt")
+        @Field(name = "create_at")
         var createdAt: LocalDateTime = LocalDateTime.now()
 )
