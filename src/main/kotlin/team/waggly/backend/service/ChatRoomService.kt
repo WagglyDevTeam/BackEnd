@@ -53,7 +53,8 @@ class ChatRoomService(
         for(message in findImageMessageList){
             imageList.add(ChatRoomImageDto(message))
         }
-        // TODO:  3. 세팅 불러오기
+
+        return ChatRoomInfoResponseDto(imageList, messageList)
     }
 
     fun getMessageList(user: User, roomId: Long, pageCount: Int) : List<MessageResponseDto> {

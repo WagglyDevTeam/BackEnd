@@ -11,12 +11,14 @@ data class ChatRoomResponseDto(
     //val chatLastMsgTime: LocalDateTime,
     @get:JsonProperty("isAlarmOn")
     val isAlarmOn: Boolean,
+    val isBindOn: Boolean
     //val unreadMsgCnt: Int
 ){
     constructor(chatInfo: ChatParticipantsInfo): this(
         chatRoomId = chatInfo.chatRoom.id,
         opponentNickname = chatInfo.opponent.nickName,
         profileImage = chatInfo.opponent.profileImgUrl,
-        isAlarmOn = chatInfo.isAlarmOn
+        isAlarmOn = chatInfo.isAlarmOn,
+        isBindOn = chatInfo.isBindOn
     )
 }

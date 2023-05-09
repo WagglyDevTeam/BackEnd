@@ -6,5 +6,4 @@ import team.waggly.backend.dto.chat.SenderResponseDto
 data class ChatRoomInfoResponseDto(
         val imageList: List<ChatRoomImageDto>,
         val messageList: List<MessageResponseDto>,
-        val settings: ChatSettingDto
 )
