@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 import team.waggly.backend.dto.ResponseDto
 import team.waggly.backend.dto.chat.MessageResponseDto
 import team.waggly.backend.dto.chat.WrapMessageResponseDto
+import team.waggly.backend.dto.chatroomdto.ChatRoomInfoResponseDto
 import team.waggly.backend.dto.chatroomdto.ChatRoomResponseDto
 import team.waggly.backend.security.UserDetailsImpl
 import team.waggly.backend.service.ChatRoomService
@@ -30,8 +31,10 @@ class ChatRoomController(private val chatRoomService: ChatRoomService) {
 
     // 채팅방 입장시 최초 1번 불러오는 API
     @GetMapping("/chat/room/{roomid}")
-    fun getChatRoomInfomation(@PathVariable roomId: Long, @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?) : ResponseDto<Any> {
+    fun getChatRoomInfomation(@PathVariable roomId: Long, @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?) : ResponseDto<ChatRoomInfoResponseDto> {
         val user = userDetailsImpl?.user ?: throw Exception("회원 정보가 없습니다.")
-        return ResponseDto()
+        return ResponseDto(chatRoomService.getChatRoomInfomation(user, roomId))
     }
+
+    // TODO: 채팅방 설정 바인드 API 
 }

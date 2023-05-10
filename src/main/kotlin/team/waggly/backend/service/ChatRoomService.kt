@@ -37,7 +37,7 @@ class ChatRoomService(
         return chatRoomResponseDtoList
     }
 
-    fun getAllChatMessage(user: User, roomId: Long, pageCount: Int): Any {
+    fun getAllChatMessage(user: User, roomId: Long, pageCount: Int): WrapMessageResponseDto {
         return WrapMessageResponseDto(getMessageList(user, roomId, pageCount))
     }
 
