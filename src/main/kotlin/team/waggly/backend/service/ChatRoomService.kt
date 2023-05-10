@@ -5,7 +5,11 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import team.waggly.backend.commomenum.ActiveStatusType
-import team.waggly.backend.dto.chatmessage.MessageResponseDto
+import team.waggly.backend.dto.chat.ChatImageResponseDto
+import team.waggly.backend.dto.chat.MessageResponseDto
+import team.waggly.backend.dto.chat.WrapMessageResponseDto
+import team.waggly.backend.dto.chatroomdto.ChatRoomImageDto
+import team.waggly.backend.dto.chatroomdto.ChatRoomInfoResponseDto
 import team.waggly.backend.dto.chatroomdto.ChatRoomResponseDto
 import team.waggly.backend.model.ChatParticipantsInfo
 import team.waggly.backend.model.User
@@ -33,8 +37,27 @@ class ChatRoomService(
         return chatRoomResponseDtoList
     }
 
-    fun getAllChatMessage(user: User, roomId: Long, pageCount: Int): List<MessageResponseDto> {
+    fun getAllChatMessage(user: User, roomId: Long, pageCount: Int): WrapMessageResponseDto {
+        return WrapMessageResponseDto(getMessageList(user, roomId, pageCount))
+    }
 
+    fun getChatRoomInfomation(user: User, roomId: Long) : ChatRoomInfoResponseDto {
+
+        // 1. 최근 20개 메시지 불러오기
+        val messageList: List<MessageResponseDto> = getMessageList(user, roomId, 0)
+
+        // 2. 이미지 불러오기
+        val findImageMessageList: List<Message> = messageRepository.findAllByType("image")
+        val imageList: MutableList<ChatRoomImageDto> = arrayListOf()
+
+        for(message in findImageMessageList){
+            imageList.add(ChatRoomImageDto(message))
+        }
+
+        return ChatRoomInfoResponseDto(imageList, messageList)
+    }
+
+    fun getMessageList(user: User, roomId: Long, pageCount: Int) : List<MessageResponseDto> {
         val page: Page<Message> = messageRepository.findAllByRoomId(roomId,
                 PageRequest.of(pageCount, 20, Sort.Direction.ASC, "create_at"))
         val myChatMessageList: List<Message> = page.content

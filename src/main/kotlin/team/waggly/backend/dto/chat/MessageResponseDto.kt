@@ -1,8 +1,11 @@
-package team.waggly.backend.dto.chatmessage
+package team.waggly.backend.dto.chat
 
 import team.waggly.backend.model.mongo.Message
 import java.time.LocalDateTime
 
+data class WrapMessageResponseDto(
+        var messageLit: List<MessageResponseDto>
+)
 data class MessageResponseDto (
         var roomId: Long?,
         var senderId: Long?,
