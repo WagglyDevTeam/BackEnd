@@ -22,7 +22,7 @@ class RequestForChatController(
     @GetMapping
     fun getRequestForChatRecommend(
             @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl,
-            @RequestBody getRequestForChatRecommendRequest: GetRequestForChatRecommendRequest,
+            getRequestForChatRecommendRequest: GetRequestForChatRecommendRequest,
     ): ResponseDto<List<GetRequestForChatRecommendResponse>> {
         return ResponseDto(
                 requestForChatService.getRequestForChatRecommend(getRequestForChatRecommendRequest, userDetailsImpl.user)

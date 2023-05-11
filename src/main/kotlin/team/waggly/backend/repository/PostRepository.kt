@@ -2,6 +2,7 @@ package team.waggly.backend.repository
 
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import team.waggly.backend.commomenum.ActiveStatusType
 import team.waggly.backend.commomenum.CollegeType
@@ -24,6 +25,7 @@ interface PostRepository: JpaRepository<Post, Long> {
     fun findByIdAndActiveStatus(id: Long, activeStatus: ActiveStatusType): Post?
 
     fun findFirstByCollegeAndActiveStatusOrderByIdDesc(college: CollegeType, activeStatus: ActiveStatusType): Post?
+
 
 
 }
