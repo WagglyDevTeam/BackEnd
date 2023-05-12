@@ -69,6 +69,7 @@ jobs:
         username: ubuntu
         key: ${{ secrets.KEY }}
         script: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           sudo docker rm -f $(docker ps -qa)
           sudo docker pull ${{secrets.DOCKER_REPO}}
           docker-compose -f docker-compose.yml up
