@@ -68,8 +68,9 @@ jobs:
         username: ubuntu
         key: ${{ secrets.KEY }}
         script: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_KEY }}
+          
           sudo docker rm -f $(docker ps -qa)
+          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_KEY }}
           sudo docker pull ${{secrets.DOCKER_REPO}}
-          docker-compose -f docker-compose.yml up
-          docker image prune -f
+          sudo docker-compose -f docker-compose.yml up -d
+          sudo docker image prune -f
