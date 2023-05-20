@@ -30,7 +30,7 @@ class ChatRoomController(private val chatRoomService: ChatRoomService) {
     }
 
     // 채팅방 입장시 최초 1번 불러오는 API
-    @GetMapping("/chat/room/{roomid}")
+    @GetMapping("/chat/room/{roomId}")
     fun getChatRoomInfomation(@PathVariable roomId: Long, @AuthenticationPrincipal userDetailsImpl: UserDetailsImpl?) : ResponseDto<ChatRoomInfoResponseDto> {
         val user = userDetailsImpl?.user ?: throw Exception("회원 정보가 없습니다.")
         return ResponseDto(chatRoomService.getChatRoomInfomation(user, roomId))
