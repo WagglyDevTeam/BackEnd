@@ -18,6 +18,7 @@ class RequestForChatService(
 ) {
     fun getRequestForChatRecommend(requestBody: GetRequestForChatRecommendRequest, user: User): List<GetRequestForChatRecommendResponse> {
         // 알림 설정에 따라 추천자 다르게 내리는 것 필요
+        // 관심 주제에 따라 추천자 다르게 해주는 것 필요
         val users = when(requestBody.chatClass) {
             RequestForChat.ChatClassType.JUNIOR -> {
                 userRepository.findAllByClassNumGreaterThan(user.classNum)
