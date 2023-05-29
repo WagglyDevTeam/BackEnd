@@ -26,8 +26,7 @@ class HomeService(
         val randomCollege = colleges[Random().nextInt(colleges.size)]
 
         // 해당 단과대의 베스트 게시글 ID -> 게시글 찾아옴 -> summary dto 생성
-        val collegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(userCollege.name)
-            ?: 1
+        val collegeBestId= postLikeRepository.getMostLikedPostInCollege(userCollege.name, 1).firstOrNull() ?: 1
 //            postRepository.findFirstByCollegeAndActiveStatusOrderByIdDesc(userCollege, ActiveStatusType.ACTIVE).id
 //            ?: throw IllegalArgumentException("해당 학과에 게시글이 없습니다.")
 
@@ -38,17 +37,18 @@ class HomeService(
 
         val bestPostWithCollegeType = Pair(userCollege, bestPostDto)
 
-        val randomCollegeBestId: Long = postLikeRepository.getMostLikedPostInCollege(randomCollege.name)
-            ?: 1
+        val randomCollegeBestIds = postLikeRepository.getMostLikedPostInCollege(randomCollege.name, 3)
 //            postRepository.findFirstByCollegeAndActiveStatusOrderByIdDesc(randomCollege, ActiveStatusType.ACTIVE).id
 //            ?: throw IllegalArgumentException("해당 학과에 게시글이 없습니다.")
 
-        val randomBestPost: Post =
-            postRepository.findByIdOrNull(randomCollegeBestId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
+        val randomBestPosts = mutableListOf<PostDto>()
+        randomCollegeBestIds.forEach { randomCollegeBestId ->
+            val randomBestPost: Post =
+                postRepository.findByIdOrNull(randomCollegeBestId) ?: throw IllegalArgumentException("해당 게시글이 없습니다.")
+            randomBestPosts.add(this.updatePostDto(randomBestPost, userId))
+        }
 
-        val randomBestPostDto: PostDto = this.updatePostDto(randomBestPost, userId)
-
-        return HomeResponseDto(bestPostWithCollegeType, randomBestPostDto)
+        return HomeResponseDto(bestPostWithCollegeType, randomBestPosts)
     }
 
 

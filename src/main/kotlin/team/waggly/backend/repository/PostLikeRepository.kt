@@ -11,14 +11,14 @@ import team.waggly.backend.model.PostLike
 @Repository
 interface PostLikeRepository : JpaRepository<PostLike, Long> {
     @Query("select a.id from post a left join post_like b on a.id=b.post_id where a.college = :college " +
-            "group by post_id order by COUNT(post_id) desc limit 1",
+            "group by post_id order by COUNT(post_id) desc limit :count",
         nativeQuery = true)
-    fun getMostLikedPostInCollege(college: String): Long?
+    fun getMostLikedPostInCollege(college: String, count: Int): List<Long>
 
     @Query("select a.* from post a left join post_like b on a.id=b.post_id where a.college = :college " +
-            "group by post_id order by COUNT(post_id) desc limit 5",
+            "group by post_id order by COUNT(post_id) desc limit :count",
         nativeQuery = true)
-    fun getMostLikedPostsInCollege(college: String): List<Post>
+    fun getMostLikedPostsInCollege(college: String, count: Int): List<Post>
 
     fun countByPostId(postId: Long): Int
     fun countByPostIdAndStatus(postId: Long, status: ActiveStatusType): Int

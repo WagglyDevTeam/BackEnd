@@ -73,7 +73,7 @@ class PostService(
 
     fun searchPostsByCollege(searchPostsByCollege: SearchPostsByCollege): PagingResponseDto<SearchPostsByCollegeResponseDto> {
         // Best 게시글
-        val collegeBestPosts = postLikeRepository.getMostLikedPostsInCollege(searchPostsByCollege.college.name)
+        val collegeBestPosts = postLikeRepository.getMostLikedPostsInCollege(searchPostsByCollege.college.name, 5)
 
         // 학과 전체 게시글
         val allPosts =
