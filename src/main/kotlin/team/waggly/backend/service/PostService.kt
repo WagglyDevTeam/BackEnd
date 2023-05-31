@@ -35,7 +35,7 @@ class PostService(
 
     // 게시판 홈
     fun getPostsInHome(userId: Long?): ResponseDto<PostsInHomeResponseDto> {
-        val user = userRepository.findByIdOrNull(userId)
+        val user = userId?.let { userRepository.findByIdOrNull(it) }
         val colleges = CollegeType.values()
         val userCollege = user?.major?.college ?: colleges[Random().nextInt(colleges.size)]
 
