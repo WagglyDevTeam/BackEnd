@@ -5,5 +5,5 @@ import team.waggly.backend.dto.post.PostDto
 
 data class HomeResponseDto(
     val bestPostWithCollegeType : Pair<CollegeType,PostDto>,
-    val randomBestPostSummary: PostDto
+    val randomBestPostSummary: List<PostDto>
 )
