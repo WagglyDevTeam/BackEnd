@@ -20,6 +20,26 @@ repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    dependencies {
+        dependencySet("com.fasterxml.jackson.core:2.13.1") {
+            entry("jackson-core")
+            entry("jackson-annotations")
+            entry("jackson-databind")
+        }
+
+        dependencySet("org.slf4j:1.7.33") {
+            entry("slf4j-api")
+            entry("slf4j-simple")
+        }
+
+        dependencySet("ch.qos.logback:1.2.10") {
+            entry("logback-core")
+            entry("logback-classic")
+        }
+    }
+}
+
 sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
     kotlin.srcDir("$buildDir/generated/source/kapt/main")
 }
@@ -71,6 +91,13 @@ dependencies {
 
     // MongoDB
     implementation ("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+    // Log
+    implementation("org.slf4j:slf4j-api")
+    implementation("ch.qos.logback:logback-core")
+    implementation("ch.qos.logback:logback-classic")
+    implementation("org.codehaus.janino:janino:3.1.6")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
 }
 
 

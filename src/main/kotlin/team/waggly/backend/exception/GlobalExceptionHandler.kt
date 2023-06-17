@@ -1,5 +1,6 @@
 package team.waggly.backend.exception
 
+import mu.KotlinLogging
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
@@ -13,6 +14,8 @@ import javax.servlet.http.HttpServletRequest
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+    private val log = KotlinLogging.logger {}
+
     @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ExceptionHandler(BindException::class)
@@ -31,6 +34,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(Exception::class)
     fun unknownExceptionHandler(req: HttpServletRequest, e: Exception): ResponseEntity<ErrorResponse> {
+        log.error(e.stackTraceToString())
         return ResponseEntity(
                 ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.message),
                 HttpStatus.INTERNAL_SERVER_ERROR
