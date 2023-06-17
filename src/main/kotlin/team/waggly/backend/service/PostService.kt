@@ -74,6 +74,7 @@ class PostService(
     fun searchPostsByCollege(searchPostsByCollege: SearchPostsByCollege): PagingResponseDto<SearchPostsByCollegeResponseDto> {
         // Best 게시글
         val collegeBestPosts = postLikeRepository.getMostLikedPostsInCollege(searchPostsByCollege.college.name, 5)
+                .map { postId -> postRepository.findByIdOrNull(postId) ?: throw NotFoundException() }
 
         // 학과 전체 게시글
         val allPosts =

@@ -38,8 +38,10 @@ class HomeService(
         val bestPostWithCollegeType = Pair(userCollege, bestPostDto)
 
         val randomBestPosts = mutableListOf<PostDto>()
-        postLikeRepository.getMostLikedPostsInCollege(randomCollege.name, 3).forEach { randomBestPost ->
-            randomBestPosts.add(this.updatePostDto(randomBestPost, userId))
+        postLikeRepository.getMostLikedPostsInCollege(randomCollege.name, 3).forEach { randomBestPostId ->
+            postRepository.findByIdOrNull(randomBestPostId)?.let {
+                randomBestPosts.add(this.updatePostDto(it, userId))
+            }
         }
 
 //            postRepository.findFirstByCollegeAndActiveStatusOrderByIdDesc(randomCollege, ActiveStatusType.ACTIVE).id
